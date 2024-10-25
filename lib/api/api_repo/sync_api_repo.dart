@@ -1,25 +1,28 @@
 import 'package:dio/dio.dart';
 
+import '../api_request.dart';
 import '../base_api_repo.dart';
 
+
 class SyncApiRepo extends BaseApiRepo {
-  static final SyncApiRepo _loginApiRepo = SyncApiRepo._();
-
-  SyncApiRepo._();
-
-  factory SyncApiRepo() {
-    return _loginApiRepo;
+  Future<BaseApiResponse<SyncResponse>> getSyncBloc() async {
+    final Map<String, dynamic> data =
+        ApiRequest.createSyncAction(actionName: 'get_sync');
+    // Response response = await ApiCall(ApiUtils.buildDio())
+    //     .postMethodCall(path: '/post/', data: data);
+    Response response =
+        await apiCall.postMethodCall(path: '/post/', data: data);
+    return BaseApiResponse.fromJson(response.data);
   }
 
-  Future<bool> syncApiRequest(
-      {required String requestName, required String date}) async {
-    try {
-      Response response = await postApiMethodCall(
-          additionalPath: "post/api", params: {'sync_action': requestName});
-      // save in database
-      return true;
-    } on Exception {
-      return false;
-    }
+  Future<Response> sendAction(String actionName) async {
+    final data = await ApiRequest.createActionRequest(actionName);
+    // print(data);
+    // final response = await ApiCall(ApiUtils.buildDio())
+    //     .postMethodCall(path: '/post/', data: data);
+    Response response =
+        await apiCall.postMethodCall(path: '/post/', data: data);
+    // print(response);
+    return response;
   }
 }

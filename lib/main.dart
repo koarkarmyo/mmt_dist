@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mmt_mobile/database/database_helper.dart';
 import 'package:mmt_mobile/route/route_generate.dart';
 import 'package:mmt_mobile/ui/home_page.dart';
 
@@ -11,6 +12,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    DatabaseHelper.instance.database;
+
     return MaterialApp(
       title: 'MMT',
       debugShowCheckedModeBanner: false,

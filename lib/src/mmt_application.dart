@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mmt_mobile/model/language_model.dart';
+import 'package:odoo_rpc/odoo_rpc.dart';
 
 // import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import '../model/employee.dart';
@@ -16,6 +17,7 @@ class MMTApplication {
 
   static String serverUrl = '';
   static Employee? currentUser;
+  static Company? selectedCompany;
 
   static List<String> databaseList = [];
   static String loginDatabase = 'htz_db';

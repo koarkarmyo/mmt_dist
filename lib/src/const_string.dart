@@ -1,4 +1,5 @@
 class ConstString {
+  static const String appName = 'mmt_distribution';
   static const String version = '1.0.7';
   static const String welcome = 'Welcome';
   static const String history = 'History';
@@ -9,7 +10,6 @@ class ConstString {
   static const String urlRequired = 'ဆာဗာလင့်ထည့်‌ပေးပါ';
   static const String employeeName = "ဝန်ထမ်းနာမည်";
   static const String pkgNo = "ပစ္စည်းထုတ်အရေအတွက်";
-  static const String appName = "HTZ";
   static const String barcode = "Barcode";
   static const String retry = "ထပ်မံကြိုးစားပါ";
   static const String marker = "Marker အမည်";
