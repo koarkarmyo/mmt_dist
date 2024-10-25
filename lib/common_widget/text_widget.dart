@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mmt_mobile/src/extension/string_extension.dart';
 
 import '../src/mmt_application.dart';
 

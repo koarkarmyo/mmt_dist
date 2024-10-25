@@ -3,9 +3,20 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:mmt_mobile/src/extension/navigator_extension.dart';
+import 'package:mmt_mobile/src/extension/number_extension.dart';
+import 'package:mmt_mobile/src/extension/widget_extension.dart';
 
+import '../../business logic/bloc/fetch_database/fetch_database_cubit.dart';
 import '../../business logic/bloc/login/login_bloc.dart';
+import '../../common_widget/animated_button.dart';
+import '../../common_widget/text_widget.dart';
+import '../../common_widget/textfield_widget.dart';
+import '../../share_preference/sh_keys.dart';
+import '../../share_preference/sh_utils.dart';
+import '../../src/const_string.dart';
 import '../../src/mmt_application.dart';
+import '../../src/style/app_color.dart';
 
 
 class AdminLoginPage extends StatefulWidget {
@@ -83,7 +94,6 @@ class _AdminLoginPage extends State<AdminLoginPage> {
         if (state is FetchDatabaseSuccess) {
           fetchSuccess = true;
           selectedDatabase.value = state.databaseList.firstOrNull ?? '';
-          selectedDatabase.notifyListeners();
         } else {
           fetchSuccess = false;
         }
@@ -202,7 +212,7 @@ class _AdminLoginPage extends State<AdminLoginPage> {
                               onTap: () {
                                 selectedDatabase.value =
                                     MMTApplication.databaseList[index];
-                                selectedDatabase.notifyListeners();
+                                // selectedDatabase.notifyListeners();
                                 context.pop();
                               },
                               title: Text(MMTApplication.databaseList[index])

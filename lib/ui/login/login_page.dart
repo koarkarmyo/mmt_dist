@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:logistic/src/extension/navigator_extension.dart';
-import 'package:logistic/src/mmt_application.dart';
+import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 
-import '../business_logic/bloc/login/login_bloc.dart';
-import '../common_widget/animated_button.dart';
-import '../common_widget/text_widget.dart';
-import '../common_widget/textfield_widget.dart';
-import '../route/route_list.dart';
-import '../src/const_string.dart';
+import '../../business logic/bloc/login/login_bloc.dart';
+import '../../common_widget/animated_button.dart';
+import '../../common_widget/text_widget.dart';
+import '../../common_widget/textfield_widget.dart';
+import '../../route/route_list.dart';
+import '../../src/const_string.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -107,7 +106,6 @@ class _LoginPageState extends State<LoginPage> {
             } else {
               setState(() {});
             }
-            // context.pushReplace(route: RouteList.homePageRoute);
           },
           child: AnimatedButton(
             buttonText: 'Login',
