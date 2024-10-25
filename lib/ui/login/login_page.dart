@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
+import 'package:mmt_mobile/src/style/app_color.dart';
 
 import '../../business logic/bloc/login/login_bloc.dart';
 import '../../common_widget/animated_button.dart';
@@ -110,7 +111,7 @@ class _LoginPageState extends State<LoginPage> {
           child: AnimatedButton(
             buttonText: 'Login',
             status: status,
-            buttonColor: Colors.orangeAccent,
+            buttonColor: AppColors.primaryColor,
           ),
         );
       },
@@ -136,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
       hintText: "username",
       prefixIcon: const Icon(Icons.person),
       backgroundColor: Colors.white,
-      accentColor: Colors.orangeAccent,
+      accentColor: AppColors.primaryColor,
       borderRadius: 10,
       showWarning: _invalidName,
       isShadow: false,
@@ -158,12 +159,12 @@ class _LoginPageState extends State<LoginPage> {
       hintText: "password",
       prefixIcon: const Icon(Icons.key),
       backgroundColor: Colors.white,
-      accentColor: Colors.orangeAccent,
+      accentColor:AppColors.primaryColor,
       borderRadius: 10,
       isShadow: false,
       isPassword: true,
       showWarning: _invalidPassword,
-      suffixIcon: const Icon(Icons.key),
+      suffixIcon: const Icon(Icons.remove_red_eye),
       height: 50,
     );
   }

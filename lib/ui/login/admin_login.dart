@@ -184,7 +184,7 @@ class _AdminLoginPage extends State<AdminLoginPage> {
           child: AnimatedButton(
             buttonText: 'Login',
             status: status,
-            buttonColor: Colors.orangeAccent,
+            buttonColor:  AppColors.primaryColor,
           ),
         );
       },
@@ -260,7 +260,7 @@ class _AdminLoginPage extends State<AdminLoginPage> {
       hintText: "192.168.1.99",
       prefixIcon: const Icon(Icons.link),
       backgroundColor: Colors.white,
-      accentColor: Colors.orangeAccent,
+      accentColor: AppColors.primaryColor,
       borderRadius: 10,
       showWarning: _invalidName,
       isShadow: false,
@@ -282,7 +282,7 @@ class _AdminLoginPage extends State<AdminLoginPage> {
       hintText: "username",
       prefixIcon: const Icon(Icons.person),
       backgroundColor: Colors.white,
-      accentColor: Colors.orangeAccent,
+      accentColor:  AppColors.primaryColor,
       borderRadius: 10,
       showWarning: _invalidName,
       isShadow: false,
@@ -303,7 +303,7 @@ class _AdminLoginPage extends State<AdminLoginPage> {
       hintText: "password",
       prefixIcon: const Icon(Icons.key),
       backgroundColor: Colors.white,
-      accentColor: Colors.orangeAccent,
+      accentColor: AppColors.primaryColor,
       borderRadius: 10,
       isShadow: false,
       isPassword: true,
@@ -313,10 +313,4 @@ class _AdminLoginPage extends State<AdminLoginPage> {
     );
   }
 
-  Widget _logoWidget() {
-    return TextWidget(
-      "HMO",
-      style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-    );
-  }
 }

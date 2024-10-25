@@ -9,6 +9,7 @@ import 'package:mmt_mobile/src/extension/widget_extension.dart';
 
 import '../business logic/bloc/login/login_bloc.dart';
 import '../route/route_list.dart';
+import '../src/style/app_color.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -42,7 +43,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       delayAndGoNextPage(RouteList.homePage);
                     }
                     if (state.status == LoginStatus.fail) {
-                      delayAndGoNextPage(RouteList.homePage);
+                      delayAndGoNextPage(RouteList.loginPage);
                     }
                   },
                   builder: (BuildContext context, LoginState state) {
@@ -58,9 +59,9 @@ class _SplashScreenState extends State<SplashScreen> {
                     // return const Icon(FontAwesomeIcons.circleXmark,
                     //     size: 50, color: Colors.red);
 
-                    return const SpinKitCircle(
+                    return  SpinKitChasingDots(
                       size: 50,
-                      color: Colors.purple,
+                      color: AppColors.primaryColorPale,
                     );
                   },
                 )),
@@ -74,7 +75,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   AnimatedTextKit(
                     repeatForever: true,
                     animatedTexts: [
-                      FlickerAnimatedText(
+                      TyperAnimatedText(
                         'MMT',
                         textStyle: const TextStyle(
                           fontSize: 32.0,
