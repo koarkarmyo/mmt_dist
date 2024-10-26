@@ -51,6 +51,11 @@ class DatabaseHelper {
     await db.query(tableName, orderBy: orderBy);
     return maps;
   }
+  Future<List<Map<String, dynamic>>> readDataRaw(String query) async {
+    Database db = await database;
+    List<Map<String, dynamic>> list = await db.rawQuery(query);
+    return list;
+  }
 
   Future<List<Map<String, dynamic>>> readDataByWhereArgs(
       {required String tableName,

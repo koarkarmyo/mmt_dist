@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 
+import '../../model/base_api_response.dart';
+import '../../model/sync_response.dart';
 import '../api_request.dart';
 import '../base_api_repo.dart';
 
@@ -11,8 +13,8 @@ class SyncApiRepo extends BaseApiRepo {
     // Response response = await ApiCall(ApiUtils.buildDio())
     //     .postMethodCall(path: '/post/', data: data);
     Response response =
-        await apiCall.postMethodCall(path: '/post/', data: data);
-    return BaseApiResponse.fromJson(response.data);
+    await postMethodCall(additionalPath: '/post/', params: data);
+    return BaseApiResponse.fromJson(response.data, fromJson: SyncResponse.fromJson);
   }
 
   Future<Response> sendAction(String actionName) async {
@@ -21,7 +23,7 @@ class SyncApiRepo extends BaseApiRepo {
     // final response = await ApiCall(ApiUtils.buildDio())
     //     .postMethodCall(path: '/post/', data: data);
     Response response =
-        await apiCall.postMethodCall(path: '/post/', data: data);
+    await postMethodCall(additionalPath: '/post/', params: data);
     // print(response);
     return response;
   }

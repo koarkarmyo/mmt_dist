@@ -7,7 +7,7 @@ class BaseApiResponse<T> {
     this.error,
   });
 
-  BaseApiResponse.fromJson({required Map<String, dynamic> json, required T Function(Map<String,dynamic>) fromJson}) {
+  BaseApiResponse.fromJson(Map<String,dynamic> json, { required T Function(Map<String,dynamic>) fromJson}) {
     if (json['data'] != null) {
       data = [];
       json['data'].forEach((v) {

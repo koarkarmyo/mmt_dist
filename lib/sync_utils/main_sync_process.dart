@@ -1,13 +1,25 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:mmt_mobile/model/sync_group.dart';
 import 'package:mmt_mobile/sync_utils/sync_utils.dart';
 
 import '../api/api_error_handler.dart';
 import '../api/api_repo/sync_api_repo.dart';
 import '../database/db_constant.dart';
 import '../database/db_constant.dart';
+import '../database/db_repo/cust_visit_repo/cust_visit_db_repo.dart';
+import '../database/db_repo/sync_action_repo/sync_action_db_repo.dart';
+import '../model/auto_sync_response.dart';
+import '../model/cust_visit.dart';
 import '../model/sync_response.dart';
+import '../src/mmt_application.dart';
+import '../utils/date_time_utils.dart';
+import 'package:collection/collection.dart';
+
+import '../utils/location_utils.dart';
+
 
 
 class MainSyncProcess {
@@ -23,14 +35,14 @@ class MainSyncProcess {
   List<SyncResponse> _autoSyncProcess = [];
 
   //
-  static SaleOrderDBRepo _saleOrderDBRepo = SaleOrderDBRepo.instance;
-  static SaleOrderApiRepo _saleOrderApiRepo = SaleOrderApiRepo.instance;
-  static CashCollectDBRepo _cashCollectDBRepo = CashCollectDBRepo();
-  static final SqlFLiteHelper _sqlFLiteHelper = SqlFLiteHelper();
-  static final DeliveryDBRepo _deliveryDBRepo = DeliveryDBRepo();
-  static final DeliveryApiRepo _deliveryApiRepo = DeliveryApiRepo();
+  // static SaleOrderDBRepo _saleOrderDBRepo = SaleOrderDBRepo.instance;
+  // static SaleOrderApiRepo _saleOrderApiRepo = SaleOrderApiRepo.instance;
+  // static CashCollectDBRepo _cashCollectDBRepo = CashCollectDBRepo();
+  // static final SqlFLiteHelper _sqlFLiteHelper = SqlFLiteHelper();
+  // static final DeliveryDBRepo _deliveryDBRepo = DeliveryDBRepo();
+  // static final DeliveryApiRepo _deliveryApiRepo = DeliveryApiRepo();
   static CustVisitDBRepo _custVisitDBRepo = CustVisitDBRepo.instance;
-  static CustVisitApiRepo _custVisitApiRepo = CustVisitApiRepo();
+  // static CustVisitApiRepo _custVisitApiRepo = CustVisitApiRepo();
 
   //
   static Position? _tempPosition;
@@ -321,123 +333,123 @@ class MainSyncProcess {
     }
   }
 
-  static Future<bool> _sendSaleOrderSingle() async {
-    List<SaleOrderHeader> saleOrderHdrList =
-        await _saleOrderDBRepo.getDraftSaleOrderHdrs();
-
-    if (saleOrderHdrList.isEmpty) return false;
-
-    if (saleOrderHdrList.isNotEmpty) {
-      SaleOrderHeader saleOrderHdr = saleOrderHdrList.first;
-// qty available check from server
-
-// List<SaleOrderLine> saleOrderLines = await DataObject.instance.getSaleOrderLines(saleOrderHdr.id);
-      List<Map<String, dynamic>> saleOrderLineJson = await _sqlFLiteHelper
-          .readDataByWhereArgs(
-              tableName: DBConstant.saleOrderLineTable,
-              where: '${DBConstant.orderNo} =? ',
-              whereArgs: [saleOrderHdr.name]);
-      List<SaleOrderLine> saleOrderLine = [];
-
-      saleOrderLineJson.forEach((element) {
-        saleOrderLine.add(SaleOrderLine.fromJson(element));
-      });
-
-      final List<Map<String, dynamic>> saleOrderLineJsonApi =
-          saleOrderLine.map((e) => e.toJsonForSaleOrderApi()).toList();
-
-      BaseSingleApiResponse response;
-      Map<String, dynamic> headerJson = {};
-      Map<String, dynamic> cashCollectJson = {};
-
-      if (saleOrderHdr.fromDirectSale == true) {
-        CashCollect? cashCollect =
-            await _cashCollectDBRepo.getCashCollect(saleOrderHdr);
-        response = await _saleOrderApiRepo.directSaleApiCall(
-            saleOrderHeader: saleOrderHdr,
-            cashCollect: cashCollect,
-            saleOrderLineJson: saleOrderLineJsonApi);
-
-        headerJson = response.data!['sale_order'];
-        cashCollectJson = response.data!['cash_collect'];
-      } else {
-//send to server
-        response = await _saleOrderApiRepo.sendApiCall(
-            saleOrderHdr, null, saleOrderLineJsonApi);
-        headerJson = response.data!;
-      }
-
-      SaleOrderHeader responseHeader = SaleOrderHeader.fromJson(headerJson);
-
-      responseHeader.isUpload = 1;
-
-      if (saleOrderHdr.fromDirectSale == true) {
-        CashCollect cashCollect = CashCollect.fromJson(cashCollectJson);
-        cashCollect.orderNo = responseHeader.name;
-        cashCollect.orderId = responseHeader.id;
-
-        responseHeader.fromDirectSale = true;
-
-        bool isUpdated = await _cashCollectDBRepo.updateCashCollect(
-            saleOrderHdr.name, cashCollect);
-      }
-
-      await _saleOrderDBRepo.updateResponseOrder(
-          preOrder: saleOrderHdr, curOrder: responseHeader);
-    }
-    return true;
-  }
-
-  static Future<bool> _sendDeliveryOrderSingle() async {
-    List<StockPickingModel> stockPickingList =
-        await _deliveryDBRepo.getStockPickingList();
-
-// MMTApplication.printJob('${stockPickingList.length}');
-
-    if (stockPickingList.isEmpty) return false;
+//   static Future<bool> _sendSaleOrderSingle() async {
+//     List<SaleOrderHeader> saleOrderHdrList =
+//         await _saleOrderDBRepo.getDraftSaleOrderHdrs();
 //
-    if (stockPickingList.isNotEmpty) {
-      StockPickingModel stockPickingModel = stockPickingList.first;
+//     if (saleOrderHdrList.isEmpty) return false;
+//
+//     if (saleOrderHdrList.isNotEmpty) {
+//       SaleOrderHeader saleOrderHdr = saleOrderHdrList.first;
+// // qty available check from server
+//
+// // List<SaleOrderLine> saleOrderLines = await DataObject.instance.getSaleOrderLines(saleOrderHdr.id);
+//       List<Map<String, dynamic>> saleOrderLineJson = await _sqlFLiteHelper
+//           .readDataByWhereArgs(
+//               tableName: DBConstant.saleOrderLineTable,
+//               where: '${DBConstant.orderNo} =? ',
+//               whereArgs: [saleOrderHdr.name]);
+//       List<SaleOrderLine> saleOrderLine = [];
+//
+//       saleOrderLineJson.forEach((element) {
+//         saleOrderLine.add(SaleOrderLine.fromJson(element));
+//       });
+//
+//       final List<Map<String, dynamic>> saleOrderLineJsonApi =
+//           saleOrderLine.map((e) => e.toJsonForSaleOrderApi()).toList();
+//
+//       BaseSingleApiResponse response;
+//       Map<String, dynamic> headerJson = {};
+//       Map<String, dynamic> cashCollectJson = {};
+//
+//       if (saleOrderHdr.fromDirectSale == true) {
+//         CashCollect? cashCollect =
+//             await _cashCollectDBRepo.getCashCollect(saleOrderHdr);
+//         response = await _saleOrderApiRepo.directSaleApiCall(
+//             saleOrderHeader: saleOrderHdr,
+//             cashCollect: cashCollect,
+//             saleOrderLineJson: saleOrderLineJsonApi);
+//
+//         headerJson = response.data!['sale_order'];
+//         cashCollectJson = response.data!['cash_collect'];
+//       } else {
+// //send to server
+//         response = await _saleOrderApiRepo.sendApiCall(
+//             saleOrderHdr, null, saleOrderLineJsonApi);
+//         headerJson = response.data!;
+//       }
+//
+//       SaleOrderHeader responseHeader = SaleOrderHeader.fromJson(headerJson);
+//
+//       responseHeader.isUpload = 1;
+//
+//       if (saleOrderHdr.fromDirectSale == true) {
+//         CashCollect cashCollect = CashCollect.fromJson(cashCollectJson);
+//         cashCollect.orderNo = responseHeader.name;
+//         cashCollect.orderId = responseHeader.id;
+//
+//         responseHeader.fromDirectSale = true;
+//
+//         bool isUpdated = await _cashCollectDBRepo.updateCashCollect(
+//             saleOrderHdr.name, cashCollect);
+//       }
+//
+//       await _saleOrderDBRepo.updateResponseOrder(
+//           preOrder: saleOrderHdr, curOrder: responseHeader);
+//     }
+//     return true;
+//   }
 
-      List<StockMoveNewModel> stockMoves =
-          stockPickingModel.moveIdsWithoutPackage ?? [];
-
-      List<Map<String, dynamic>> jsonList =
-          stockMoves.map((e) => e.toJson()).toList();
-
-      BaseSingleApiResponse response;
-      Map<String, dynamic> headerJson = {};
-      Map<String, dynamic> cashCollectJson = {};
-
-      CashCollect? cashCollect;
-
-      if (stockPickingModel.state != DeliveryStatus.cancel) {
-        cashCollect = await _cashCollectDBRepo
-            .getCashCollectByOrderId(stockPickingModel.saleId ?? 0);
-      }
-
-      response = await _deliveryApiRepo.deliverySendApiCall(
-          stockPicking: stockPickingModel,
-          cashCollect: cashCollect,
-          stockMoveJsonList: jsonList);
-
-      headerJson = response.data!['delivery_order'];
-      cashCollectJson = response.data!['cash_collect'];
-
-      StockPickingModel responsePickingModel =
-          StockPickingModel.fromJson(headerJson);
-
-      if (stockPickingModel.state != DeliveryStatus.cancel) {
-        CashCollect responseCashCollect = CashCollect.fromJson(cashCollectJson);
-
-        bool isUpdated = await _cashCollectDBRepo.updateCashCollect(
-            responsePickingModel.origin, responseCashCollect);
-      }
-
-      await _deliveryDBRepo.updateResponsePicking(responsePickingModel);
-    }
-    return true;
-  }
+//   static Future<bool> _sendDeliveryOrderSingle() async {
+//     List<StockPickingModel> stockPickingList =
+//         await _deliveryDBRepo.getStockPickingList();
+//
+// // MMTApplication.printJob('${stockPickingList.length}');
+//
+//     if (stockPickingList.isEmpty) return false;
+// //
+//     if (stockPickingList.isNotEmpty) {
+//       StockPickingModel stockPickingModel = stockPickingList.first;
+//
+//       List<StockMoveNewModel> stockMoves =
+//           stockPickingModel.moveIdsWithoutPackage ?? [];
+//
+//       List<Map<String, dynamic>> jsonList =
+//           stockMoves.map((e) => e.toJson()).toList();
+//
+//       BaseSingleApiResponse response;
+//       Map<String, dynamic> headerJson = {};
+//       Map<String, dynamic> cashCollectJson = {};
+//
+//       CashCollect? cashCollect;
+//
+//       if (stockPickingModel.state != DeliveryStatus.cancel) {
+//         cashCollect = await _cashCollectDBRepo
+//             .getCashCollectByOrderId(stockPickingModel.saleId ?? 0);
+//       }
+//
+//       response = await _deliveryApiRepo.deliverySendApiCall(
+//           stockPicking: stockPickingModel,
+//           cashCollect: cashCollect,
+//           stockMoveJsonList: jsonList);
+//
+//       headerJson = response.data!['delivery_order'];
+//       cashCollectJson = response.data!['cash_collect'];
+//
+//       StockPickingModel responsePickingModel =
+//           StockPickingModel.fromJson(headerJson);
+//
+//       if (stockPickingModel.state != DeliveryStatus.cancel) {
+//         CashCollect responseCashCollect = CashCollect.fromJson(cashCollectJson);
+//
+//         bool isUpdated = await _cashCollectDBRepo.updateCashCollect(
+//             responsePickingModel.origin, responseCashCollect);
+//       }
+//
+//       await _deliveryDBRepo.updateResponsePicking(responsePickingModel);
+//     }
+//     return true;
+//   }
 
   static Future<void> _locationSaver() async {
     Position position = await LocationUtils.determinePosition();
@@ -453,7 +465,7 @@ class MainSyncProcess {
       await _saveLocationProcess(position);
     }
   }
-
+//
   static Future<void> _saveLocationProcess(Position position) async {
     try {
       CustVisit custVisit = CustVisit(
@@ -473,56 +485,53 @@ class MainSyncProcess {
       print('location_error : ' + e.toString());
     }
   }
-
-  static Future<bool> _sendCustVisit() async {
-// await SyncUtils.saveCustVisit();
-    List<CustVisit> list = await _custVisitDBRepo.getDraftCustVisitList();
-    if (list.isEmpty) return false;
-
-    final saved = await _custVisitApiRepo.saveCustVisit(list.first);
-    final cust = list.first.copyWith(isUpload: 1);
-    await _sqlFLiteHelper.updateData(
-        table: DBConstant.custVisitTable,
-        where: '${DBConstant.customerId} = ? AND ${DBConstant.docDate} = ?',
-        whereArgs: [cust.customerId, cust.docDate],
-        data: cust.toJson());
-
-    return true;
-  }
-
+//
+//   static Future<bool> _sendCustVisit() async {
+// // await SyncUtils.saveCustVisit();
+//     List<CustVisit> list = await _custVisitDBRepo.getDraftCustVisitList();
+//     if (list.isEmpty) return false;
+//
+//     final saved = await _custVisitApiRepo.saveCustVisit(list.first);
+//     final cust = list.first.copyWith(isUpload: 1);
+//     await _sqlFLiteHelper.updateData(
+//         table: DBConstant.custVisitTable,
+//         where: '${DBConstant.customerId} = ? AND ${DBConstant.docDate} = ?',
+//         whereArgs: [cust.customerId, cust.docDate],
+//         data: cust.toJson());
+//
+//     return true;
+//   }
+//
   Future<SyncProcess> _sendApiRequest(String actionName) async {
     SyncProcess syncProcess = SyncProcess.Finished;
-    // await Future.delayed(const Duration(milliseconds: 1000));
-    // Completer<void> completer = Completer();
-    if (actionName == 'send_sale_order') {
-      // send sale order
-      bool isNeedToSend = await _sendSaleOrderSingle();
-      // sleep 300 milliseconds before next call
-      await Future.delayed(Duration(milliseconds: 300));
-      if (isNeedToSend) syncProcess = SyncProcess.Paginated;
-    } else if (actionName == 'get_delivery_order') {
-      bool isNeedToSend = await _sendDeliveryOrderSingle();
-      // sleep 300 milliseconds before next call
-      await Future.delayed(Duration(milliseconds: 300));
-      // recursive
-      if (isNeedToSend) syncProcess = SyncProcess.Paginated;
-      if (syncProcess == SyncProcess.Paginated) {
-        return syncProcess;
-      }
-      Response response = await _syncApiRepo.sendAction(actionName);
-      syncProcess = await SyncUtils.insertToDatabase(
-          actionName: actionName, response: response);
-    } else if (actionName == 'store_cust_visit' ||
-        actionName == 'save_cust_visit') {
-      bool isNeedToSend = await _sendCustVisit();
-      if (isNeedToSend) syncProcess = SyncProcess.Paginated;
-    } else {
-      // api call
+//     // await Future.delayed(const Duration(milliseconds: 1000));
+//     // Completer<void> completer = Completer();
+//     if (actionName == 'send_sale_order') {
+//
+//       bool isNeedToSend = await _sendSaleOrderSingle();
+//       await Future.delayed(Duration(milliseconds: 300));
+//       if (isNeedToSend) syncProcess = SyncProcess.Paginated;
+//     } else if (actionName == 'get_delivery_order') {
+//       bool isNeedToSend = await _sendDeliveryOrderSingle();
+//       await Future.delayed(Duration(milliseconds: 300));
+//       if (isNeedToSend) syncProcess = SyncProcess.Paginated;
+//       if (syncProcess == SyncProcess.Paginated) {
+//         return syncProcess;
+//       }
+//       Response response = await _syncApiRepo.sendAction(actionName);
+//       syncProcess = await SyncUtils.insertToDatabase(
+//           actionName: actionName, response: response);
+//     } else if (actionName == 'store_cust_visit' ||
+//         actionName == 'save_cust_visit') {
+//       bool isNeedToSend = await _sendCustVisit();
+//       if (isNeedToSend) syncProcess = SyncProcess.Paginated;
+//     } else {
+     // api call
       Response response = await _syncApiRepo.sendAction(actionName);
 
       syncProcess = await SyncUtils.insertToDatabase(
           actionName: actionName, response: response);
-    }
+    // }
     return syncProcess;
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:odoo_rpc/odoo_rpc.dart';
 
@@ -9,6 +11,53 @@ import '../model/readable_api_error.dart';
 class ApiErrorHandler {
   static const String internetError = 'internet connection error';
   static const int errorCode = 0;
+  static const String _message = 'message';
+
+
+  static Map<String, String> createError(DioError error) {
+    if (error.type == DioExceptionType.badResponse) {
+      if (error.response?.statusCode == 400) {
+        return {_message: 'bad request'};
+      }
+      if (error.response?.statusCode == 401) {
+        return {_message: 'Login required'};
+      }
+      if (error.response?.statusCode == 422) {
+        Map<String, String> entryError = {};
+        Map<String, dynamic> errors = error.response?.data['errors'];
+        for (MapEntry mapEntry in errors.entries) {
+          var valueList = mapEntry.value.toList();
+          entryError.putIfAbsent(mapEntry.key, () => valueList[0]);
+        }
+        return entryError;
+      }
+      if (error.response?.statusCode == 404) {
+        return {_message: 'not found'};
+      }
+      if (error.response?.statusCode == 403) {
+        return {_message: 'forbidden'};
+      }
+      if (error.response?.statusCode == 500) {
+        return {_message: 'server error!'};
+      }
+      if (error.response?.statusCode == 503) {
+        return {_message: 'server unavailable!'};
+      }
+    } else if (error.type == DioExceptionType.connectionTimeout ||
+        error.type == DioErrorType.sendTimeout) {
+      return {_message: 'connection time out'};
+    } else if (error.type == DioErrorType.receiveTimeout) {
+      return {_message: 'receive time out'};
+    }
+
+    if (error.type == DioExceptionType.unknown) {
+      if (error.error is SocketException) {
+        return {_message: 'connection error!'};
+      }
+    }
+
+    return {_message: 'something was wrong!'};
+  }
 
   static ReadableApiError createReadableErrorMessage(Exception exception) {
     String message = 'Json error!';
