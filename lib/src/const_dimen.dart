@@ -1,4 +1,7 @@
 class ConstantDimens {
+
+  static const double pagePadding = 16.0;
+  static const double normalPadding = 8.0;
   static const double padding = 16.0;
   static const double smallPadding = 8.0;
   static const double avatar_radius = 50.0;
