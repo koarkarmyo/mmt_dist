@@ -8,6 +8,8 @@ import 'package:mmt_mobile/ui/login/admin_login.dart';
 import 'package:mmt_mobile/ui/login/login_page.dart';
 
 import '../business logic/bloc/login/login_bloc.dart';
+import '../ui/profile_page.dart';
+import '../ui/route_page.dart';
 import '../ui/splash_page.dart';
 
 Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
@@ -39,6 +41,12 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
           ));
     case RouteList.homePage:
       return _buildPageRoute(routeSettings, const HomePage());
+    case RouteList.profilePage:
+      return _buildPageRoute(routeSettings, const ProfilePage());
+  // case RouteList.dashboardPage:
+  //   return _buildPageRoute(routeSettings, const DashboardPage() );
+    case RouteList.routePage:
+      return _buildPageRoute(routeSettings, const RoutePage());
     default:
       return _buildPageRoute(routeSettings, const NotFoundPage());
   }
@@ -55,7 +63,7 @@ class NotFoundPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
         child: TextWidget("Page not found"),
       ),
