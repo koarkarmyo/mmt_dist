@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../common_widget/alert_dialog.dart';
 import '../common_widget/sync_progress_dialog.dart';
 import '../common_widget/text_widget.dart';
-import '../sync_utils/main_sync_process.dart';
+import '../sync/sync_utils/main_sync_process.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,33 +15,27 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   StreamSubscription? _masterSyncStream;
   late GlobalKey<SyncProgressDialogState> _dialogKey = GlobalKey();
-
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    manualSyncStreamListener();
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: ElevatedButton(onPressed: () {
-
-        }, child: TextWidget(
-          "Sync"
-        )),
+        child: ElevatedButton(
+          onPressed: () {},
+          child: const TextWidget("Sync"),
+        ),
       ),
     );
   }
-
 
   void manualSyncStreamListener() {
     _masterSyncStream = MainSyncProcess.instance.syncStream.listen((data) {

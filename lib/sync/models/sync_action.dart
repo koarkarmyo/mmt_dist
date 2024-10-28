@@ -1,5 +1,6 @@
 
-import 'package:mmt_mobile/model/sync_group.dart';
+
+import 'package:mmt_mobile/sync/models/sync_group.dart';
 
 class SyncAction {
   int? id;

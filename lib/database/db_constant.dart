@@ -24,7 +24,7 @@ class DBConstant {
   static const String dashboardTableGroupId = 'dashboard_group_id';
   static const String categoryTable = 'categories';
   static const String childCategoryTable = 'child_categories';
-  static const String mscmSyncActionTable = 'mscm_sync_actions';
+  static const String syncActionTable = 'mscm_sync_actions';
   static const String syncActionWithGroupTable = 'sync_actions_with_groups';
   static const String resPartnerTable = 'res_partners';
   static const String mscmStaffRoleTable = 'mscm_staff_roles';

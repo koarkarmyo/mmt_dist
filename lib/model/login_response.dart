@@ -3,7 +3,7 @@ import 'dart:convert' as converter;
 import 'package:equatable/equatable.dart';
 import 'package:mmt_mobile/model/product_group.dart';
 import 'package:mmt_mobile/model/staff_role.dart';
-import 'package:mmt_mobile/model/sync_action.dart';
+import 'package:mmt_mobile/sync/models/sync_action.dart';
 import 'package:collection/collection.dart';
 
 import '../src/enum.dart';

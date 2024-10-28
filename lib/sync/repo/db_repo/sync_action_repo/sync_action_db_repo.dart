@@ -1,9 +1,9 @@
 
 
-import '../../../model/sync_group.dart';
-import '../../../model/sync_response.dart';
-import '../../base_db_repo.dart';
-import '../../db_constant.dart';
+import '../../../../database/base_db_repo.dart';
+import '../../../../database/db_constant.dart';
+import '../../../models/sync_group.dart';
+import '../../../models/sync_response.dart';
 
 class SyncActionDBRepo extends BaseDBRepo {
   static final SyncActionDBRepo _instance = SyncActionDBRepo._();
@@ -44,7 +44,7 @@ class SyncActionDBRepo extends BaseDBRepo {
 
     await Future.forEach<int>(actionIds, (actionId) async {
       List<Map<String, dynamic>> jsonList = await helper.readDataByWhereArgs(
-          tableName: DBConstant.mscmSyncActionTable,
+          tableName: DBConstant.syncActionTable,
           where:
               '${DBConstant.id}=?  AND ${(isManualSync ?? true) ? DBConstant.iSManualSync : DBConstant.isAutoSync} =?',
           whereArgs: [

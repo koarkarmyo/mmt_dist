@@ -1,24 +1,22 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:mmt_mobile/model/sync_group.dart';
-import 'package:mmt_mobile/sync_utils/sync_utils.dart';
-
-import '../api/api_error_handler.dart';
-import '../api/api_repo/sync_api_repo.dart';
-import '../database/db_constant.dart';
-import '../database/db_constant.dart';
-import '../database/db_repo/cust_visit_repo/cust_visit_db_repo.dart';
-import '../database/db_repo/sync_action_repo/sync_action_db_repo.dart';
-import '../model/auto_sync_response.dart';
-import '../model/cust_visit.dart';
-import '../model/sync_response.dart';
-import '../src/mmt_application.dart';
-import '../utils/date_time_utils.dart';
 import 'package:collection/collection.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:mmt_mobile/sync/sync_utils/sync_utils.dart';
 
-import '../utils/location_utils.dart';
+import '../../api/api_error_handler.dart';
+import '../../database/db_repo/cust_visit_repo/cust_visit_db_repo.dart';
+import '../models/auto_sync_response.dart';
+import '../../model/cust_visit.dart';
+import '../../src/mmt_application.dart';
+import '../../utils/date_time_utils.dart';
+import '../../utils/location_utils.dart';
+import '../models/sync_group.dart';
+import '../models/sync_response.dart';
+import '../repo/api_repo/sync_api_repo.dart';
+import '../repo/db_repo/sync_action_repo/sync_action_db_repo.dart';
+
 
 
 

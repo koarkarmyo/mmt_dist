@@ -1,10 +1,9 @@
 import 'package:dio/dio.dart';
 
-import '../../model/base_api_response.dart';
-import '../../model/sync_response.dart';
-import '../api_request.dart';
-import '../base_api_repo.dart';
-
+import '../../../api/api_request.dart';
+import '../../../api/base_api_repo.dart';
+import '../../../model/base_api_response.dart';
+import '../../models/sync_response.dart';
 
 class SyncApiRepo extends BaseApiRepo {
   Future<BaseApiResponse<SyncResponse>> getSyncBloc() async {

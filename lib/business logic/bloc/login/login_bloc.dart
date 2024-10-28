@@ -7,11 +7,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:odoo_rpc/odoo_rpc.dart';
 import '../../../api/api_repo/login_api_repo.dart';
+import '../../../database/database_helper.dart';
+import '../../../database/db_constant.dart';
 import '../../../model/employee.dart';
 import '../../../model/odoo_session.dart';
+import '../../../sync/models/sync_action.dart';
 import '../../../share_preference/sh_keys.dart';
 import '../../../share_preference/sh_utils.dart';
 import '../../../src/mmt_application.dart';
+import '../../../sync/models/sync_group.dart';
 
 part 'login_event.dart';
 
@@ -61,7 +65,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         MMTApplication.currentUser = employee;
         SharePrefUtils()
             .saveString(ShKeys.currentUser, jsonEncode(employee.toJson()));
-        emit(state.copyWith(status: LoginStatus.success));
+        bool _saveSyncActionSuccess = await _saveSyncAction(
+            syncActionList: employee.syncActionList ?? []);
+        if (!_saveSyncActionSuccess) {
+          emit(state.copyWith(
+              status: LoginStatus.fail, error: "Sync Action Save Fail"));
+        } else {
+          emit(state.copyWith(status: LoginStatus.success));
+        }
       }
     } on DioException {
       _emitFail();
@@ -69,6 +80,29 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       _emitFail();
     } on Error {
       _emitFail();
+    }
+  }
+
+  Future<bool> _saveSyncAction(
+      {required List<SyncAction> syncActionList}) async {
+    try {
+      List<Map<String, dynamic>> syncActionMapList = [];
+      List<Map<String, dynamic>> syncGroupMapList = [];
+      syncActionList.forEach(
+        (element) {
+          syncActionMapList.add(element.toJson());
+          for (SyncActionGroup syncGroup in element.actionGroup ?? []) {
+            syncGroupMapList.add(syncGroup.toJson());
+          }
+        },
+      );
+      bool syncActionSuccess = await DatabaseHelper.instance
+          .insertDataListBath(DBConstant.syncActionTable, syncActionMapList);
+      bool syncGroupSuccess = await DatabaseHelper.instance.insertDataListBath(
+          DBConstant.syncActionGroupTable, syncGroupMapList);
+      return syncActionSuccess && syncGroupSuccess;
+    } on Exception {
+      return false;
     }
   }
 

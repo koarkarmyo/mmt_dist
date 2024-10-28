@@ -98,6 +98,8 @@ class DatabaseHelper {
 
   _onCreateDatabase(Database db, int version) async {
     await _createProductTable(db);
+    await _createSyncActionTable(db);
+    await _createSyncGroupTable(db);
   }
 
   _createProductTable(Database db) async {
@@ -126,6 +128,26 @@ class DatabaseHelper {
         '${DBConstant.saleOK} TEXT,'
         '${DBConstant.purchaseOK} TEXT,'
         '${DBConstant.writeDate} TEXT'
+        ')');
+  }
+
+  _createSyncActionTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.syncActionTable}'
+        '(${DBConstant.id} INTEGER,'
+        '${DBConstant.name} TEXT,'
+        '${DBConstant.isAutoSync} INTEGER,'
+        '${DBConstant.priority} INTEGER,'
+        '${DBConstant.iSManualSync} INTEGER,'
+        '${DBConstant.isUpload} INTEGER,'
+        '${DBConstant.description} TEXT,'
+        '${DBConstant.solutionId} TEXT'
+        ')');
+  }
+
+  _createSyncGroupTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.syncActionGroupTable} '
+        '(${DBConstant.id} INTEGER,'
+        '${DBConstant.name} TEXT'
         ')');
   }
 }
