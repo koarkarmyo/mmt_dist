@@ -8,6 +8,7 @@ class ConstantDimens {
   static const double margin_from_avatar_image = 75.0;
   static const double app_bar_size = 56.0;
   static const double no_item_image_size = 75.0;
+  static const double listDefaultHeight = 65.0;
 
   static const double date_picker_text_field_max_width = 300;
   static const double gridItemHeight = 200;
@@ -21,6 +22,7 @@ class ConstantDimens {
   static const double numberInputWidth = 400;
 
   static const double sizedBoxS = 10;
+  static const double sizedBoxM = 15;
   static const double sizedBoxL = 20;
 
   static const double dialogWidth = 250;
