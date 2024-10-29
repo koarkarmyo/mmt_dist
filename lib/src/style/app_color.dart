@@ -7,4 +7,6 @@ class AppColors {
   static Color primaryColor = Colors.black;
   static Color primaryColorPale = Colors.grey;
   static Color majorColorPale = Colors.black.withOpacity(0.5);
+  static const Color infoColor = Color(0xFF02CAF2);
+
 }

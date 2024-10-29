@@ -12,8 +12,8 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white70,
-      appBar: AppBar(backgroundColor: Colors.black12,),
+      // backgroundColor: Colors.white70,
+      appBar: AppBar(title: Text("Profile"),),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: Column(
@@ -21,7 +21,7 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 10),
             _buildProfileCard(),
             const SizedBox(height: 10),
-            _buildButton(label: "Master Sync", icon: Icons.sync,color: Colors.white70,textColor: Colors.black),
+            _buildButton(label: "Master Sync", icon: Icons.sync,color: Colors.green,textColor: Colors.black),
             const SizedBox(height: 10),
             _buildSettingsCard(),
             const SizedBox(height: 10,),
@@ -36,6 +36,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildProfileCard() {
     return Card(
+      shadowColor: Colors.grey,
       surfaceTintColor: Colors.white24,
       child: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -110,6 +111,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildSettingsCard() {
     return Card(
+      shadowColor: Colors.grey,
       surfaceTintColor: Colors.white24,
       child: Padding(
         padding: const EdgeInsets.all(10.0),

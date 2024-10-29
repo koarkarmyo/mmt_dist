@@ -67,9 +67,9 @@ class DatePickerBtnState extends State<DatePickerBtn> {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Row(
                 children: [
-                  const Icon(Icons.today),
+                  const Icon(Icons.today,size: 28,),
                   const SizedBox(width: 10,),
-                  Text(_textEditingController.text)
+                  Text(_textEditingController.text,style: const TextStyle(fontSize: 18),)
                 ],
               ),
             ),

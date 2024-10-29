@@ -8,12 +8,13 @@ import 'package:mmt_mobile/ui/login/admin_login.dart';
 import 'package:mmt_mobile/ui/login/login_page.dart';
 
 import '../business logic/bloc/login/login_bloc.dart';
+import '../ui/contact_page.dart';
 import '../ui/profile_page.dart';
 import '../ui/route_page.dart';
 import '../ui/splash_page.dart';
 
 Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
-  print("Route ::::::::: ${routeSettings.name}");
+  debugPrint("Route ::::::::: ${routeSettings.name}");
   switch (routeSettings.name) {
     case RouteList.splash:
       return _buildPageRoute(
@@ -47,6 +48,8 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
   //   return _buildPageRoute(routeSettings, const DashboardPage() );
     case RouteList.routePage:
       return _buildPageRoute(routeSettings, const RoutePage());
+    case RouteList.contactPage:
+      return _buildPageRoute(routeSettings, const ContactPage());
     default:
       return _buildPageRoute(routeSettings, const NotFoundPage());
   }

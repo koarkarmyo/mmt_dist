@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:mmt_mobile/ui/widgets/customer_filter_widget.dart';
-import 'package:mmt_mobile/ui/widgets/date_picker_button.dart';
-import 'package:mmt_mobile/ui/widgets/responsive.dart';
-
-import '../src/const_dimen.dart';
 import '../utils/date_time_utils.dart';
 
-class RoutePage extends StatefulWidget {
-  const RoutePage({super.key});
+class ContactPage extends StatefulWidget {
+  const ContactPage({super.key});
 
   @override
-  State<RoutePage> createState() => _RoutePageState();
+  State<ContactPage> createState() => _ContactPageState();
 }
 
-class _RoutePageState extends State<RoutePage> {
+class _ContactPageState extends State<ContactPage> {
   // late CustomerBloc _customerBloc;
   // CustomerViewTypes viewType = CustomerViewTypes.list;
   // late GlobalKey<RouteListWidgetState> _routeListKey = GlobalKey();
@@ -40,6 +36,7 @@ class _RoutePageState extends State<RoutePage> {
   // late List<Partner> _customerList = [];
   int length = 2;
   DateTime _selectedDate = DateTime.now();
+  int counter = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -71,138 +68,114 @@ class _RoutePageState extends State<RoutePage> {
         actions: [
           _showCustomerFilter(),
         ],
-        bottom: DatePickerPreferredSizeWidget(
-            context: context,
-            onChange: (DateTime value) {
-              _selectedDate = value;
-              _filteredCalled(context);
-            },
-            initDate: DateTime.now()),
       ),
-      floatingActionButton:
-          // BlocListener<CustVisitBloc, CustVisitState>(
-          //   listener: (context, state) {
-          //     // cust visit send success or fail close dialog
-          //     if (state.state == BlocCRUDProcessState.fetchFail ||
-          //         state.state == BlocCRUDProcessState.fetchSuccess)
-          //       Navigator.pop(context);
-          //     // fetch background service
-          //     BackgroundServiceUtils.startLocationFetchProcess();
-          //   },
-          //   child: viewType == ViewTypes.list
-          //       ?
-          FloatingActionButton(
-        onPressed: () {
-          // Navigator.pushNamed(context, RouteList.customerCreateRoute)
-          //     .then((value) {
-          //   if (value != null) {
-          //     _filteredCalled(context);
-          //   }
-          // }
-          // );
-          // Navigator.pushNamed(context, RouteList.custVisitReportRoute);
-        },
-        child: const Icon(Icons.person_add_alt_1_outlined),
-      ),
-      // : Container(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: GridView.builder(
-                itemCount: 10, // Replace with your desired item count
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1,
-                  childAspectRatio: 4.4/2,
-                ),
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            icon: const Icon(Icons.account_box_rounded,size: 80,),
-                            title: const Text("Clock In",style: TextStyle(fontSize: 24),),
-                            content: const Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text("Are you sure to clock in?",textAlign: TextAlign.center,),
-                                SizedBox(height: 10,),
-                                Icon(Icons.camera_alt_outlined,size: 80,)
-                              ],
-                            ),
-
-                            actions: [
-                              Center(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop(); // Close the dialog
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //     builder: (context) => NextPage(), // Replace with your next page
-                                    //   ),
-                                    // );
-                                  },
-                                  child: const Text("Clock In"),
+            Stack(
+              children: [
+                Expanded(
+                  child: GridView.builder(
+                    itemCount: 10, // Replace with your desired item count
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 1,
+                      childAspectRatio: 4.4/2,
+                    ),
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                icon: const Icon(Icons.account_box_rounded,size: 80,),
+                                title: const Text("Clock In",style: TextStyle(fontSize: 24),),
+                                content: const Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text("Are you sure to clock in?",textAlign: TextAlign.center,),
+                                    SizedBox(height: 10,),
+                                    Icon(Icons.camera_alt_outlined,size: 80,)
+                                  ],
                                 ),
-                              ),
-                            ],
+
+                                actions: [
+                                  Center(
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(); // Close the dialog
+                                        // Navigator.push(
+                                        //   context,
+                                        //   MaterialPageRoute(
+                                        //     builder: (context) => NextPage(), // Replace with your next page
+                                        //   ),
+                                        // );
+                                      },
+                                      child: const Text("Clock In"),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
                           );
                         },
+                        child: Card(
+                          shadowColor: Colors.grey,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                GestureDetector(
+                                  onTap: (){
+
+                                  },
+                                  child: Container(
+                                    height: 140,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.grey,
+                                    ),
+                                    child: const Icon(
+                                      Icons.person,
+                                      size: 90,
+                                    ),
+                                  ),
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 12.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text("Wai Lin Naing", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                                      SizedBox(height: 5,),
+                                      Text("09-777789648", style: TextStyle(fontSize: 14)),
+                                      Text("location", style: TextStyle(fontSize: 14)),
+                                      SizedBox(height: 5,),
+                                      Text("Last Order : Can't Define", style: TextStyle(fontSize: 14, color: Colors.lightBlueAccent)),
+                                      Text("Last Order Amount: 0", style: TextStyle(fontSize: 14, color: Colors.lightBlueAccent)),
+                                      Text("Amount Due: 0", style: TextStyle(fontSize: 14, color: Colors.red)),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       );
                     },
-                    child: Card(
-                      shadowColor: Colors.grey,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            GestureDetector(
-                        onTap: (){
-
-                      },
-                              child: Container(
-                                height: 140,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.grey,
-                                ),
-                                child: const Icon(
-                                  Icons.person,
-                                  size: 90,
-                                ),
-                              ),
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 12.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Wai Lin Naing", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                                  SizedBox(height: 5,),
-                                  Text("09-777789648", style: TextStyle(fontSize: 14)),
-                                  Text("location", style: TextStyle(fontSize: 14)),
-                                  SizedBox(height: 5,),
-                                  Text("Last Order : Can't Define", style: TextStyle(fontSize: 14, color: Colors.lightBlueAccent)),
-                                  Text("Last Order Amount: 0", style: TextStyle(fontSize: 14, color: Colors.lightBlueAccent)),
-                                  Text("Amount Due: 0", style: TextStyle(fontSize: 14, color: Colors.red)),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+                  ),
+                ),
+                Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  child: Text((0).toString()),
+                  color: Colors.green,
+                ),
+              ]
             )
           ],
         ),
@@ -257,20 +230,6 @@ class _RoutePageState extends State<RoutePage> {
                 child: RadioListTile<CustomerFilterType>(
                   title: const Text('Missed customer'),
                   value: CustomerFilterType.MISSED,
-                  groupValue: _customerFilterType,
-                  onChanged: (type) {
-                    _customerFilterType = type!;
-                    Navigator.pop(context);
-                    _filteredCalled(context);
-                  },
-                ),
-              ),
-              PopupMenuItem(
-                onTap: () {},
-                padding: const EdgeInsets.all(0.0),
-                child: RadioListTile<CustomerFilterType>(
-                  title: const Text('Plan customer'),
-                  value: CustomerFilterType.PLAN,
                   groupValue: _customerFilterType,
                   onChanged: (type) {
                     _customerFilterType = type!;
@@ -447,72 +406,3 @@ class _RoutePageState extends State<RoutePage> {
 //   });
 }
 
-class DatePickerPreferredSizeWidget extends StatefulWidget
-    implements PreferredSizeWidget {
-  final DateTime initDate;
-  final ValueChanged<DateTime> onChange;
-  final BuildContext context;
-
-  const DatePickerPreferredSizeWidget(
-      {super.key,
-      required this.initDate,
-      required this.onChange,
-      required this.context});
-
-  @override
-  State<DatePickerPreferredSizeWidget> createState() =>
-      _DatePickerPreferredSizeWidgetState();
-
-  @override
-  Size get preferredSize =>
-      Size(Responsive.currentWidth(context), ConstantDimens.listDefaultHeight);
-}
-
-class _DatePickerPreferredSizeWidgetState
-    extends State<DatePickerPreferredSizeWidget> {
-  final GlobalKey<DatePickerBtnState> _datePickerKey =
-      GlobalKey<DatePickerBtnState>();
-  DateTime _currentDate = DateTime.now();
-
-  @override
-  void initState() {
-    _currentDate = widget.initDate;
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: ConstantDimens.listDefaultHeight,
-      alignment: Alignment.center,
-      padding:
-          const EdgeInsets.symmetric(vertical: ConstantDimens.normalPadding),
-      child: Row(
-        children: [
-          IconButton(
-              onPressed: () => _onChange(false),
-              icon: const Icon(Icons.arrow_back_ios_sharp)),
-          Expanded(
-            child: DatePickerBtn(
-                key: _datePickerKey,
-                onChange: widget.onChange,
-                defaultDate: widget.initDate),
-          ),
-          IconButton(
-              onPressed: () => _onChange(true),
-              icon: const Icon(Icons.arrow_forward_ios_sharp)),
-        ],
-      ),
-    );
-  }
-
-  void _onChange(bool isPlus) {
-    if (isPlus) {
-      _currentDate = _currentDate.add(const Duration(days: 1));
-    } else {
-      _currentDate = _currentDate.add(const Duration(days: -1));
-    }
-    _datePickerKey.currentState?.setDate(_currentDate);
-    widget.onChange.call(_currentDate);
-  }
-}
