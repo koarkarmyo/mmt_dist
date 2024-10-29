@@ -1,18 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mmt_mobile/common_widget/bottom_sheet_selection_widget.dart';
-import 'package:mmt_mobile/common_widget/sync_progress_dialog.dart';
-import 'package:mmt_mobile/model/login_response.dart';
-import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/style/app_color.dart';
-import 'package:mmt_mobile/sync/bloc/sync_action_bloc/sync_action_bloc_cubit.dart';
-import 'package:mmt_mobile/sync/models/sync_response.dart';
-import 'package:mmt_mobile/sync/sync_utils/main_sync_process.dart';
-import 'package:collection/collection.dart';
 
-import '../common_widget/alert_dialog.dart';
+import '../model/partner.dart';
+import '../model/tag.dart';
+import '../src/enum.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -22,27 +13,11 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  late SyncActionCubit _syncActionCubit;
-  ValueNotifier<List<bool>> selectActionList = ValueNotifier([]);
-  late GlobalKey<SyncProgressDialogState> _dialogKey = GlobalKey();
-  StreamSubscription? _masterSyncStream;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    manualSyncStreamListener();
-    _syncActionCubit = context.read<SyncActionCubit>()
-      ..getSyncAction(isManualSync: true);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white70,
-      appBar: AppBar(
-        backgroundColor: Colors.black12,
-      ),
+      // backgroundColor: Colors.white70,
+      appBar: AppBar(title: const Text("Profile"),),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: Column(
@@ -50,98 +25,22 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 10),
             _buildProfileCard(),
             const SizedBox(height: 10),
-            BlocBuilder<SyncActionCubit, SyncActionState>(
-              builder: (context, state) {
-                return _buildButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          List<String?> selectionList = [];
-                          state.actionList.forEach(
-                            (element) => selectionList.add(element.name),
-                          );
-                          return BottomSheetSelectionWidget(
-                              selectedValueList: selectActionList,
-                              onTap: () {
-                                List<SyncResponse> syncList = [];
-                                state.actionList.forEachIndexed(
-                                  (index, element) {
-                                    if (selectActionList.value[index]) {
-                                      syncList.add(element);
-                                    }
-                                  },
-                                );
-
-                                MainSyncProcess.instance
-                                    .startManualSyncProcess(syncList);
-                                context.pop();
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return SyncProgressDialog(
-                                      key: _dialogKey,
-                                    );
-                                  },
-                                );
-                              },
-                              selectionList: selectionList);
-                        },
-                      );
-                    },
-                    label: "Master Sync",
-                    icon: Icons.sync,
-                    color: Colors.white70,
-                    textColor: Colors.black);
-              },
-            ),
+            _buildButton(label: "Master Sync", icon: Icons.sync,color: Colors.green,textColor: Colors.black),
             const SizedBox(height: 10),
             _buildSettingsCard(),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10,),
           ],
         ),
       ),
       persistentFooterButtons: [
-        _buildButton(
-            label: "Sign Out",
-            icon: Icons.logout,
-            color: AppColors.dangerColor),
+        _buildButton(label: "Sign Out", icon: Icons.logout,color: AppColors.dangerColor),
       ],
     );
   }
 
-  void manualSyncStreamListener() async {
-    _masterSyncStream = MainSyncProcess.instance.syncStream.listen((data) {
-      if (!data.isAutoSync) {
-        _dialogKey.currentState
-            ?.changeProgress(actionName: data.name, percentage: data.progress);
-        print("Sync Progress : ${data.toJson()} : ${data.progress}");
-        if (data.isFinished) {
-          print("Sync Complete");
-          _dialogKey.currentState?.closeDialog();
-          Future.delayed(Duration(milliseconds: 300)).then((value) {
-            _dialogKey.currentState?.closeDialog();
-            if (data.message == MainSyncProcess.failMessage) {
-              showDialog(
-                  context: context,
-                  builder: (_) {
-                    return CustomAlertDialog(
-                      dialogType: AlertDialogType.error,
-                      title: 'Sync Process',
-                      content: '${data.name} fail',
-                    );
-                  });
-            }
-          });
-        }
-      }
-    });
-  }
-
   Widget _buildProfileCard() {
     return Card(
+      shadowColor: Colors.grey,
       surfaceTintColor: Colors.white24,
       child: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -163,7 +62,7 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 const Text(
                   "Wai Lin Naing",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),
                 ),
                 _buildInfoRow(Icons.phone, "09-777789648"),
                 _buildInfoRow(Icons.email_outlined, "wailinnaing@gmial.com"),
@@ -198,7 +97,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: color ?? AppColors.primaryColor,
+        backgroundColor:color ?? AppColors.primaryColor,
         padding: const EdgeInsets.symmetric(vertical: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       ),
@@ -206,14 +105,9 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(label,
-              style: TextStyle(fontSize: 18, color: textColor ?? Colors.white)),
+          Text(label, style: TextStyle(fontSize: 18,color:textColor ?? Colors.white)),
           const SizedBox(width: 8),
-          Icon(
-            icon,
-            size: 25,
-            color: textColor,
-          ),
+          Icon(icon, size: 25,color: textColor,),
         ],
       ),
     );
@@ -221,6 +115,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildSettingsCard() {
     return Card(
+      shadowColor: Colors.grey,
       surfaceTintColor: Colors.white24,
       child: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -246,8 +141,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildSettingsOption(String title, IconData? icon, VoidCallback? onTap,
-      {String? trailingText}) {
+  Widget _buildSettingsOption(String title, IconData? icon, VoidCallback? onTap, {String? trailingText}) {
     return GestureDetector(
       onTap: onTap,
       child: Padding(

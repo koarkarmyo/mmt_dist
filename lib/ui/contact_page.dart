@@ -1,24 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:mmt_mobile/ui/widgets/cust_mini_dialog.dart';
 import 'package:mmt_mobile/ui/widgets/customer_filter_widget.dart';
-import 'package:mmt_mobile/ui/widgets/date_picker_button.dart';
-import 'package:mmt_mobile/ui/widgets/responsive.dart';
-
 import '../model/partner.dart';
 import '../model/tag.dart';
 import '../on_clicked_listener.dart';
-import '../src/const_dimen.dart';
 import '../src/enum.dart';
 import '../utils/date_time_utils.dart';
 
-class RoutePage extends StatefulWidget {
-  const RoutePage({super.key});
+class ContactPage extends StatefulWidget {
+  const ContactPage({super.key});
 
   @override
-  State<RoutePage> createState() => _RoutePageState();
+  State<ContactPage> createState() => _ContactPageState();
 }
 
-class _RoutePageState extends State<RoutePage> {
+class _ContactPageState extends State<ContactPage> {
   // late CustomerBloc _customerBloc;
   // CustomerViewTypes viewType = CustomerViewTypes.list;
   // late GlobalKey<RouteListWidgetState> _routeListKey = GlobalKey();
@@ -46,8 +42,6 @@ class _RoutePageState extends State<RoutePage> {
   int length = 2;
   DateTime _selectedDate = DateTime.now();
   int counter = 1;
-
-
   Partner selectedCustomer = Partner(
     id: 1,
     name: "John Doe",
@@ -127,45 +121,10 @@ class _RoutePageState extends State<RoutePage> {
         actions: [
           _showCustomerFilter(),
         ],
-        bottom: DatePickerPreferredSizeWidget(
-            context: context,
-            onChange: (DateTime value) {
-              _selectedDate = value;
-              _filteredCalled(context);
-            },
-            initDate: DateTime.now()),
       ),
-      floatingActionButton:
-          // BlocListener<CustVisitBloc, CustVisitState>(
-          //   listener: (context, state) {
-          //     // cust visit send success or fail close dialog
-          //     if (state.state == BlocCRUDProcessState.fetchFail ||
-          //         state.state == BlocCRUDProcessState.fetchSuccess)
-          //       Navigator.pop(context);
-          //     // fetch background service
-          //     BackgroundServiceUtils.startLocationFetchProcess();
-          //   },
-          //   child: viewType == ViewTypes.list
-          //       ?
-          FloatingActionButton(
-            backgroundColor: Colors.white,
-        onPressed: () {
-          // Navigator.pushNamed(context, RouteList.customerCreateRoute)
-          //     .then((value) {
-          //   if (value != null) {
-          //     _filteredCalled(context);
-          //   }
-          // }
-          // );
-          // Navigator.pushNamed(context, RouteList.custVisitReportRoute);
-        },
-        child: const Icon(Icons.person_add_alt_1_outlined),
-      ),
-      // : Container(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
@@ -304,6 +263,19 @@ class _RoutePageState extends State<RoutePage> {
     );
   }
 
+  _customerInfo(BuildContext context,
+      {required Partner selectedCust,
+        OnClickCallBack<bool>? callback}) async {
+    bool? success = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CustDialog.createDialog(context, selectedCustomer);
+        });
+    if (success ?? false) {
+      if (callback != null) callback(success!);
+    }
+  }
+
   void _filteredCalled(BuildContext context) {
     final date = DateTimeUtils.yMmDd.format(_selectedDate);
     // _customerBloc.add(CustomerFilterByRouteEvent(
@@ -346,20 +318,6 @@ class _RoutePageState extends State<RoutePage> {
                 child: RadioListTile<CustomerFilterType>(
                   title: const Text('Missed customer'),
                   value: CustomerFilterType.MISSED,
-                  groupValue: _customerFilterType,
-                  onChanged: (type) {
-                    _customerFilterType = type!;
-                    Navigator.pop(context);
-                    _filteredCalled(context);
-                  },
-                ),
-              ),
-              PopupMenuItem(
-                onTap: () {},
-                padding: const EdgeInsets.all(0.0),
-                child: RadioListTile<CustomerFilterType>(
-                  title: const Text('Plan customer'),
-                  value: CustomerFilterType.PLAN,
                   groupValue: _customerFilterType,
                   onChanged: (type) {
                     _customerFilterType = type!;
@@ -534,87 +492,5 @@ class _RoutePageState extends State<RoutePage> {
 //       ],
 //     );
 //   });
-
-  _customerInfo(BuildContext context,
-      {required Partner selectedCust,
-        OnClickCallBack<bool>? callback}) async {
-    bool? success = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return CustDialog.createDialog(context, selectedCustomer);
-        });
-    if (success ?? false) {
-      if (callback != null) callback(success!);
-    }
-  }
 }
 
-class DatePickerPreferredSizeWidget extends StatefulWidget
-    implements PreferredSizeWidget {
-  final DateTime initDate;
-  final ValueChanged<DateTime> onChange;
-  final BuildContext context;
-
-  const DatePickerPreferredSizeWidget(
-      {super.key,
-      required this.initDate,
-      required this.onChange,
-      required this.context});
-
-  @override
-  State<DatePickerPreferredSizeWidget> createState() =>
-      _DatePickerPreferredSizeWidgetState();
-
-  @override
-  Size get preferredSize =>
-      Size(Responsive.currentWidth(context), ConstantDimens.listDefaultHeight);
-}
-
-class _DatePickerPreferredSizeWidgetState
-    extends State<DatePickerPreferredSizeWidget> {
-  final GlobalKey<DatePickerBtnState> _datePickerKey =
-      GlobalKey<DatePickerBtnState>();
-  DateTime _currentDate = DateTime.now();
-
-  @override
-  void initState() {
-    _currentDate = widget.initDate;
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: ConstantDimens.listDefaultHeight,
-      alignment: Alignment.center,
-      padding:
-          const EdgeInsets.symmetric(vertical: ConstantDimens.normalPadding),
-      child: Row(
-        children: [
-          IconButton(
-              onPressed: () => _onChange(false),
-              icon: const Icon(Icons.arrow_back_ios_sharp)),
-          Expanded(
-            child: DatePickerBtn(
-                key: _datePickerKey,
-                onChange: widget.onChange,
-                defaultDate: widget.initDate),
-          ),
-          IconButton(
-              onPressed: () => _onChange(true),
-              icon: const Icon(Icons.arrow_forward_ios_sharp)),
-        ],
-      ),
-    );
-  }
-
-  void _onChange(bool isPlus) {
-    if (isPlus) {
-      _currentDate = _currentDate.add(const Duration(days: 1));
-    } else {
-      _currentDate = _currentDate.add(const Duration(days: -1));
-    }
-    _datePickerKey.currentState?.setDate(_currentDate);
-    widget.onChange.call(_currentDate);
-  }
-}

@@ -1,14 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mmt_mobile/model/language_model.dart';
 import 'package:mmt_mobile/model/login_response.dart';
 import 'package:odoo_rpc/odoo_rpc.dart';
 
-// import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import '../model/employee.dart';
-import '../../route/route_list.dart';
 import '../model/odoo_session.dart';
 import 'enum.dart';
 
@@ -16,7 +12,7 @@ class MMTApplication {
   // Server
   // static const String serverUrl = 'http://217.15.166.234:8069';
 
-  static String serverUrl = 'http://192.168.1.24:8016';
+  static String serverUrl = '';
   static Employee? currentUser;
   static Company? selectedCompany;
 
@@ -28,4 +24,7 @@ class MMTApplication {
 
   static ValueNotifier<LanguageCode> languageNotifier =
       ValueNotifier(LanguageCode.eng);
+
+  static int qtyDigit = loginResponse?.deviceId?.qtyDigit ?? 0;
+  static int priceDigit = loginResponse?.deviceId?.priceDigit ?? 0;
 }

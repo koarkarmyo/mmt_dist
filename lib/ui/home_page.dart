@@ -1,16 +1,16 @@
-import 'dart:async';
+// import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 
-import '../common_widget/alert_dialog.dart';
-import '../common_widget/sync_progress_dialog.dart';
-import '../common_widget/text_widget.dart';
+// import '../common_widget/alert_dialog.dart';
+// import '../common_widget/sync_progress_dialog.dart';
+// import '../common_widget/text_widget.dart';
 import '../route/route_list.dart';
 import '../src/const_dimen.dart';
 import '../src/style/app_color.dart';
-import '../sync/sync_utils/main_sync_process.dart';
+// import '../sync/sync_utils/main_sync_process.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -110,50 +110,57 @@ class _HomePageState extends State<HomePage> {
   Widget buildTitleList() {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
-      child: Wrap(
-        alignment: WrapAlignment.start,
-        spacing: 8,
-        runSpacing: 6,
-        children: List.generate(titles.length, (index) {
-          return InkWell(
-            onTap: () {
-              setState(() {
-                selectedTitleIndex = index;
-              });
-            },
-            child: Container(
-              width: 123,
-              height: 45,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-
-                border: Border.all(
-                  color:Colors.grey,
-                ),
-                color: selectedTitleIndex ==index ? AppColors.primaryColor :Colors.white,
-              ),
-              alignment: Alignment.center,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                child: Text(
-                  titles[index],
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: selectedTitleIndex == index ?FontWeight.bold : null,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: List.generate(titles.length, (index) {
+            return Padding(
+              padding: const EdgeInsets.only(right: 8.0), // Add spacing between items
+              child: InkWell(
+                onTap: () {
+                  setState(() {
+                    selectedTitleIndex = index;
+                  });
+                },
+                child: Container(
+                  width: 150,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Colors.grey,
+                    ),
                     color: selectedTitleIndex == index
-                        ? Colors.white
-                        : Colors.black,
+                        ? AppColors.primaryColor
+                        : Colors.white,
+                  ),
+                  alignment: Alignment.center,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: Text(
+                      titles[index],
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: selectedTitleIndex == index
+                            ? FontWeight.bold
+                            : null,
+                        color: selectedTitleIndex == index
+                            ? Colors.white
+                            : Colors.black,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        }),
+            );
+          }),
+        ),
       ),
     );
   }
+
 
   Widget buildProcessList() {
     final processes = processLists[selectedTitleIndex];
@@ -170,7 +177,12 @@ class _HomePageState extends State<HomePage> {
                 onTap: () {
                   debugPrint("Process clicked: $process");
 
-                  Navigator.pushNamed(context, RouteList.routePage);
+                  if(process == "Route"){
+                    Navigator.pushNamed(context, RouteList.routePage);
+                  }
+                  else if (process == "Contact"){
+                    Navigator.pushNamed(context, RouteList.contactPage);
+                  }
                 },
                 child: Container(
                   height: 60,
@@ -186,7 +198,7 @@ class _HomePageState extends State<HomePage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         const Icon(Icons.business_center, size: 35),
-                        SizedBox(width: ConstantDimens.sizedBoxM),
+                        const SizedBox(width: ConstantDimens.sizedBoxM),
                         Text(
                           process,
                           maxLines: 1,
