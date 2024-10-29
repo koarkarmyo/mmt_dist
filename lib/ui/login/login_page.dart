@@ -83,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
     return BlocConsumer<LoginBloc, LoginState>(
       listener: (context, state) {
         if (state.status == LoginStatus.success) {
-          context.pushReplace(route: RouteList.dashboardPage);
+          context.pushReplace(route: RouteList.homePage);
         }
       },
       builder: (context, state) {

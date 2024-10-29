@@ -29,6 +29,4 @@ class MMTApplication {
   static ValueNotifier<LanguageCode> languageNotifier =
       ValueNotifier(LanguageCode.eng);
 
-  static int qtyDigit = loginResponse?.deviceId?.qtyDigit ?? 0;
-  static int priceDigit = loginResponse?.deviceId?.priceDigit ?? 0;
 }

@@ -30,9 +30,9 @@ class SyncAction {
       'id': this.id,
       'name': this.name,
       'priority': this.priority,
-      'is_auto_sync': this.isAutoSync,
-      'is_manual_sync': this.isManualSync,
-      'is_upload': this.isUpload,
+      'is_auto_sync': this.isAutoSync == true ? 1 : 0,
+      'is_manual_sync': this.isManualSync == true ? 1 : 0,
+      'is_upload': this.isUpload == true ? 1 : 0,
       'description': this.description,
       'solution_id': this.solutionId,
     };

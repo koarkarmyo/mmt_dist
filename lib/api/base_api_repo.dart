@@ -45,13 +45,22 @@ class BaseApiRepo {
 
   Future<Response> createApiRequest(
       {String? additionalPath, Map<String, dynamic>? params}) {
-    return dio.post(MMTApplication.serverUrl + (additionalPath ?? ''), data: params);
+    return dio.post(MMTApplication.serverUrl + (additionalPath ?? ''),
+        data: params);
   }
 
   Future<Response> postMethodCall(
-      {String? additionalPath, Map<String, dynamic>? params}) {
+      {String? additionalPath,
+      Map<String, dynamic>? params,
+      Map<String, dynamic>? bodyData}) {
+    Map<String, dynamic> data = {
+      'jsonrpc': '2.0',
+      'method': 'call',
+      'params': params
+    };
+    data.addAll(bodyData ?? {});
     return dio.post(MMTApplication.serverUrl + (additionalPath ?? ''),
-        data: {'jsonrpc': '2.0', 'method': 'call', 'params': params});
+        data: data);
   }
 
   Future<Response> postApiMethodCall(

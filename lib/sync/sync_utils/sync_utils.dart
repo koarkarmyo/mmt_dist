@@ -1,5 +1,10 @@
 import 'package:dio/dio.dart';
 
+import '../../database/database_helper.dart';
+import '../../database/db_constant.dart';
+import '../../model/base_api_response.dart';
+import '../../model/category.dart';
+
 
 enum SyncProcess {
   Finished,
@@ -30,8 +35,8 @@ class SyncUtils {
       //   return await _getDashboardProcess(actionName, response);
       // case 'get_cust_dashboard':
       //   return _getCustDashboardProcess(actionName, response);
-      // case 'get_category':
-      //   return await _getCategoryProcess(actionName, response);
+      case 'get_category':
+        return await _getCategoryProcess(actionName, response);
       // case 'get_product':
       //   return await _getProductProcess(actionName, response);
       // case 'get_product_pricelist':
@@ -89,24 +94,24 @@ class SyncUtils {
     }
   }
 
-  // static Future<bool> _insertOrUpdateLastWriteDate(
-  //     {required String actionName, required String lastWriteDate}) async {
-  //   final data = {
-  //     DBConstant.actionName: actionName,
-  //     DBConstant.writeDate: lastWriteDate
-  //   };
-  //   final success = await _helper.updateData(
-  //       table: DBConstant.syncHistoryTable,
-  //       where: '${DBConstant.actionName} =?',
-  //       whereArgs: [actionName],
-  //       data: data);
-  //   if (!success) {
-  //     final success =
-  //         await _helper.insertData(DBConstant.syncHistoryTable, data);
-  //     return success;
-  //   }
-  //   return success;
-  // }
+  static Future<bool> _insertOrUpdateLastWriteDate(
+      {required String actionName, required String lastWriteDate}) async {
+    final data = {
+      DBConstant.actionName: actionName,
+      DBConstant.writeDate: lastWriteDate
+    };
+    final success = await DatabaseHelper.instance.updateData(
+        table: DBConstant.syncHistoryTable,
+        where: '${DBConstant.actionName} =?',
+        whereArgs: [actionName],
+        data: data);
+    if (!success) {
+      final success =
+          await DatabaseHelper.instance.insertData(table: DBConstant.syncHistoryTable,values:  data);
+      return success;
+    }
+    return success;
+  }
   //
   // static Future<SyncProcess> _getCustomerProcess(
   //     String actionName, Response response) async {
@@ -426,55 +431,58 @@ class SyncUtils {
   //   return SyncProcess.Finished;
   // }
   //
-  // static Future<SyncProcess> _getCategoryProcess(
-  //     String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data!;
-  //   BaseApiResponse<Category> baseResponse = BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //
-  //   await _helper.deleteAllRow(tableName: DBConstant.childCategoryTable);
-  //   await _helper.deleteAllRow(tableName: DBConstant.categoryTable);
-  //
-  //   // await _helper.deleteRows(
-  //   //     tableName: DBConstant.childCategoryTable,
-  //   //     where: DBConstant.parentId,
-  //   //     wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //   // await _helper.deleteRows(
-  //   //     tableName: DBConstant.categoryTable,
-  //   //     where: DBConstant.id,
-  //   //     wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //
-  //   List<Map<String, dynamic>> uomListMap = [];
-  //   // change to json to insert database
-  //   List<Map<String, dynamic>>? dataList = baseResponse.data!.map((e) {
-  //     // e.uomLines is list
-  //     // so loop
-  //     e.childId?.forEach((childId) {
-  //       Map<String, dynamic> json = {'child_id': childId, 'parent_id': e.id!};
-  //       uomListMap.add(json);
-  //     });
-  //     return e.toJsonDB();
-  //   }).toList();
-  //   // final insert uom list to database
-  //   final bool childCategoryInsert = await _helper.insertDataListBath(
-  //       DBConstant.childCategoryTable, uomListMap);
-  //
-  //   // insert category list to database
-  //   final bool categoryInsertSuccess =
-  //       await _helper.insertDataListBath(DBConstant.categoryTable, dataList);
-  //
-  //   // if (childCategoryInsert && categoryInsertSuccess) {
-  //   //   return await _insertOrUpdateLastWriteDate(
-  //   //           actionName: actionName,
-  //   //           lastWriteDate: baseResponse.data!.last.writeDate!)
-  //   //       ? SyncProcess.Paginated
-  //   //       : SyncProcess.Fail;
-  //   // }
-  //
-  //   return SyncProcess.Finished;
-  // }
+  static Future<SyncProcess> _getCategoryProcess(
+      String actionName, Response response) async {
+    Map<String, dynamic> res = response.data!;
+    BaseApiResponse<Category> baseResponse = BaseApiResponse.fromJson(res, fromJson: Category.fromJson);
+    if (baseResponse.data!.isEmpty) {
+      return SyncProcess.Finished;
+    }
+
+    await DatabaseHelper.instance.deleteAllRow(tableName: DBConstant.childCategoryTable);
+    await DatabaseHelper.instance.deleteAllRow(tableName: DBConstant.categoryTable);
+
+    // await _helper.deleteRows(
+    //     tableName: DBConstant.childCategoryTable,
+    //     where: DBConstant.parentId,
+    //     wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+    // await _helper.deleteRows(
+    //     tableName: DBConstant.categoryTable,
+    //     where: DBConstant.id,
+    //     wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+
+    List<Map<String, dynamic>> uomListMap = [];
+    // change to json to insert database
+    List<Map<String, dynamic>>? dataList = baseResponse.data!.map((e) {
+      // e.uomLines is list
+      // so loop
+      e.childId?.forEach((childId) {
+        Map<String, dynamic> json = {'child_id': childId, 'parent_id': e.id!};
+        uomListMap.add(json);
+      });
+      return e.toJsonDB();
+    }).toList();
+    // final insert uom list to database
+    // final bool childCategoryInsert = await DatabaseHelper.instance.insertDataListBath(
+    //     DBConstant.childCategoryTable, uomListMap);
+    final bool childCategoryInsert = true;
+
+    // insert category list to database
+    final bool categoryInsertSuccess =
+        await DatabaseHelper.instance.insertDataListBath(DBConstant.categoryTable, dataList);
+
+    print("Last Write Date : ${baseResponse.data!.last.writeDate} : child Category insert : $childCategoryInsert, category insert : $categoryInsertSuccess");
+
+    if (childCategoryInsert && categoryInsertSuccess) {
+      return await _insertOrUpdateLastWriteDate(
+              actionName: actionName,
+              lastWriteDate: baseResponse.data!.last.writeDate!)
+          ? SyncProcess.Paginated
+          : SyncProcess.Fail;
+    }
+
+    return SyncProcess.Finished;
+  }
   //
   // static Future<SyncProcess> _getCustDashboardProcess(
   //     String actionName, Response response) async {

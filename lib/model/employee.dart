@@ -20,8 +20,8 @@ class Employee {
     companyId = json['company_id'];
     if(json['sync_action'] != null){
       syncActionList = [];
-      for (Map<String,dynamic> element in (json['sync_action'] as List<Map<String,dynamic>>)) {
-        syncActionList?.add(SyncAction.fromJson(element));
+      for (var element in (json['sync_action'] as List<dynamic>)) {
+        syncActionList?.add(SyncAction.fromJson(element as Map<String,dynamic>));
       }
     }
   }

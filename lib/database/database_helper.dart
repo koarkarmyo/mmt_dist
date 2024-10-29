@@ -22,6 +22,7 @@ class DatabaseHelper {
     return _database!;
   }
 
+
   Future<Database> _initDatabase() async {
     String path = join(await getDatabasesPath(), _databaseName);
     return await openDatabase(path, version: _databaseVersion,
@@ -32,6 +33,16 @@ class DatabaseHelper {
     int? id =  await  _database?.insert(table, values);
     return id != null;
   }
+
+  Future deleteAllRow({required String tableName}) async {
+    Database db = await database;
+    if (db.isOpen) {
+      int affectedRow = await db.delete(tableName);
+      return affectedRow;
+    } else
+      return 0;
+  }
+
 
   Future<bool> insertDataListBath(
       String tableName, List<Map<String, dynamic>> list) async {
@@ -84,7 +95,7 @@ class DatabaseHelper {
     return re > 0 ? true : false;
   }
 
-  Future<String> getLastWriteDate({required String actionName}) async {
+  Future<String?> getLastWriteDate({required String actionName}) async {
     Database db = await database;
     List<Map<String, dynamic>> list = await db.query(
         DBConstant.syncHistoryTable,
@@ -92,7 +103,7 @@ class DatabaseHelper {
         whereArgs: [actionName],
         limit: 1);
     return list.isEmpty
-        ? '2021-03-23 13:34:12'
+        ? null
         : list.first[DBConstant.writeDate];
   }
 
@@ -100,6 +111,17 @@ class DatabaseHelper {
     await _createProductTable(db);
     await _createSyncActionTable(db);
     await _createSyncGroupTable(db);
+    await _createSyncActionLinkWithGroupTable(db);
+   await _createSyncHistoryTable(db);
+   await _createChildCategoryTable(db);
+    await _createCategoryTable(db);
+  }
+
+  Future<void> _createSyncHistoryTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.syncHistoryTable} '
+        '(${DBConstant.actionName} TEXT,'
+        '${DBConstant.writeDate} TEXT'
+        ')');
   }
 
   _createProductTable(Database db) async {
@@ -144,10 +166,39 @@ class DatabaseHelper {
         ')');
   }
 
+  _createSyncActionLinkWithGroupTable(Database db) async {
+    return await db
+        .execute('CREATE TABLE ${DBConstant.syncActionWithGroupTable}'
+        '(${DBConstant.actionId} INTEGER,'
+        '${DBConstant.actionName} TEXT,'
+        '${DBConstant.actionGroupID} INTEGER,'
+        '${DBConstant.actionGroupName} TEXT'
+        ')');
+  }
+
   _createSyncGroupTable(Database db) async {
     return await db.execute('CREATE TABLE ${DBConstant.syncActionGroupTable} '
         '(${DBConstant.id} INTEGER,'
         '${DBConstant.name} TEXT'
+        ')');
+  }
+
+  _createCategoryTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.categoryTable} '
+        '(${DBConstant.id} INTEGER,'
+        '${DBConstant.name} TEXT,'
+        '${DBConstant.completeName} TEXT,'
+        '${DBConstant.parentId} INTEGER,'
+        '${DBConstant.parentName} TEXT,'
+        '${DBConstant.parentPath} TEXT,'
+        '${DBConstant.writeDate} TEXT'
+        ')');
+  }
+
+  _createChildCategoryTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.childCategoryTable} '
+        '(${DBConstant.parentId} INTEGER,'
+        '${DBConstant.childId} INTEGER'
         ')');
   }
 }

@@ -12,7 +12,7 @@ class SyncApiRepo extends BaseApiRepo {
     // Response response = await ApiCall(ApiUtils.buildDio())
     //     .postMethodCall(path: '/post/', data: data);
     Response response =
-    await postMethodCall(additionalPath: '/post/', params: data);
+    await postMethodCall(additionalPath: '/api/sync/', params: data);
     return BaseApiResponse.fromJson(response.data, fromJson: SyncResponse.fromJson);
   }
 
@@ -22,7 +22,7 @@ class SyncApiRepo extends BaseApiRepo {
     // final response = await ApiCall(ApiUtils.buildDio())
     //     .postMethodCall(path: '/post/', data: data);
     Response response =
-    await postMethodCall(additionalPath: '/post/', params: data);
+    await postMethodCall(additionalPath: '/api/sync/', bodyData: data);
     // print(response);
     return response;
   }
