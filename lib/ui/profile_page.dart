@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mmt_mobile/src/style/app_color.dart';
 
+import '../model/partner.dart';
+import '../model/tag.dart';
+import '../src/enum.dart';
+
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
@@ -9,11 +13,12 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       // backgroundColor: Colors.white70,
-      appBar: AppBar(title: Text("Profile"),),
+      appBar: AppBar(title: const Text("Profile"),),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: Column(

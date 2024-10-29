@@ -1,24 +1,5 @@
-// import 'package:atom_ui/grid_utils/grild_utils.dart';
-// import 'package:atom_ui/on_clicked_listener.dart';
-// import 'package:atom_ui/widgets/memory_asset_image_view.dart';
-// import 'package:atom_ui/widgets/no_item_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/model/employee.dart';
-// import 'package:mscm_odoo/business_logic/bloc/bloc_crud_process_state.dart';
-// import 'package:mscm_odoo/business_logic/bloc/customer/customer_bloc.dart';
-// import 'package:mscm_odoo/business_logic/bloc/customer_ui_change/customer_ui_change_cubit.dart';
-// import 'package:mscm_odoo/business_logic/bloc/route_tab_bar_cubit/route_tabbar_select_cubit.dart';
-// import 'package:mscm_odoo/models/partner.dart';
-// import 'package:mscm_odoo/src/constant_dimens.dart';
-// import 'package:mscm_odoo/src/constant_widgets.dart';
-// import 'package:mscm_odoo/src/image_assets.dart';
-// import 'package:mscm_odoo/src/themes.dart';
-// import 'package:mscm_odoo/ui/pages/route_map_page.dart';
-// import 'package:mscm_odoo/ui/widgets/cust_dialog.dart';
-
-import '../../business logic/bloc/bloc_crud_process_state.dart';
-import '../../business logic/bloc/customer/customer_bloc.dart';
 import '../../common_widget/constant_widgets.dart';
 import '../../grid_utils/grild_utils.dart';
 import '../../model/partner.dart';
@@ -26,8 +7,8 @@ import '../../on_clicked_listener.dart';
 import '../../src/const_dimen.dart';
 import '../../src/image_assets.dart';
 import '../../src/style/app_color.dart';
+import 'cust_mini_dialog.dart';
 import 'memory_asset_image_view.dart';
-import 'no_item_widget.dart';
 
 class CustomerListWidget extends StatelessWidget {
   final OnClickCallBack<Employee> onClickCallBack;
@@ -233,8 +214,8 @@ class CustomerListWidget extends StatelessWidget {
     bool? success = await showDialog(
         context: context,
         builder: (BuildContext context) {
-          return Container();
-          // return CustDialog.createDialog(context, selectedCustomer);
+          // return Container();
+          return CustDialog.createDialog(context, selectedCustomer);
         });
     if (success ?? false) {
       if (callback != null) callback(success!);
