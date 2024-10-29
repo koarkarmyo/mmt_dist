@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:mmt_mobile/sync/models/sync_action.dart';
+import 'package:mmt_mobile/sync/models/sync_response.dart';
 
 import '../common_widget/alert_dialog.dart';
 import '../common_widget/sync_progress_dialog.dart';
@@ -30,7 +32,22 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Center(
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            List<SyncResponse> actionList = [];
+            actionList.add(SyncResponse(
+              name: 'get_category'
+            ));
+            Future.delayed(Duration.zero, () {
+              showDialog(
+                  context: context,
+                  builder: (context) => SyncProgressDialog(
+                      key: _dialogKey
+                    // cancelClicked: () => _syncBloc
+                    //     .add(GetSyncActionCancelEvent()),
+                  ));
+            });
+            MainSyncProcess.instance.startManualSyncProcess(actionList);
+          },
           child: const TextWidget("Sync"),
         ),
       ),

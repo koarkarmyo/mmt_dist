@@ -16,7 +16,7 @@ class MMTApplication {
   // Server
   // static const String serverUrl = 'http://217.15.166.234:8069';
 
-  static String serverUrl = '';
+  static String serverUrl = 'http://192.168.1.24:8016';
   static Employee? currentUser;
   static Company? selectedCompany;
 
@@ -28,5 +28,4 @@ class MMTApplication {
 
   static ValueNotifier<LanguageCode> languageNotifier =
       ValueNotifier(LanguageCode.eng);
-
 }

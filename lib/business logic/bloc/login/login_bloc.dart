@@ -52,28 +52,28 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
     emit(state.copyWith(status: LoginStatus.loading));
     try {
-      Employee? employee = await LoginApiRepo()
-          .employeeLogin(username: event.username, password: event.password);
+    Employee? employee = await LoginApiRepo()
+        .employeeLogin(username: event.username, password: event.password);
 
-      print("Login User : ${employee?.toJson()}");
+    print("Login User : ${employee?.toJson()}");
 
-      if (employee == null) {
-        emit(state.copyWith(status: LoginStatus.fail));
-        await Future.delayed(1.second);
-        emit(state.copyWith(status: LoginStatus.initial));
+    if (employee == null) {
+      emit(state.copyWith(status: LoginStatus.fail));
+      await Future.delayed(1.second);
+      emit(state.copyWith(status: LoginStatus.initial));
+    } else {
+      MMTApplication.currentUser = employee;
+      SharePrefUtils()
+          .saveString(ShKeys.currentUser, jsonEncode(employee.toJson()));
+      bool _saveSyncActionSuccess =
+          await _saveSyncAction(syncActionList: employee.syncActionList ?? []);
+      if (!_saveSyncActionSuccess) {
+        emit(state.copyWith(
+            status: LoginStatus.fail, error: "Sync Action Save Fail"));
       } else {
-        MMTApplication.currentUser = employee;
-        SharePrefUtils()
-            .saveString(ShKeys.currentUser, jsonEncode(employee.toJson()));
-        bool _saveSyncActionSuccess = await _saveSyncAction(
-            syncActionList: employee.syncActionList ?? []);
-        if (!_saveSyncActionSuccess) {
-          emit(state.copyWith(
-              status: LoginStatus.fail, error: "Sync Action Save Fail"));
-        } else {
-          emit(state.copyWith(status: LoginStatus.success));
-        }
+        emit(state.copyWith(status: LoginStatus.success));
       }
+    }
     } on DioException {
       _emitFail();
     } on OdooException {
@@ -86,21 +86,33 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   Future<bool> _saveSyncAction(
       {required List<SyncAction> syncActionList}) async {
     try {
-      List<Map<String, dynamic>> syncActionMapList = [];
-      List<Map<String, dynamic>> syncGroupMapList = [];
-      syncActionList.forEach(
-        (element) {
-          syncActionMapList.add(element.toJson());
-          for (SyncActionGroup syncGroup in element.actionGroup ?? []) {
-            syncGroupMapList.add(syncGroup.toJson());
+      List<Map<String, dynamic>> actionJson = [];
+      List<Map<String, dynamic>> groupList = [];
+      List<Map<String, dynamic>> actionWithGroupJsonList = [];
+      syncActionList.forEach((element) {
+        actionJson.add(element.toJson());
+
+        for (SyncActionGroup actionGroup in element.actionGroup ?? []) {
+          Map<String, dynamic> actionJson = {};
+          int index =
+          groupList.indexWhere((element) => element['id'] == actionGroup.id);
+          if (index <= -1) {
+            groupList.add(actionGroup.toJson());
           }
-        },
-      );
+          actionJson['action_id'] = element.id;
+          actionJson['action_name'] = element.name;
+          actionJson['action_group_id'] = actionGroup.id;
+          actionJson['action_group_name'] = actionGroup.name;
+          actionWithGroupJsonList.add(actionJson);
+        }
+      });
       bool syncActionSuccess = await DatabaseHelper.instance
-          .insertDataListBath(DBConstant.syncActionTable, syncActionMapList);
+          .insertDataListBath(DBConstant.syncActionTable, actionJson);
       bool syncGroupSuccess = await DatabaseHelper.instance.insertDataListBath(
-          DBConstant.syncActionGroupTable, syncGroupMapList);
-      return syncActionSuccess && syncGroupSuccess;
+          DBConstant.syncActionGroupTable, groupList);
+      bool syncGroupActionSuccess = await DatabaseHelper.instance.insertDataListBath(
+          DBConstant.syncActionWithGroupTable, actionWithGroupJsonList);
+      return syncActionSuccess && syncGroupSuccess && syncGroupActionSuccess;
     } on Exception {
       return false;
     }

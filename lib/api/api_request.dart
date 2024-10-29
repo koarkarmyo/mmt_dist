@@ -2,11 +2,9 @@ import 'package:mmt_mobile/database/database_helper.dart';
 
 import '../src/mmt_application.dart';
 
-class ApiRequest{
-
-
+class ApiRequest {
   static Map<String, dynamic> createRequest(
-      {required String action, required List<Map<String, dynamic>> whereArgs}) {
+      {required String action, required Map<String, dynamic> whereArgs}) {
     Map<String, dynamic> json = {
       "name": action,
       "args": whereArgs,
@@ -20,18 +18,14 @@ class ApiRequest{
       "name": actionName,
       "token": '${DateTime.now().millisecondsSinceEpoch}',
       "args": [
-        {
-          "name": "device_id",
-          "value": null
-        }
+        {"name": "device_id", "value": null}
       ]
     };
   }
 
-
   static createActionRequest(String actionName) async {
-    final String writeDate =
-    await DatabaseHelper.instance.getLastWriteDate(actionName: actionName);
+    final String? writeDate =
+        await DatabaseHelper.instance.getLastWriteDate(actionName: actionName);
 
     // int locationId = MMTApplication.user.currentLocationId ?? 0;
     // if (actionName == 'get_wh_stock') {
@@ -131,13 +125,19 @@ class ApiRequest{
     // }
     return ApiRequest.createRequest(
         action:
-        actionName == 'get_wh_stock' ? 'get_inventory_stock' : actionName,
-        whereArgs: [
-          {"name": "company_id", "value": MMTApplication.selectedCompany?.id},
-          {"name": "staff_role_id", "value": MMTApplication.currentUser?.id},
-          {"name": "location_id", "value": 0},
-          {"name": "write_date", "value": writeDate},
-          {"name": "employee_id", "value": MMTApplication.currentUser?.id},
-        ]);
+            actionName == 'get_wh_stock' ? 'get_inventory_stock' : actionName,
+        whereArgs:
+            // {"name": "company_id", "value": MMTApplication.selectedCompany?.id},
+            // {"name": "staff_role_id", "value": MMTApplication.currentUser?.id},
+            // {"name": "location_id", "value": 0},
+            // {"name": "write_date", "value": writeDate},
+            // {"name": "employee_id", "value": MMTApplication.currentUser?.id},
+            {
+          "company_id": MMTApplication.loginResponse?.companyId,
+          "staff_role_id": MMTApplication.currentUser?.id,
+          "location_id": 0,
+          "write_date": writeDate,
+          "employee_id": MMTApplication.currentUser?.id
+        });
   }
 }
