@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../src/const_dimen.dart';
+import '../src/style/app_color.dart';
 import 'constant_widgets.dart';
 
 // ignore: must_be_immutable
@@ -33,6 +34,7 @@ class SyncProgressDialogState extends State<SyncProgressDialog> {
   }
 
   void closeDialog() {
+    print("Close Dialog");
     if (mounted) {
       Navigator.pop(context);
     }
@@ -50,7 +52,7 @@ class SyncProgressDialogState extends State<SyncProgressDialog> {
               borderRadius:
               BorderRadius.circular(ConstantDimens.normalPadding)),
           child: Container(
-            padding: EdgeInsets.all(ConstantDimens.normalPadding),
+            padding: const EdgeInsets.all(ConstantDimens.pagePadding),
             width: 200,
             // height: 150,
             child: Column(
@@ -64,38 +66,36 @@ class SyncProgressDialogState extends State<SyncProgressDialog> {
                         style: Theme.of(context).textTheme.headlineSmall),
                   ),
                 ),
-                Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      LinearProgressIndicator(
-                        backgroundColor: Colors.red,
-                        color: Colors.purple,
-                        value: progressPercent,
-                      ),
-                      ConstantWidgets.SizedBoxHeight,
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              '${actionName}',
-                              overflow: TextOverflow.clip,
-                            ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    LinearProgressIndicator(
+                      backgroundColor: AppColors.primaryColorPale,
+                      color: AppColors.successColor,
+                      value: progressPercent,
+                    ),
+                    ConstantWidgets.SizedBoxHeight,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            actionName,
+                            overflow: TextOverflow.clip,
                           ),
-                          Text(
-                              '${(progressPercent * 100).toStringAsFixed(2)} %'),
-                        ],
-                      ),
-                      ConstantWidgets.SizedBoxHeight,
-                      // TextButton(
-                      //     onPressed: () {
-                      //       Navigator.pop(context);
-                      //     },
-                      //     child: Text('Cancel')),
-                    ],
-                  ),
+                        ),
+                        Text(
+                            '${(progressPercent * 100).toStringAsFixed(2)} %'),
+                      ],
+                    ),
+                    ConstantWidgets.SizedBoxHeight,
+                    // TextButton(
+                    //     onPressed: () {
+                    //       Navigator.pop(context);
+                    //     },
+                    //     child: Text('Cancel')),
+                  ],
                 ),
                 // if (widget.cancelClicked != null)
                 //   ElevatedButton(

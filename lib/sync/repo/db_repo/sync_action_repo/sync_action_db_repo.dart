@@ -1,5 +1,3 @@
-
-
 import '../../../../database/base_db_repo.dart';
 import '../../../../database/db_constant.dart';
 import '../../../models/sync_group.dart';
@@ -23,6 +21,24 @@ class SyncActionDBRepo extends BaseDBRepo {
     }
 
     return groupList;
+  }
+
+  Future<List<SyncResponse>> getActionList({required bool isManualSync}) async {
+    List<SyncResponse> actionList = [];
+
+    List<Map<String, dynamic>> actionJsonList = await helper
+        .readDataByWhereArgs(
+            tableName: DBConstant.syncActionTable,
+            where: '${DBConstant.iSManualSync}=?',
+            whereArgs: [isManualSync == true ? 1 : 0]);
+
+    actionJsonList.forEach(
+      (element) {
+        actionList.add(SyncResponse.fromJsonDB(element));
+      },
+    );
+
+    return actionList;
   }
 
   Future<List<SyncResponse>> getActionListByGroup(int gpId,

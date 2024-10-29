@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/business%20logic/bloc/fetch_database/fetch_database_cubit.dart';
 import 'package:mmt_mobile/common_widget/text_widget.dart';
 import 'package:mmt_mobile/route/route_list.dart';
+import 'package:mmt_mobile/sync/bloc/sync_action_bloc/sync_action_bloc_cubit.dart';
 import 'package:mmt_mobile/ui/home_page.dart';
 import 'package:mmt_mobile/ui/login/admin_login.dart';
 import 'package:mmt_mobile/ui/login/login_page.dart';
@@ -42,9 +43,14 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
     case RouteList.homePage:
       return _buildPageRoute(routeSettings, const HomePage());
     case RouteList.profilePage:
-      return _buildPageRoute(routeSettings, const ProfilePage());
-  // case RouteList.dashboardPage:
-  //   return _buildPageRoute(routeSettings, const DashboardPage() );
+      return _buildPageRoute(
+          routeSettings,
+          MultiBlocProvider(
+            providers: [BlocProvider(create: (context) => SyncActionCubit())],
+            child: const ProfilePage(),
+          ));
+    // case RouteList.dashboardPage:
+    //   return _buildPageRoute(routeSettings, const DashboardPage() );
     case RouteList.routePage:
       return _buildPageRoute(routeSettings, const RoutePage());
     default:
