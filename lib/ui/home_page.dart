@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int selectedTitleIndex = 0;
+  final ValueNotifier selectedTitleIndexNotifier = ValueNotifier(0);
 
   final List<String> titles = [
     "Sale",
@@ -176,7 +176,7 @@ class _HomePageState extends State<HomePage> {
                     buildTitleList()
                   ],
                 )),
-            Text(titles[selectedTitleIndex],
+            Text(titles[selectedTitleIndexNotifier.value],
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold))
                 .padding(padding: 5.allPadding),
@@ -191,115 +191,124 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildTitleList() {
-    return Padding(
-      padding: 10.allPadding,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: List.generate(titles.length, (index) {
-            return Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    selectedTitleIndex = index;
-                  });
-                },
-                child: Container(
-                  width: 250,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: selectedTitleIndex == index
-                        ? Colors.blueAccent
-                        : Colors.black12,
-                  ),
-                  alignment: Alignment.center,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5),
-                    child: Text(
-                      titles[index],
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: selectedTitleIndex == index
-                            ? FontWeight.bold
-                            : null,
-                        color: selectedTitleIndex == index
-                            ? Colors.white
-                            : Colors.black,
+    return StatefulBuilder(
+      builder: (context, innerState) {
+        return Padding(
+          padding: 10.allPadding,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: List.generate(titles.length, (index) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: InkWell(
+                    onTap: () {
+                      innerState(() {
+                        selectedTitleIndexNotifier.value = index;
+                      },);
+                    },
+                    child: Container(
+                      width: 250,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: selectedTitleIndexNotifier.value == index
+                            ? Colors.blueAccent
+                            : Colors.black12,
+                      ),
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        child: Text(
+                          titles[index],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: selectedTitleIndexNotifier.value == index
+                                ? FontWeight.bold
+                                : null,
+                            color: selectedTitleIndexNotifier.value == index
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-            );
-          }),
-        ),
-      ),
+                );
+              }),
+            ),
+          ),
+        );
+      },
     );
   }
 
   Widget buildProcessList() {
-    final processes = processLists[selectedTitleIndex];
     return Expanded(
-      child: GridView.builder(
-        padding: EdgeInsets.symmetric(horizontal: 10),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 5,
-          mainAxisSpacing: 6,
-          childAspectRatio: 0.8,
-        ),
-        itemCount: processes.length,
-        itemBuilder: (context, index) {
-          final process = processes[index];
-          return InkWell(
-            borderRadius: 10.borderRadius,
-            onTap: () {
-              debugPrint("Process clicked: $process");
+      child: ValueListenableBuilder(
+        valueListenable: selectedTitleIndexNotifier,
+        builder: (context, selectedTitleIndex, _) {
+          final processes = processLists[selectedTitleIndex];
+          return GridView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 5,
+              mainAxisSpacing: 6,
+              childAspectRatio: 0.8,
+            ),
+            itemCount: processes.length,
+            itemBuilder: (context, index) {
+              final process = processes[index];
+              return InkWell(
+                borderRadius: 10.borderRadius,
+                onTap: () {
+                  debugPrint("Process clicked: $process");
 
-              if (process == "Route") {
-                Navigator.pushNamed(context, RouteList.routePage);
-              } else if (process == "Contact") {
-                Navigator.pushNamed(context, RouteList.contactPage);
-              }
-            },
-            child: Card(
-              elevation: 0.6,
-              surfaceTintColor: Colors.blueGrey,
-              shadowColor: Colors.black,
-              color: Colors.white,
-              borderOnForeground: true,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                  if (process == "Route") {
+                    Navigator.pushNamed(context, RouteList.routePage);
+                  } else if (process == "Contact") {
+                    Navigator.pushNamed(context, RouteList.contactPage);
+                  }
+                },
+                child: Card(
+                  elevation: 0.6,
+                  surfaceTintColor: Colors.blueGrey,
+                  shadowColor: Colors.black,
+                  color: Colors.white,
+                  borderOnForeground: true,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10.0, vertical: 10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Icon(Icons.business_center, size: 25),
+                        const Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(Icons.business_center, size: 25),
+                          ],
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          process,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.black45,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.right,
+                        ),
                       ],
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      process,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.black45,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.right,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           );
         },
       ),
