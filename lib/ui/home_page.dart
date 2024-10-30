@@ -4,13 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 
-// import '../common_widget/alert_dialog.dart';
-// import '../common_widget/sync_progress_dialog.dart';
-// import '../common_widget/text_widget.dart';
 import '../route/route_list.dart';
-import '../src/const_dimen.dart';
-import '../src/style/app_color.dart';
-// import '../sync/sync_utils/main_sync_process.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,7 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int selectedTitleIndex = 0;
+  final ValueNotifier selectedTitleIndexNotifier = ValueNotifier(0);
 
   final List<String> titles = [
     "Sale",
@@ -54,48 +48,137 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return SafeArea(
+      child: Scaffold(
         backgroundColor: Colors.white,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 15.0),
-          child: IconButton(
-            onPressed: () {
-              debugPrint("Profile");
-              Navigator.of(context).pushNamed(RouteList.profilePage);
-            },
-            icon: const Icon(Icons.person_2_rounded, size: 30),
-          ),
-        ),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text("SR1"),
-            IconButton(
-                onPressed: () {
-                  debugPrint("SYNC");
-                },
-                icon: const Icon(
-                  Icons.sync,
-                  size: 25,
-                ))
-          ],
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        child: Column(
+        // appBar: AppBar(
+        //   backgroundColor: Colors.white,
+        //   leading: Padding(
+        //     padding: const EdgeInsets.only(left: 15.0),
+        //     child: IconButton(
+        //       onPressed: () {
+        //         debugPrint("Profile");
+        //         Navigator.of(context).pushNamed(RouteList.profilePage);
+        //       },
+        //       icon: const Icon(Icons.person_2_rounded, size: 30),
+        //     ),
+        //   ),
+        //   title: Row(
+        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //     children: [
+        //       const Text("SR1"),
+        //       IconButton(
+        //           onPressed: () {
+        //             debugPrint("SYNC");
+        //           },
+        //           icon: const Icon(
+        //             Icons.sync,
+        //             size: 30,
+        //           ))
+        //     ],
+        //   ),
+        // ),
+        body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            buildTitleList(),
-            const SizedBox(
-              height: 10,
-            ),
-            const Divider(),
-            Text(titles[selectedTitleIndex],
-                style: const TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.bold))
+            Container(
+                height: 350,
+                padding: 10.allPadding,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: 10.allPadding,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Dashboard",
+                                style: TextStyle(
+                                    fontSize: 25, fontWeight: FontWeight.bold),
+                              ),
+                              Text("Hello Sr1", style: TextStyle(fontSize: 12))
+                            ],
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                color: Colors.white),
+                            child: IconButton(
+                              onPressed: () {
+                                debugPrint("Profile");
+                                Navigator.of(context)
+                                    .pushNamed(RouteList.profilePage);
+                              },
+                              icon:
+                                  const Icon(Icons.person_2_rounded, size: 30),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    const Divider(
+                      color: Colors.black12,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.blueAccent,
+                              borderRadius: BorderRadius.circular(5)),
+                          height: 70,
+                          width: 135,
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("Delivery Sync",style: TextStyle(color: Colors.white),),
+                              Icon(Icons.sync,color: Colors.white,),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.blueAccent,
+                              borderRadius: BorderRadius.circular(5)),
+                          height: 70,
+                          width: 135,
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("Sale Sync",style: TextStyle(color: Colors.white),),
+                              Icon(Icons.sync,color: Colors.white,),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.blueAccent,
+                              borderRadius: BorderRadius.circular(5)),
+                          height: 70,
+                          width: 90,
+                          child: const Icon(Icons.sync,size: 45,color: Colors.white,),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    buildTitleList()
+                  ],
+                )),
+            Text(titles[selectedTitleIndexNotifier.value],
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold))
                 .padding(padding: 5.allPadding),
             const SizedBox(
               height: 5,
@@ -108,114 +191,127 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildTitleList() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: List.generate(titles.length, (index) {
-            return Padding(
-              padding: const EdgeInsets.only(right: 8.0), // Add spacing between items
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    selectedTitleIndex = index;
-                  });
-                },
-                child: Container(
-                  width: 150,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Colors.grey,
-                    ),
-                    color: selectedTitleIndex == index
-                        ? AppColors.primaryColor
-                        : Colors.white,
-                  ),
-                  alignment: Alignment.center,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5),
-                    child: Text(
-                      titles[index],
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontWeight: selectedTitleIndex == index
-                            ? FontWeight.bold
-                            : null,
-                        color: selectedTitleIndex == index
-                            ? Colors.white
-                            : Colors.black,
+    return StatefulBuilder(
+      builder: (context, innerState) {
+        return Padding(
+          padding: 10.allPadding,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: List.generate(titles.length, (index) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: InkWell(
+                    onTap: () {
+                      innerState(() {
+                        selectedTitleIndexNotifier.value = index;
+                      },);
+                    },
+                    child: Container(
+                      width: 250,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: selectedTitleIndexNotifier.value == index
+                            ? Colors.blueAccent
+                            : Colors.black12,
+                      ),
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        child: Text(
+                          titles[index],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: selectedTitleIndexNotifier.value == index
+                                ? FontWeight.bold
+                                : null,
+                            color: selectedTitleIndexNotifier.value == index
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-            );
-          }),
-        ),
-      ),
+                );
+              }),
+            ),
+          ),
+        );
+      },
     );
   }
 
-
   Widget buildProcessList() {
-    final processes = processLists[selectedTitleIndex];
     return Expanded(
-      child: ListView(
-        shrinkWrap: true,
-        children: [
-          Wrap(
-            alignment: WrapAlignment.start,
-            spacing: 8,
-            runSpacing: 6,
-            children: processes.map((process) {
+      child: ValueListenableBuilder(
+        valueListenable: selectedTitleIndexNotifier,
+        builder: (context, selectedTitleIndex, _) {
+          final processes = processLists[selectedTitleIndex];
+          return GridView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 5,
+              mainAxisSpacing: 6,
+              childAspectRatio: 0.8,
+            ),
+            itemCount: processes.length,
+            itemBuilder: (context, index) {
+              final process = processes[index];
               return InkWell(
+                borderRadius: 10.borderRadius,
                 onTap: () {
                   debugPrint("Process clicked: $process");
 
-                  if(process == "Route"){
+                  if (process == "Route") {
                     Navigator.pushNamed(context, RouteList.routePage);
-                  }
-                  else if (process == "Contact"){
+                  } else if (process == "Contact") {
                     Navigator.pushNamed(context, RouteList.contactPage);
                   }
                 },
-                child: Container(
-                  height: 60,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(),
-                    color: Colors.white,
-                  ),
-                  alignment: Alignment.center,
+                child: Card(
+                  elevation: 0.6,
+                  surfaceTintColor: Colors.blueGrey,
+                  shadowColor: Colors.black,
+                  color: Colors.white,
+                  borderOnForeground: true,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10.0, vertical: 10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Icon(Icons.business_center, size: 35),
-                        const SizedBox(width: ConstantDimens.sizedBoxM),
+                        const Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(Icons.business_center, size: 25),
+                          ],
+                        ),
+                        const SizedBox(width: 8),
                         Text(
                           process,
-                          maxLines: 1,
-                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                              color: Colors.black, fontSize: 16),
+                            color: Colors.black45,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.right,
                         ),
                       ],
                     ),
                   ),
                 ),
               );
-            }).toList(),
-          ),
-        ],
+            },
+          );
+        },
       ),
     );
   }
 }
-
