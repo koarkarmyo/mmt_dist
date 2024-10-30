@@ -22,11 +22,26 @@ class SyncActionCubit extends Cubit<SyncActionState> {
   }
 
   getSyncAction({required bool isManualSync, String? groupName}) async {
-    List<SyncResponse> actionList = await _actionDBRepo.getActionList(
-        isManualSync: isManualSync, groupName: groupName);
+    try {
+      final startTime = DateTime.now();
 
-    emit(state.copyWith(
-        actionList: actionList, state: BlocCRUDProcessState.fetchSuccess));
+      List<SyncResponse> actionList = await _actionDBRepo.getActionList(
+          isManualSync: isManualSync, groupName: groupName);
+      List<SyncActionGroup> syncActionGroupList =
+          await _actionDBRepo.getSyncActionGroups();
+
+      final endTime = DateTime.now();
+      final elapsedTime = endTime.difference(startTime).inMilliseconds;
+      print('Execution took $elapsedTime milliseconds');
+
+      emit(state.copyWith(
+        actionGroupList: syncActionGroupList,
+        actionList: actionList,
+        state: BlocCRUDProcessState.fetchSuccess,
+      ));
+    } on Exception {
+      emit(state.copyWith(state: BlocCRUDProcessState.fetchFail));
+    }
   }
 
   getActionListByGroupId(int gpId) async {
@@ -44,7 +59,7 @@ class SyncActionCubit extends Cubit<SyncActionState> {
   getActionListByGroupName({required String groupName}) async {
     emit(state.copyWith(state: BlocCRUDProcessState.fetching));
     List<SyncResponse> actionList =
-    await _actionDBRepo.getActionListByGroup(groupName: groupName);
+        await _actionDBRepo.getActionListByGroup(groupName: groupName);
     List<SyncResponse> selectedList = [...actionList];
     emit(state.copyWith(
         state: BlocCRUDProcessState.fetchSuccess,

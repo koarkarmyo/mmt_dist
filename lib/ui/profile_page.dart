@@ -15,6 +15,9 @@ import '../common_widget/bottom_sheet_selection_widget.dart';
 import '../common_widget/sync_progress_dialog.dart';
 import '../model/partner.dart';
 import '../model/tag.dart';
+import '../route/route_list.dart';
+import '../share_preference/sh_keys.dart';
+import '../share_preference/sh_utils.dart';
 import '../src/enum.dart';
 import '../sync/bloc/sync_action_bloc/sync_action_bloc_cubit.dart';
 import '../sync/models/sync_response.dart';
@@ -115,6 +118,14 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       persistentFooterButtons: [
         _buildButton(
+            onPressed: () async {
+              await SharePrefUtils().delete(ShKeys.currentUser);
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                RouteList.loginPage,
+                (route) => false,
+              );
+            },
             label: "Log Out",
             icon: Icons.logout,
             color: AppColors.primaryColor,
@@ -124,8 +135,9 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _syncWidget() {
-    return const ListTile(title: Text("Delivery Sync"),
-    subtitle: Text("sync action name"),
+    return const ListTile(
+      title: Text("Delivery Sync"),
+      subtitle: Text("sync action name"),
     );
   }
 
@@ -272,10 +284,10 @@ class _ProfilePageState extends State<ProfilePage> {
         if (data.isFinished) {
           print("Sync Complete");
           _dialogKey.currentState?.closeDialog();
-          Future.delayed(Duration(milliseconds: 300)).then((value) {
+          Future.delayed(const Duration(milliseconds: 300)).then((value) {
             _dialogKey.currentState?.closeDialog();
             if (data.message == MainSyncProcess.failMessage) {
-              Future.delayed(Duration(milliseconds: 100), () {
+              Future.delayed(const Duration(milliseconds: 100), () {
                 if (context.mounted) {
                   showDialog(
                       context: context,

@@ -9,11 +9,13 @@ class BottomSheetSelectionWidget extends StatefulWidget {
       {super.key,
       required this.selectionList,
       required this.onTap,
-      required this.selectedValueList});
+      required this.selectedValueList,
+      this.listTitle});
 
   List<String?> selectionList;
   VoidCallback onTap;
   ValueNotifier<List<bool>> selectedValueList;
+  String? listTitle;
 
   @override
   State<BottomSheetSelectionWidget> createState() =>
@@ -28,11 +30,14 @@ class _BottomSheetSelectionWidgetState
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
+    widget.selectedValueList.value = [];
     widget.selectionList.forEach(
       (element) {
         widget.selectedValueList.value.add(true);
       },
     );
+
+    print("Select List : ${widget.selectedValueList}");
   }
 
   @override
@@ -44,8 +49,8 @@ class _BottomSheetSelectionWidgetState
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              "Sync Action List",
+            Text(
+              widget.listTitle ?? "Sync Action List",
               style: TextStyle(fontWeight: FontWeight.w700),
             ),
             GestureDetector(
@@ -81,8 +86,8 @@ class _BottomSheetSelectionWidgetState
                       widget.selectedValueList.value = List.from(boolList);
                     },
                     dense: true,
-                    title: Text(
-                      'select all',
+                    title: const Text(
+                      'SELECT ALL',
                       style: TextStyle(fontWeight: FontWeight.w600),
                     ).padding(padding: 8.horizontalPadding),
                     trailing: Checkbox(

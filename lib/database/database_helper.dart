@@ -33,6 +33,8 @@ class DatabaseHelper {
     int? id =  await  _database?.insert(table, values);
     return id != null;
   }
+  
+  
 
   Future deleteAllRow({required String tableName}) async {
     Database db = await database;
@@ -53,6 +55,8 @@ class DatabaseHelper {
         where:
         '$where IN (${List.filled(wantDeleteRow.length, '?').join(',')})',
         whereArgs: wantDeleteRow);
+
+    print("Deleted rows : $affectedRow : $tableName");
 
     return affectedRow == wantDeleteRow.length;
   }

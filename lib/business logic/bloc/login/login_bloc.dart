@@ -52,28 +52,28 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
     emit(state.copyWith(status: LoginStatus.loading));
     try {
-    Employee? employee = await LoginApiRepo()
-        .employeeLogin(username: event.username, password: event.password);
+      Employee? employee = await LoginApiRepo()
+          .employeeLogin(username: event.username, password: event.password);
 
-    print("Login User : ${employee?.toJson()}");
+      print("Login User : ${employee?.toJson()}");
 
-    if (employee == null) {
-      emit(state.copyWith(status: LoginStatus.fail));
-      await Future.delayed(1.second);
-      emit(state.copyWith(status: LoginStatus.initial));
-    } else {
-      MMTApplication.currentUser = employee;
-      SharePrefUtils()
-          .saveString(ShKeys.currentUser, jsonEncode(employee.toJson()));
-      bool _saveSyncActionSuccess =
-          await _saveSyncAction(syncActionList: employee.syncActionList ?? []);
-      if (!_saveSyncActionSuccess) {
-        emit(state.copyWith(
-            status: LoginStatus.fail, error: "Sync Action Save Fail"));
+      if (employee == null) {
+        emit(state.copyWith(status: LoginStatus.fail));
+        await Future.delayed(1.second);
+        emit(state.copyWith(status: LoginStatus.initial));
       } else {
-        emit(state.copyWith(status: LoginStatus.success));
+        MMTApplication.currentUser = employee;
+        SharePrefUtils()
+            .saveString(ShKeys.currentUser, jsonEncode(employee.toJson()));
+        bool _saveSyncActionSuccess = await _saveSyncAction(
+            syncActionList: employee.syncActionList ?? []);
+        if (!_saveSyncActionSuccess) {
+          emit(state.copyWith(
+              status: LoginStatus.fail, error: "Sync Action Save Fail"));
+        } else {
+          emit(state.copyWith(status: LoginStatus.success));
+        }
       }
-    }
     } on DioException {
       _emitFail();
     } on OdooException {
@@ -94,8 +94,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
         for (SyncActionGroup actionGroup in element.actionGroup ?? []) {
           Map<String, dynamic> actionJson = {};
-          int index =
-          groupList.indexWhere((element) => element['id'] == actionGroup.id);
+          int index = groupList
+              .indexWhere((element) => element['id'] == actionGroup.id);
           if (index <= -1) {
             groupList.add(actionGroup.toJson());
           }
@@ -106,12 +106,40 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           actionWithGroupJsonList.add(actionJson);
         }
       });
+
+      await DatabaseHelper.instance.deleteRows(
+          tableName: DBConstant.syncActionTable,
+          where: DBConstant.id,
+          wantDeleteRow: syncActionList
+              .map(
+                (e) => e.id,
+              )
+              .toList());
+      await DatabaseHelper.instance.deleteRows(
+          tableName: DBConstant.syncActionWithGroupTable,
+          where: DBConstant.actionId,
+          wantDeleteRow: actionWithGroupJsonList
+              .map(
+                (e) => e['action_id'],
+              )
+              .toList());
+      await DatabaseHelper.instance.deleteRows(
+          tableName: DBConstant.syncActionGroupTable,
+          where: DBConstant.id,
+          wantDeleteRow: groupList
+              .map(
+                (e) => e[DBConstant.id],
+              )
+              .toList());
+
       bool syncActionSuccess = await DatabaseHelper.instance
           .insertDataListBath(DBConstant.syncActionTable, actionJson);
-      bool syncGroupSuccess = await DatabaseHelper.instance.insertDataListBath(
-          DBConstant.syncActionGroupTable, groupList);
-      bool syncGroupActionSuccess = await DatabaseHelper.instance.insertDataListBath(
-          DBConstant.syncActionWithGroupTable, actionWithGroupJsonList);
+      bool syncGroupSuccess = await DatabaseHelper.instance
+          .insertDataListBath(DBConstant.syncActionGroupTable, groupList);
+      bool syncGroupActionSuccess = await DatabaseHelper.instance
+          .insertDataListBath(
+              DBConstant.syncActionWithGroupTable, actionWithGroupJsonList);
+
       return syncActionSuccess && syncGroupSuccess && syncGroupActionSuccess;
     } on Exception {
       return false;
@@ -129,11 +157,15 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       }
       MMTApplication.serverUrl = url;
       String? sessionKey = await SharePrefUtils().getString(ShKeys.sessionKey);
+      String? currentUser =
+          await SharePrefUtils().getString(ShKeys.currentUser);
       // print("Session : $sessionKey");
       bool getSuccess = await _getFromSharedPreference();
       if (sessionKey != null) {
         Map<String, dynamic> data = await json.decode(sessionKey);
         MMTApplication.session = Session.fromJson(data);
+      }
+      if (currentUser != null && sessionKey != null) {
         // add the session id to the request
         (getSuccess)
             ? emit(state.copyWith(status: LoginStatus.success))
