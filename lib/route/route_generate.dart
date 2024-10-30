@@ -42,7 +42,12 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
             child: const LoginPage(),
           ));
     case RouteList.homePage:
-      return _buildPageRoute(routeSettings, const HomePage());
+      return _buildPageRoute(
+          routeSettings,
+          MultiBlocProvider(
+            providers: [BlocProvider(create: (context) => SyncActionCubit())],
+            child: const HomePage(),
+          ));
     case RouteList.profilePage:
       return _buildPageRoute(
           routeSettings,

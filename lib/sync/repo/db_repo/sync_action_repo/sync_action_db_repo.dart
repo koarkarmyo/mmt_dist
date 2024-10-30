@@ -35,10 +35,8 @@ class SyncActionDBRepo extends BaseDBRepo {
           where: ' ${DBConstant.actionGroupName} =? ',
           whereArgs: [groupName]);
       actionJsonList.forEach(
-            (element) {
-          actionList.add(SyncResponse(
-            name: element['action_name']
-          ));
+        (element) {
+          actionList.add(SyncResponse(name: element['action_name']));
         },
       );
     } else {
@@ -47,29 +45,43 @@ class SyncActionDBRepo extends BaseDBRepo {
           where: '${DBConstant.iSManualSync}=? ',
           whereArgs: [isManualSync == true ? 1 : 0]);
 
+      List<Map<String, dynamic>> actionGroupList = await helper.readAllData(
+          tableName: DBConstant.syncActionWithGroupTable);
+
       actionJsonList.forEach(
-            (element) {
-          actionList.add(SyncResponse.fromJsonDB(element));
+        (element) {
+         SyncResponse syncResponse = SyncResponse.fromJsonDB(element);
+         syncResponse.syncActionGroup = [];
+         actionGroupList.where((syncGroup)=> syncGroup['action_id'] == syncResponse.id).toList().forEach((element) {
+           syncResponse.syncActionGroup?.add(SyncActionGroup(
+             id: element[DBConstant.actionGroupID],
+             name: element[DBConstant.actionGroupName]
+           ));
+         },);
+         actionList.add(syncResponse);
         },
       );
     }
-    print("Sync action List : $actionJsonList");
-
-
-
     return actionList;
   }
 
-  Future<List<SyncResponse>> getActionListByGroup(int gpId,
-      {bool? isManualSync}) async {
+  Future<List<SyncResponse>> getActionListByGroup(
+      {int? gpId, String? groupName, bool? isManualSync}) async {
     List<SyncResponse> actionList = [];
 
-    // date1.subtract(Duration(days: 7, hours: 3, minutes: 43, seconds: 56));
+    List<Map<String, dynamic>> jsonList = [];
 
-    List<Map<String, dynamic>> jsonList = await helper.readDataByWhereArgs(
-        tableName: DBConstant.syncActionWithGroupTable,
-        where: '${DBConstant.actionGroupID}=?',
-        whereArgs: [gpId]);
+    if (gpId != null) {
+      jsonList = await helper.readDataByWhereArgs(
+          tableName: DBConstant.syncActionWithGroupTable,
+          where: '${DBConstant.actionGroupID}=?',
+          whereArgs: [gpId]);
+    } else if (groupName != null) {
+      await helper.readDataByWhereArgs(
+          tableName: DBConstant.syncActionWithGroupTable,
+          where: '${DBConstant.actionGroupName}=?',
+          whereArgs: [groupName]);
+    }
 
     List<int> actionIds = [];
 

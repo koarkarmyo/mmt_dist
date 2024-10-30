@@ -1,10 +1,19 @@
 // import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
+import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
+import 'package:collection/collection.dart';
 
+import '../common_widget/bottom_sheet_selection_widget.dart';
+import '../common_widget/sync_progress_dialog.dart';
 import '../route/route_list.dart';
+import '../sync/bloc/sync_action_bloc/sync_action_bloc_cubit.dart';
+import '../sync/models/sync_response.dart';
+import '../sync/sync_utils/main_sync_process.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,6 +24,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final ValueNotifier selectedTitleIndexNotifier = ValueNotifier(0);
+  ValueNotifier<List<bool>> selectActionList = ValueNotifier([]);
+  late SyncActionCubit _syncActionCubit;
+  GlobalKey<SyncProgressDialogState> _dialogKey = GlobalKey();
 
   final List<String> titles = [
     "Sale",
@@ -45,6 +57,14 @@ class _HomePageState extends State<HomePage> {
       "Daily Sale Product Report"
     ]
   ];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _syncActionCubit = context.read<SyncActionCubit>()
+      ..getSyncAction(isManualSync: true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,46 +149,91 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(
                       height: 20,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Colors.blueAccent,
-                              borderRadius: BorderRadius.circular(5)),
-                          height: 70,
-                          width: 135,
-                          child: const Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text("Delivery Sync",style: TextStyle(color: Colors.white),),
-                              Icon(Icons.sync,color: Colors.white,),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Colors.blueAccent,
-                              borderRadius: BorderRadius.circular(5)),
-                          height: 70,
-                          width: 135,
-                          child: const Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text("Sale Sync",style: TextStyle(color: Colors.white),),
-                              Icon(Icons.sync,color: Colors.white,),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Colors.blueAccent,
-                              borderRadius: BorderRadius.circular(5)),
-                          height: 70,
-                          width: 90,
-                          child: const Icon(Icons.sync,size: 45,color: Colors.white,),
-                        ),
-                      ],
+                    BlocConsumer<SyncActionCubit, SyncActionState>(
+                      listener: (context, state) {
+                        if (state.state == BlocCRUDProcessState.fetchSuccess) {}
+                      },
+                      builder: (context, state) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                _showSyncActionSelectWidget(
+                                    actionList: state.actionList
+                                        .where(
+                                          (element) => element.checkActionGroup(
+                                              groupName: "DELIVERY"),
+                                        )
+                                        .toList());
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.blueAccent,
+                                    borderRadius: BorderRadius.circular(5)),
+                                height: 70,
+                                width: 135,
+                                child: const Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Delivery Sync",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    Icon(
+                                      Icons.sync,
+                                      color: Colors.white,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                _showSyncActionSelectWidget(
+                                    actionList: state.actionList
+                                        .where(
+                                          (element) => element.checkActionGroup(
+                                              groupName: "MASTER"),
+                                        )
+                                        .toList());
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.blueAccent,
+                                    borderRadius: BorderRadius.circular(5)),
+                                height: 70,
+                                width: 135,
+                                child: const Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Sale Sync",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    Icon(
+                                      Icons.sync,
+                                      color: Colors.white,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.blueAccent,
+                                  borderRadius: BorderRadius.circular(5)),
+                              height: 70,
+                              width: 90,
+                              child: const Icon(
+                                Icons.sync,
+                                size: 45,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                     const SizedBox(
                       height: 20,
@@ -190,6 +255,42 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _showSyncActionSelectWidget({required List<SyncResponse> actionList}) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        List<String?> selectionList = [];
+        actionList.forEach(
+          (element) => selectionList.add(element.name),
+        );
+        return BottomSheetSelectionWidget(
+            selectedValueList: selectActionList,
+            onTap: () {
+              List<SyncResponse> syncList = [];
+              actionList.forEachIndexed(
+                (index, element) {
+                  if (selectActionList.value[index]) {
+                    syncList.add(element);
+                  }
+                },
+              );
+
+              MainSyncProcess.instance.startManualSyncProcess(syncList);
+              context.pop();
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return SyncProgressDialog(
+                    key: _dialogKey,
+                  );
+                },
+              );
+            },
+            selectionList: selectionList);
+      },
+    );
+  }
+
   Widget buildTitleList() {
     return StatefulBuilder(
       builder: (context, innerState) {
@@ -203,9 +304,11 @@ class _HomePageState extends State<HomePage> {
                   padding: const EdgeInsets.only(right: 8.0),
                   child: InkWell(
                     onTap: () {
-                      innerState(() {
-                        selectedTitleIndexNotifier.value = index;
-                      },);
+                      innerState(
+                        () {
+                          selectedTitleIndexNotifier.value = index;
+                        },
+                      );
                     },
                     child: Container(
                       width: 250,
@@ -225,9 +328,10 @@ class _HomePageState extends State<HomePage> {
                           overflow: TextOverflow.ellipsis,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontWeight: selectedTitleIndexNotifier.value == index
-                                ? FontWeight.bold
-                                : null,
+                            fontWeight:
+                                selectedTitleIndexNotifier.value == index
+                                    ? FontWeight.bold
+                                    : null,
                             color: selectedTitleIndexNotifier.value == index
                                 ? Colors.white
                                 : Colors.black,

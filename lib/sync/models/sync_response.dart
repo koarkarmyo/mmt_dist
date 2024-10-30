@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:mmt_mobile/sync/models/sync_group.dart';
+
 SyncResponse dataFromJson(String str) =>
     SyncResponse.fromJson(json.decode(str));
 
@@ -42,6 +44,7 @@ class SyncResponse {
   String? description;
   int? actionGroupId;
   String? solutionId;
+  List<SyncActionGroup>? syncActionGroup;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -55,6 +58,7 @@ class SyncResponse {
     map['action_group_id'] = actionGroupId;
     map['solution_id'] = solutionId;
     map['description'] = description;
+    map['action_group'] = syncActionGroup?.map((e) => e.toJson(),).toList();
     return map;
   }
 
@@ -84,5 +88,14 @@ class SyncResponse {
     actionGroupId = json['action_group_id'];
     solutionId = json['solution_id'];
     description = json['description'];
+  }
+
+   bool checkActionGroup({ int? groupId, String? groupName}){
+    for(SyncActionGroup group in syncActionGroup ?? []){
+      if(group.name == groupName || group.id == groupId){
+        return true;
+      }
+    }
+    return false;
   }
 }

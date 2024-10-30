@@ -70,7 +70,7 @@ class MainSyncProcess {
     List<SyncActionGroup> groups = await _syncDBRepo.getSyncActionGroups();
     SyncActionGroup? group = groups.firstWhereOrNull(
         (element) => element.name?.contains(syncGroup) ?? false);
-    return await _syncDBRepo.getActionListByGroup(group?.id ?? 0,
+    return await _syncDBRepo.getActionListByGroup(gpId:  group?.id ?? 0,
         isManualSync: isManual);
   }
 

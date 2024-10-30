@@ -30,7 +30,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   late SyncActionCubit _syncActionCubit;
   ValueNotifier<List<bool>> selectActionList = ValueNotifier([]);
-  late GlobalKey<SyncProgressDialogState> _dialogKey = GlobalKey();
+  GlobalKey<SyncProgressDialogState> _dialogKey = GlobalKey();
   StreamSubscription? _masterSyncStream;
 
   @override
@@ -39,7 +39,7 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     manualSyncStreamListener();
     _syncActionCubit = context.read<SyncActionCubit>()
-      ..getSyncAction(isManualSync: true, groupName: "DELIVERY");
+      ..getSyncAction(isManualSync: true);
   }
 
   @override
