@@ -272,10 +272,10 @@ class _ProfilePageState extends State<ProfilePage> {
         if (data.isFinished) {
           print("Sync Complete");
           _dialogKey.currentState?.closeDialog();
-          Future.delayed(Duration(milliseconds: 300)).then((value) {
+          Future.delayed(const Duration(milliseconds: 500)).then((value) {
             _dialogKey.currentState?.closeDialog();
             if (data.message == MainSyncProcess.failMessage) {
-              Future.delayed(Duration(milliseconds: 100), () {
+              Future.delayed(const Duration(milliseconds: 100), () {
                 if (context.mounted) {
                   showDialog(
                       context: context,
