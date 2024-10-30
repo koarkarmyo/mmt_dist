@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
@@ -20,8 +22,12 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  late SyncActionCubit _syncActionCubit;
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<int> selectedTitleIndexNotifier = ValueNotifier(0);
+  ValueNotifier<List<bool>> selectActionList = ValueNotifier([]);
+  GlobalKey<SyncProgressDialogState> _dialogKey = GlobalKey();
+  StreamSubscription? _masterSyncStream;
 
   final List<String> titles = [
     "Sale",
@@ -101,18 +107,21 @@ class _DashboardPageState extends State<DashboardPage> {
                   icon: const Icon(Icons.person_2_rounded, size: 30),
                 ),
               ),
-              const SizedBox(width: 8,),
+              const SizedBox(
+                width: 8,
+              ),
               const Text("Sr1", style: TextStyle(fontSize: 18)),
             ],
           ),
-          title: const Text("Sr1", style: TextStyle(fontSize: 18)),
           actions: [
             // IconButton(onPressed: () {
             //
             // }, icon: Icon(Icons.sync,size: 30,))
             BlocBuilder<SyncActionCubit, SyncActionState>(
               builder: (context, state) {
-                state.actionGroupList.forEach((element) => print(element.name),);
+                state.actionGroupList.forEach(
+                  (element) => print(element.name),
+                );
                 return PopupMenuButton<String>(
                   color: Colors.white,
                   onSelected: (String value) {
@@ -168,17 +177,21 @@ class _DashboardPageState extends State<DashboardPage> {
                   padding: const EdgeInsets.only(top: 20.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade50,borderRadius: const BorderRadius.only(topLeft: Radius.circular(15),topRight: Radius.circular(15))
-                    ),
+                        color: Colors.blue.shade50,
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            topRight: Radius.circular(15))),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0,),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             titles[selectedTitleIndex],
-                            style:
-                            const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
                           ).padding(
                             padding: 5.allPadding,
                           ),
@@ -190,7 +203,6 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                 ),
               )
-
             ],
           ),
         );
@@ -271,7 +283,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 Navigator.pushNamed(context, RouteList.routePage);
               } else if (process == "Contact") {
                 Navigator.pushNamed(context, RouteList.contactPage);
-              }else if (process == "Product Report") {
+              } else if (process == "Product Report") {
                 Navigator.pushNamed(context, RouteList.productReportPage);
               }
             },
