@@ -7,4 +7,5 @@ class RouteList {
   static const String profilePage = 'profile_page';
   static const String routePage = 'route_page';
   static const String contactPage = 'contact_page';
+  static const String productReportPage = 'product_report';
 }

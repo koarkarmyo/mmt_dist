@@ -22,9 +22,6 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<int> selectedTitleIndexNotifier = ValueNotifier(0);
-  late SyncActionCubit _syncActionCubit;
-  ValueNotifier<List<bool>> selectActionList = ValueNotifier([]);
-  GlobalKey<SyncProgressDialogState> _dialogKey = GlobalKey();
 
   final List<String> titles = [
     "Sale",
@@ -88,16 +85,25 @@ class _DashboardPageState extends State<DashboardPage> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          leading: Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(25), color: Colors.white),
-            child: IconButton(
-              onPressed: () {
-                debugPrint("Profile");
-                Navigator.of(context).pushNamed(RouteList.profilePage);
-              },
-              icon: const Icon(Icons.person_2_rounded, size: 30),
-            ),
+          backgroundColor: Colors.grey.shade100,
+          automaticallyImplyLeading: false,
+          title: Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(25),
+                    color: Colors.white),
+                child: IconButton(
+                  onPressed: () {
+                    debugPrint("Profile");
+                    Navigator.of(context).pushNamed(RouteList.profilePage);
+                  },
+                  icon: const Icon(Icons.person_2_rounded, size: 30),
+                ),
+              ),
+              const SizedBox(width: 8,),
+              const Text("Sr1", style: TextStyle(fontSize: 18)),
+            ],
           ),
           title: const Text("Sr1", style: TextStyle(fontSize: 18)),
           actions: [
@@ -132,23 +138,63 @@ class _DashboardPageState extends State<DashboardPage> {
             )
           ],
         ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Dashboard",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ).padding(padding: 10.allPadding),
+            buildWorkingPart(),
+            // Move the process list to follow the title list
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildWorkingPart() {
+    return ValueListenableBuilder<int>(
+      valueListenable: selectedTitleIndexNotifier,
+      builder: (context, selectedTitleIndex, _) {
+        final processes = processLists[selectedTitleIndex];
+        return Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Dashboard",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ).padding(padding: 10.allPadding),
-              const Divider(color: Colors.black12),
-              const SizedBox(height: 20),
-              buildWorkingPart(),
-              // Move the process list to follow the title list
+              buildTitleList(),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,borderRadius: const BorderRadius.only(topLeft: Radius.circular(15),topRight: Radius.circular(15))
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0,),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            titles[selectedTitleIndex],
+                            style:
+                            const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ).padding(
+                            padding: 5.allPadding,
+                          ),
+                          const SizedBox(height: 5),
+                          buildProcessList(processes)
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              )
+
             ],
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -202,32 +248,6 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget buildWorkingPart() {
-    return ValueListenableBuilder<int>(
-      valueListenable: selectedTitleIndexNotifier,
-      builder: (context, selectedTitleIndex, _) {
-        final processes = processLists[selectedTitleIndex];
-        return Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              buildTitleList(),
-              Text(
-                titles[selectedTitleIndex],
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ).padding(
-                padding: 5.allPadding,
-              ),
-              const SizedBox(height: 5),
-              buildProcessList(processes),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   Expanded buildProcessList(List<String> processes) {
     return Expanded(
       child: GridView.builder(
@@ -251,13 +271,14 @@ class _DashboardPageState extends State<DashboardPage> {
                 Navigator.pushNamed(context, RouteList.routePage);
               } else if (process == "Contact") {
                 Navigator.pushNamed(context, RouteList.contactPage);
+              }else if (process == "Product Report") {
+                Navigator.pushNamed(context, RouteList.productReportPage);
               }
             },
             child: Card(
-              elevation: 0.9,
-              surfaceTintColor: Colors.blueGrey,
+              elevation: 1,
               shadowColor: Colors.black,
-              color: Colors.white,
+              color: Colors.grey.shade50,
               borderOnForeground: true,
               child: Padding(
                 padding:
