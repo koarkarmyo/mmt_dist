@@ -4,6 +4,7 @@ import '../../database/database_helper.dart';
 import '../../database/db_constant.dart';
 import '../../model/base_api_response.dart';
 import '../../model/category.dart';
+import '../../model/product/product.dart';
 
 
 enum SyncProcess {
@@ -26,6 +27,7 @@ class SyncUtils {
 
   static Future<SyncProcess> insertToDatabase(
       {required String actionName, required Response response}) async {
+
     switch (actionName) {
       // case 'get_route':
       //   return await _getRouteProcess(actionName, response);
@@ -37,8 +39,8 @@ class SyncUtils {
       //   return _getCustDashboardProcess(actionName, response);
       case 'get_category':
         return await _getCategoryProcess(actionName, response);
-      // case 'get_product':
-      //   return await _getProductProcess(actionName, response);
+      case 'get_product':
+        return await _getProductProcess(actionName, response);
       // case 'get_product_pricelist':
       //   return await _getPriceListProcess(actionName, response);
       // case 'get_customer_product':
@@ -341,63 +343,63 @@ class SyncUtils {
   //   return SyncProcess.Finished;
   // }
   //
-  // static Future<SyncProcess> _getProductProcess(
-  //     String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data!;
-  //
-  //   BaseApiResponse<Product> baseResponse = BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //
-  //   List<Map<String, dynamic>> uomListMap = [];
-  //   // delete can duplicate row
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.productUomTable,
-  //       where: 'product_id',
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.productId).toList());
-  //   await _helper.deleteRows(
-  //     tableName: DBConstant.productTable,
-  //     where: 'id',
-  //     wantDeleteRow: baseResponse.data!.map((e) => e.id).toList(),
-  //   );
-  //   // filter active = true
-  //   List<Product> productsActive =
-  //       baseResponse.data!.where((element) => element.active ?? false).toList();
-  //   List<Product> products = productsActive
-  //       .where((element) => element.productId != null && element.id != null)
-  //       .toList();
-  //   if (products.isEmpty) return SyncProcess.Finished;
-  //   // change to json to insert database
-  //   List<Map<String, dynamic>>? dataList = products.map((e) {
-  //     // e.uomLines is list
-  //     // so loop
-  //     e.uomLines?.forEach((uom) {
-  //       Map<String, dynamic> json = uom.toJsonDB();
-  //       json['product_id'] = e.productId;
-  //       uomListMap.add(json);
-  //     });
-  //     return e.toJsonDB();
-  //   }).toList();
-  //   // final insert uom list to database
-  //   bool uomInsertSuccess = await _helper.insertDataListBath(
-  //       DBConstant.productUomTable, uomListMap);
-  //   if (uomListMap.isEmpty) uomInsertSuccess = true;
-  //
-  //   // insert product list to database
-  //   final bool productInsertSuccess =
-  //       await _helper.insertDataListBath(DBConstant.productTable, dataList);
-  //
-  //   if (uomInsertSuccess && productInsertSuccess) {
-  //     return await _insertOrUpdateLastWriteDate(
-  //             actionName: actionName,
-  //             lastWriteDate: baseResponse.data!.last.writeDate!)
-  //         ? SyncProcess.Paginated
-  //         : SyncProcess.Fail;
-  //   }
-  //
-  //   return SyncProcess.Fail;
-  // }
+  static Future<SyncProcess> _getProductProcess(
+      String actionName, Response response) async {
+    Map<String, dynamic> res = response.data!;
+
+    BaseApiResponse<Product> baseResponse = BaseApiResponse.fromJson(res, fromJson: Product.fromJsonDB);
+    if (baseResponse.data!.isEmpty) {
+      return SyncProcess.Finished;
+    }
+
+    List<Map<String, dynamic>> uomListMap = [];
+    // delete can duplicate row
+    await DatabaseHelper.instance.deleteRows(
+        tableName: DBConstant.productUomTable,
+        where: 'product_id',
+        wantDeleteRow: baseResponse.data!.map((e) => e.productId).toList());
+    await DatabaseHelper.instance.deleteRows(
+      tableName: DBConstant.productTable,
+      where: 'id',
+      wantDeleteRow: baseResponse.data!.map((e) => e.id).toList(),
+    );
+    // filter active = true
+    List<Product> productsActive =
+        baseResponse.data!.where((element) => element.active ?? false).toList();
+    List<Product> products = productsActive
+        .where((element) => element.productId != null && element.id != null)
+        .toList();
+    if (products.isEmpty) return SyncProcess.Finished;
+    // change to json to insert database
+    List<Map<String, dynamic>>? dataList = products.map((e) {
+      // e.uomLines is list
+      // so loop
+      e.uomLines?.forEach((uom) {
+        Map<String, dynamic> json = uom.toJsonDB();
+        json['product_id'] = e.productId;
+        uomListMap.add(json);
+      });
+      return e.toJsonDB();
+    }).toList();
+    // final insert uom list to database
+    bool uomInsertSuccess = await DatabaseHelper.instance.insertDataListBath(
+        DBConstant.productUomTable, uomListMap);
+    if (uomListMap.isEmpty) uomInsertSuccess = true;
+
+    // insert product list to database
+    final bool productInsertSuccess =
+        await DatabaseHelper.instance.insertDataListBath(DBConstant.productTable, dataList);
+
+    if (uomInsertSuccess && productInsertSuccess) {
+      return await _insertOrUpdateLastWriteDate(
+              actionName: actionName,
+              lastWriteDate: baseResponse.data!.last.writeDate!)
+          ? SyncProcess.Paginated
+          : SyncProcess.Fail;
+    }
+
+    return SyncProcess.Fail;
+  }
   //
   // static Future<SyncProcess> _getDashboardProcess(
   //     String actionName, Response response) async {

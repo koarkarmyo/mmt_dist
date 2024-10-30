@@ -40,6 +40,7 @@ class _BottomSheetSelectionWidgetState
     return Column(
       children: [
         ConstantWidgets.SizedBoxHeight,
+        ConstantWidgets.SizedBoxHeight,
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -75,8 +76,8 @@ class _BottomSheetSelectionWidgetState
                       _isCheckAll = !_isCheckAll;
                       List<bool> boolList = [];
                       for (bool element in widget.selectedValueList.value) {
-                          boolList.add(_isCheckAll);
-                        }
+                        boolList.add(_isCheckAll);
+                      }
                       widget.selectedValueList.value = List.from(boolList);
                     },
                     dense: true,

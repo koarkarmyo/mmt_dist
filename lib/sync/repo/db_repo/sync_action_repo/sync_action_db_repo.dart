@@ -23,20 +23,39 @@ class SyncActionDBRepo extends BaseDBRepo {
     return groupList;
   }
 
-  Future<List<SyncResponse>> getActionList({required bool isManualSync}) async {
+  Future<List<SyncResponse>> getActionList(
+      {required bool isManualSync, String? groupName}) async {
     List<SyncResponse> actionList = [];
+    List<Map<String, dynamic>> actionJsonList = [];
 
-    List<Map<String, dynamic>> actionJsonList = await helper
-        .readDataByWhereArgs(
-            tableName: DBConstant.syncActionTable,
-            where: '${DBConstant.iSManualSync}=?',
-            whereArgs: [isManualSync == true ? 1 : 0]);
+    if (groupName != null) {
+      // "and ${DBConstant.actionGroupName} =? ;" : ';'
+      actionJsonList = await helper.readDataByWhereArgs(
+          tableName: DBConstant.syncActionWithGroupTable,
+          where: ' ${DBConstant.actionGroupName} =? ',
+          whereArgs: [groupName]);
+      actionJsonList.forEach(
+            (element) {
+          actionList.add(SyncResponse(
+            name: element['action_name']
+          ));
+        },
+      );
+    } else {
+      actionJsonList = await helper.readDataByWhereArgs(
+          tableName: DBConstant.syncActionTable,
+          where: '${DBConstant.iSManualSync}=? ',
+          whereArgs: [isManualSync == true ? 1 : 0]);
 
-    actionJsonList.forEach(
-      (element) {
-        actionList.add(SyncResponse.fromJsonDB(element));
-      },
-    );
+      actionJsonList.forEach(
+            (element) {
+          actionList.add(SyncResponse.fromJsonDB(element));
+        },
+      );
+    }
+    print("Sync action List : $actionJsonList");
+
+
 
     return actionList;
   }

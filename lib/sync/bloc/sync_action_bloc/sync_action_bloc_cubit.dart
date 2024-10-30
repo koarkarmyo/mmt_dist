@@ -21,9 +21,9 @@ class SyncActionCubit extends Cubit<SyncActionState> {
     emit(state.copyWith(actionGroupList: groupList));
   }
 
-  getSyncAction({required bool isManualSync}) async{
+  getSyncAction({required bool isManualSync, String? groupName}) async{
 
-    List<SyncResponse> actionList = await _actionDBRepo.getActionList(isManualSync: isManualSync);
+    List<SyncResponse> actionList = await _actionDBRepo.getActionList(isManualSync: isManualSync, groupName: groupName);
 
     emit(state.copyWith(actionList: actionList, state: BlocCRUDProcessState.fetchSuccess
     ));

@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> {
                 },
                 icon: const Icon(
                   Icons.sync,
-                  size: 30,
+                  size: 25,
                 ))
           ],
         ),

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:mmt_mobile/common_widget/bottom_sheet_selection_widget.dart';
+import 'package:mmt_mobile/common_widget/constant_widgets.dart';
+import 'package:mmt_mobile/src/extension/widget_extension.dart';
 
 import '../src/const_dimen.dart';
 
@@ -47,7 +50,7 @@ class CustomAlertDialog extends StatelessWidget {
                 ),
                 Icon(
                   _getIcon(),
-                  size: 60,
+                  size: 40,
                   color: _getIconColor(),
                 ),
                 SizedBox(
@@ -77,6 +80,7 @@ class CustomAlertDialog extends StatelessWidget {
                             style: TextStyle(color: Colors.green)),
                         style: OutlinedButton.styleFrom(
                             side: BorderSide(color: Colors.black))),
+                ConstantWidgets.SizedBoxHeight
               ],
             ),
           ),

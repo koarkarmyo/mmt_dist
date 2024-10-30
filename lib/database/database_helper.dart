@@ -43,6 +43,21 @@ class DatabaseHelper {
       return 0;
   }
 
+  Future<bool> deleteRows(
+      {required String tableName,
+        required String where,
+        required List wantDeleteRow}) async {
+    Database db = await database;
+    // db.rawQuery('DELETE FROM $tableName WHERE $where IN ($wantDeleteRow)');
+    int affectedRow = await db.delete(tableName,
+        where:
+        '$where IN (${List.filled(wantDeleteRow.length, '?').join(',')})',
+        whereArgs: wantDeleteRow);
+
+    return affectedRow == wantDeleteRow.length;
+  }
+
+
 
   Future<bool> insertDataListBath(
       String tableName, List<Map<String, dynamic>> list) async {
