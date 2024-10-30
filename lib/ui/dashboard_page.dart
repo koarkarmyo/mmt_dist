@@ -1,0 +1,290 @@
+import 'package:flutter/material.dart';
+import 'package:mmt_mobile/src/extension/number_extension.dart';
+import 'package:mmt_mobile/src/extension/widget_extension.dart';
+import '../route/route_list.dart';
+
+class DashboardPage extends StatefulWidget {
+  const DashboardPage({super.key});
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  final ScrollController _scrollController = ScrollController();
+  final ValueNotifier<int> selectedTitleIndexNotifier = ValueNotifier(0);
+
+  final List<String> titles = [
+    "Sale",
+    "Delivery",
+    "Finance & Accounting",
+    "Inventory",
+    "WMS",
+    "Report"
+  ];
+
+  final List<List<String>> processLists = [
+    ["Route", "Customer Visit", "Today Order", "Contact"],
+    ["Today Delivery"],
+    ["Account Payments", "Payment Transfer"],
+    ["Loading", "Vehicle Inventory", "Product Report", "Stock Request"],
+    ["Stock Unloading", "Delivery Return", "Purchase", "Purchase Quotation"],
+    [
+      "Loading Report",
+      "Unloading Report",
+      "Vehicle Inventory",
+      "Today Order Report",
+      "Delivery Report",
+      "Delivery Return Report",
+      "Delivery Report(Sale)",
+      "Stock Order",
+      "Delivery Report",
+      "Today Sale Order Report",
+      "Daily Sale Product Report"
+    ]
+  ];
+
+  void _onScroll() {
+    double offset = _scrollController.offset;
+    int newIndex = (offset / 250).round();
+
+    if (newIndex != selectedTitleIndexNotifier.value &&
+        newIndex < titles.length) {
+      selectedTitleIndexNotifier.value = newIndex;
+    }
+  }
+
+  @override
+  void initState() {
+    _scrollController.addListener(_onScroll);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    selectedTitleIndexNotifier.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          leading: Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(25),
+                color: Colors.white),
+            child: IconButton(
+              onPressed: () {
+                debugPrint("Profile");
+                Navigator.of(context)
+                    .pushNamed(RouteList.profilePage);
+              },
+              icon: const Icon(Icons.person_2_rounded, size: 30),
+            ),
+          ),
+          title: const Text("Sr1", style: TextStyle(fontSize: 18)),
+          actions: [
+            IconButton(onPressed: () {
+
+            }, icon: Icon(Icons.sync,size: 30,))
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Dashboard",
+                style: TextStyle(
+                    fontSize: 20, fontWeight: FontWeight.bold),
+              ).padding(padding: 10.allPadding),
+              const Divider(color: Colors.black12),
+              const SizedBox(height: 20),
+              buildWorkingPart(), // Move the process list to follow the title list
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildTitleList() {
+    return SingleChildScrollView(
+      controller: _scrollController,
+      scrollDirection: Axis.horizontal,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Row(
+          children: List.generate(titles.length, (index) {
+            return Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: ValueListenableBuilder<int>(
+                valueListenable: selectedTitleIndexNotifier,
+                builder: (context, selectedTitleIndex, _) {
+                  return Container(
+                    width: 250,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: selectedTitleIndex == index
+                          ? Colors.blueAccent
+                          : Colors.black12,
+                    ),
+                    alignment: Alignment.center,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      child: Text(
+                        titles[index],
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: selectedTitleIndex == index
+                              ? FontWeight.bold
+                              : null,
+                          color: selectedTitleIndex == index
+                              ? Colors.white
+                              : Colors.black,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          }),
+        ),
+      ),
+    );
+  }
+
+  Widget buildWorkingPart() {
+    return ValueListenableBuilder<int>(
+      valueListenable: selectedTitleIndexNotifier,
+      builder: (context, selectedTitleIndex, _) {
+        final processes = processLists[selectedTitleIndex];
+        return Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              buildTitleList(),
+              Text(
+                titles[selectedTitleIndex],
+                style: const TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.bold),
+              ).padding(padding: 5.allPadding,),
+              const SizedBox(height: 5),
+              buildProcessList(processes),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Expanded buildProcessList(List<String> processes) {
+    return Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 5,
+                  mainAxisSpacing: 6,
+                  childAspectRatio: 0.8,
+                ),
+                itemCount: processes.length,
+                itemBuilder: (context, index) {
+                  final process = processes[index];
+                  return InkWell(
+                    highlightColor: Colors.lightBlueAccent,
+                    splashColor: Colors.lightBlueAccent,
+                    borderRadius: 14.borderRadius,
+                    onTap: () {
+                      debugPrint("Process clicked: $process");
+                      if (process == "Route") {
+                        Navigator.pushNamed(context, RouteList.routePage);
+                      } else if (process == "Contact") {
+                        Navigator.pushNamed(context, RouteList.contactPage);
+                      }
+                    },
+                    child: Card(
+                      elevation: 0.9,
+                      surfaceTintColor: Colors.blueGrey,
+                      shadowColor: Colors.black,
+                      color: Colors.white,
+                      borderOnForeground: true,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10.0, vertical: 10),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(Icons.business_center, size: 25),
+                              ],
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              process,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.black45,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                              textAlign: TextAlign.right,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+  }
+
+  // Widget buildQuickActions() {
+  //   int itemCount = 1; // Update with the number of items you want in the row
+  //   double containerWidth = MediaQuery.of(context).size.width / itemCount - 20; // Adjusts width based on screen size
+  //
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //     children: [
+  //       buildQuickAction("Delivery Sync", Icons.sync, width: containerWidth),
+  //     ],
+  //   );
+  // }
+  //
+  //
+  // Widget buildQuickAction(String title, IconData icon, {double? width}) {
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //         color: Colors.blueAccent,
+  //         borderRadius: BorderRadius.circular(5)),
+  //     height: 70,
+  //     width: width,
+  //     child: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         Text(
+  //           title,
+  //           style: const TextStyle(color: Colors.white),
+  //         ),
+  //         Icon(
+  //           icon,
+  //           color: Colors.white,
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+}

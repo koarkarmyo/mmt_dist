@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mmt_mobile/database/database_helper.dart';
 import 'package:mmt_mobile/route/route_generate.dart';
-import 'package:mmt_mobile/ui/home_page.dart';
+import 'package:mmt_mobile/ui/dashboard_page.dart';
 
 void main() {
   runApp(const MyApp());
