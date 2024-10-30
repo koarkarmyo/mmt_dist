@@ -6,14 +6,14 @@ import 'package:mmt_mobile/src/extension/widget_extension.dart';
 
 import '../route/route_list.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class DashboardPage extends StatefulWidget {
+  const DashboardPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _DashboardPageState extends State<DashboardPage> {
   final ValueNotifier selectedTitleIndexNotifier = ValueNotifier(0);
 
   final List<String> titles = [
