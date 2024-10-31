@@ -92,7 +92,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.grey.shade100,
         appBar: AppBar(
           backgroundColor: Colors.grey.shade100,
           automaticallyImplyLeading: false,
@@ -182,8 +182,8 @@ class _DashboardPageState extends State<DashboardPage> {
                     decoration: BoxDecoration(
                         color: Colors.blue.shade50,
                         borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(15),
-                            topRight: Radius.circular(15))),
+                            topLeft: Radius.circular(25),
+                            topRight: Radius.circular(25))),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8.0,
@@ -228,7 +228,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 builder: (context, selectedTitleIndex, _) {
                   return Container(
                     width: 250,
-                    height: 80,
+                    height: selectedTitleIndex == index ?80 :70,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       color: selectedTitleIndex == index
@@ -288,6 +288,12 @@ class _DashboardPageState extends State<DashboardPage> {
                 Navigator.pushNamed(context, RouteList.contactPage);
               } else if (process == "Product Report") {
                 Navigator.pushNamed(context, RouteList.productReportPage);
+              }else if (process == "Customer Visit") {
+                Navigator.pushNamed(context, RouteList.customerVisitPage);
+              }else if (process == "Today Order") {
+                Navigator.pushNamed(context, RouteList.todayOrderPage);
+              }else if (process == "Today Delivery") {
+                Navigator.pushNamed(context, RouteList.todayDeliveryPage);
               }
             },
             child: Card(

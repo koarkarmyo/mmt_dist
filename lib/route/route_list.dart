@@ -8,4 +8,8 @@ class RouteList {
   static const String routePage = 'route_page';
   static const String contactPage = 'contact_page';
   static const String productReportPage = 'product_report';
+  static const String customerVisitPage = 'cust_visit_report';
+  static const String todayOrderPage = 'today_order';
+  static const String todayDeliveryPage = 'today_delivery';
+  static const String customerDashboardPage = 'customer_dashboard';
 }

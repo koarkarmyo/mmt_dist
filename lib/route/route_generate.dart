@@ -4,9 +4,13 @@ import 'package:mmt_mobile/business%20logic/bloc/fetch_database/fetch_database_c
 import 'package:mmt_mobile/common_widget/text_widget.dart';
 import 'package:mmt_mobile/route/route_list.dart';
 import 'package:mmt_mobile/sync/bloc/sync_action_bloc/sync_action_bloc_cubit.dart';
+import 'package:mmt_mobile/ui/customer_dashboard_page.dart';
+import 'package:mmt_mobile/ui/customer_visit_report_page.dart';
 import 'package:mmt_mobile/ui/dashboard_page.dart';
 import 'package:mmt_mobile/ui/login/admin_login.dart';
 import 'package:mmt_mobile/ui/login/login_page.dart';
+import 'package:mmt_mobile/ui/sale_order_page.dart';
+import 'package:mmt_mobile/ui/today_delivery_page.dart';
 
 import '../business logic/bloc/login/login_bloc.dart';
 import '../ui/contact_page.dart';
@@ -64,6 +68,14 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
       return _buildPageRoute(routeSettings, const ContactPage());
     case RouteList.productReportPage:
       return _buildPageRoute(routeSettings, const ProductReportPage());
+    case RouteList.customerVisitPage:
+      return _buildPageRoute(routeSettings, const CustomerVisitReportPage());
+    case RouteList.todayOrderPage:
+      return _buildPageRoute(routeSettings, const SaleOrderPage());
+    case RouteList.todayDeliveryPage:
+      return _buildPageRoute(routeSettings, const TodayDeliveryPage());
+    case RouteList.customerDashboardPage:
+      return _buildPageRoute(routeSettings, const CustomerDashboardPage());
     default:
       return _buildPageRoute(routeSettings, const NotFoundPage());
   }

@@ -3,7 +3,7 @@ class ConstString {
   static const String version = '1.0.7';
   static const String welcome = 'Welcome';
   static const String history = 'History';
-  static const String saleOrder = 'အ‌ရောင်းအော်ဒါများ';
+  static const String saleOrderMM = 'အ‌ရောင်းအော်ဒါများ';
   static const String voucherNo = 'အော်ဒါနံပါတ်';
   static const String createSaleOrder = 'အ‌ရောင်းအော်ဒါတင်ခြင်း';
   static const String name = "နာမည်";
@@ -80,4 +80,8 @@ class ConstString {
 
   static const String remark = "Note : ";
   static const String remarkTitle = " မှတ်ချက် ထည့်ပါ ";
+
+  static const String custVisitReport = "Customer Visit Report";
+  static const String saleOrder = "Sale Order";
+  static const String customerDashboard = "Customer Dashboard";
 }

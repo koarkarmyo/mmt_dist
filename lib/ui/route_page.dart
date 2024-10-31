@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mmt_mobile/business%20logic/bloc/login/login_bloc.dart';
+import 'package:mmt_mobile/route/route_list.dart';
+import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/ui/widgets/cust_mini_dialog.dart';
 import 'package:mmt_mobile/ui/widgets/customer_filter_widget.dart';
 import 'package:mmt_mobile/ui/widgets/date_picker_button.dart';
@@ -210,14 +213,16 @@ class _RoutePageState extends State<RoutePage> {
                               Center(
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    Navigator.of(context)
-                                        .pop(); // Close the dialog
+                                    // Navigator.of(context)
+                                    //     .pop(); // Close the dialog
                                     // Navigator.push(
                                     //   context,
                                     //   MaterialPageRoute(
                                     //     builder: (context) => NextPage(), // Replace with your next page
                                     //   ),
                                     // );
+
+                                    Navigator.pushNamed(context, RouteList.customerDashboardPage);
                                   },
                                   child: const Text("Clock In"),
                                 ),
