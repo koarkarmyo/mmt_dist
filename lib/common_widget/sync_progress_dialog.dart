@@ -60,7 +60,7 @@ class SyncProgressDialogState extends State<SyncProgressDialog> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
+                SizedBox(
                   height: 70,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,

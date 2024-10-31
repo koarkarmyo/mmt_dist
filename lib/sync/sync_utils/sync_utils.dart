@@ -347,7 +347,7 @@ class SyncUtils {
       String actionName, Response response) async {
     Map<String, dynamic> res = response.data!;
 
-    BaseApiResponse<Product> baseResponse = BaseApiResponse.fromJson(res, fromJson: Product.fromJsonDB);
+    BaseApiResponse<Product> baseResponse = BaseApiResponse.fromJson(res, fromJson: Product.fromJson);
     if (baseResponse.data!.isEmpty) {
       return SyncProcess.Finished;
     }
@@ -357,7 +357,7 @@ class SyncUtils {
     await DatabaseHelper.instance.deleteRows(
         tableName: DBConstant.productUomTable,
         where: 'product_id',
-        wantDeleteRow: baseResponse.data!.map((e) => e.productId).toList());
+        wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
     await DatabaseHelper.instance.deleteRows(
       tableName: DBConstant.productTable,
       where: 'id',
@@ -367,8 +367,9 @@ class SyncUtils {
     List<Product> productsActive =
         baseResponse.data!.where((element) => element.active ?? false).toList();
     List<Product> products = productsActive
-        .where((element) => element.productId != null && element.id != null)
+        .where((element) =>  element.id != null)
         .toList();
+    print("Product List : ${productsActive.length} : ${baseResponse.data?.length}");
     if (products.isEmpty) return SyncProcess.Finished;
     // change to json to insert database
     List<Map<String, dynamic>>? dataList = products.map((e) {
@@ -376,11 +377,14 @@ class SyncUtils {
       // so loop
       e.uomLines?.forEach((uom) {
         Map<String, dynamic> json = uom.toJsonDB();
-        json['product_id'] = e.productId;
+        json['product_id'] = e.id;
+        // json[DBConstant.uomCategoryName] = e.uomCategoryName;
         uomListMap.add(json);
       });
       return e.toJsonDB();
     }).toList();
+
+
     // final insert uom list to database
     bool uomInsertSuccess = await DatabaseHelper.instance.insertDataListBath(
         DBConstant.productUomTable, uomListMap);
@@ -389,6 +393,8 @@ class SyncUtils {
     // insert product list to database
     final bool productInsertSuccess =
         await DatabaseHelper.instance.insertDataListBath(DBConstant.productTable, dataList);
+
+    print("Product : $uomInsertSuccess : $productInsertSuccess");
 
     if (uomInsertSuccess && productInsertSuccess) {
       return await _insertOrUpdateLastWriteDate(

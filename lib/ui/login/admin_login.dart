@@ -41,7 +41,7 @@ class _AdminLoginPage extends State<AdminLoginPage> {
 
   final TextEditingController _usernameController = TextEditingController(text: "developer.mmtcompany@gmail.com");
   final TextEditingController _passwordController = TextEditingController(text: "password.ppt123");
-  final TextEditingController _serverUrlController = TextEditingController(text: "192.168.1.24:8016");
+  final TextEditingController _serverUrlController = TextEditingController(text: "192.168.1.6:8016");
 
   ValueNotifier<String> selectedDatabase =
       ValueNotifier(MMTApplication.loginDatabase);

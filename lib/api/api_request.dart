@@ -1,6 +1,12 @@
 import 'package:mmt_mobile/database/database_helper.dart';
 
+import '../database/data_object.dart';
+import '../model/cash_collect.dart';
+import '../model/number_series.dart';
+import '../model/stock_picking/stock_picking_model.dart';
+import '../src/enum.dart';
 import '../src/mmt_application.dart';
+import '../utils/date_time_utils.dart';
 
 class ApiRequest {
   static Map<String, dynamic> createRequest(
@@ -19,6 +25,110 @@ class ApiRequest {
       "token": '${DateTime.now().millisecondsSinceEpoch}',
       "args": [
         {"name": "device_id", "value": null}
+      ]
+    };
+  }
+
+  static Future<Map<String, dynamic>> createDeliveryRequest(
+      StockPickingModel stockPicking,
+      CashCollect? cashCollect,
+      List<Map<String, dynamic>> stockMoveJsonList) async {
+    NumberSeries? numberSeries = MMTApplication.generatedNoSeries;
+
+    if (numberSeries == null) {
+      numberSeries = await DataObject.instance
+          .getNumberSeries(moduleName: NoSeriesDocType.delivery.name);
+    }
+
+    return {
+      "token": '${DateTime.now().millisecondsSinceEpoch}',
+      "name": "save_delivery",
+      "args": [
+        {
+          "name": "device_id",
+          "value": {
+            "name": MMTApplication.loginResponse?.deviceId?.id,
+            "numberseries_name": numberSeries?.name,
+            "number_last": numberSeries?.numberLast,
+            "year_last": numberSeries?.yearLast,
+            "month_last": numberSeries?.monthLast,
+            "day_last": numberSeries?.dayLast
+          }
+        },
+        {"name": "employee_id", "value": MMTApplication.loginResponse?.id},
+        {"name": "company_id", "value": MMTApplication.selectedCompany?.id},
+        {
+          "name": "data",
+          "value": {
+            "id": stockPicking.id,
+            "remark": stockPicking.remark,
+            "state": stockPicking.state?.name,
+            "lines": stockMoveJsonList,
+          }
+        },
+        if (stockPicking.state != DeliveryStatus.cancel)
+          {
+            "name": "cash_collect",
+            "value": {
+              "order_id": cashCollect?.orderId,
+              "collect_amount": cashCollect?.collectAmount,
+              "employee_id": cashCollect?.employeeId
+            }
+          }
+      ]
+    };
+  }
+
+  static Map<String, dynamic> crateOrderReq({
+    required List<Map<String, dynamic>> orderLinejson,
+    String action = "create_order",
+    required int partnerId,
+    required int? orderId,
+    required int salePerson,
+    required String dateOrder,
+    required String orderNo,
+    required bool fromDirectSale,
+    required int? vehicleId,
+    required int? saleOrderTypeId,
+    required String? saleOrderTypeName,
+    String? note,
+    required NumberSeries numberSeries,
+    CashCollect? cashCollect,
+  }) {
+    if (fromDirectSale) action = 'create_direct_sale';
+
+    return {
+      "token": '${DateTime.now().millisecondsSinceEpoch}',
+      "name": action,
+      "args": [
+        {
+          "name": "sale_order",
+          "value": {
+            "id": orderId,
+            "name": orderNo,
+            "partner_id": partnerId,
+            "sale_person": salePerson,
+            "remark": note,
+            "pricelist_id": MMTApplication.loginResponse?.deviceId?.priceListId,
+            if (action == 'create_order_promo') "state": "draft",
+            "sale_order_type_id": saleOrderTypeId,
+            "delivery_location": vehicleId,
+            "date_order": DateTimeUtils.changeToUtc(dateOrder),
+            "order_line": orderLinejson
+          }
+        },
+        {'name': 'company_id', 'value': MMTApplication.selectedCompany?.id},
+        {
+          "name": "device_id",
+          "value": {
+            "name": MMTApplication.loginResponse!.deviceId!.id!,
+            "numberseries_name": numberSeries.name,
+            "number_last": numberSeries.numberLast,
+            "year_last": numberSeries.yearLast,
+            "month_last": numberSeries.monthLast,
+            "day_last": numberSeries.dayLast
+          }
+        }
       ]
     };
   }
@@ -133,7 +243,7 @@ class ApiRequest {
             // {"name": "write_date", "value": writeDate},
             // {"name": "employee_id", "value": MMTApplication.currentUser?.id},
             {
-          "company_id": MMTApplication.loginResponse?.companyId,
+          "company_id": MMTApplication.currentUser?.companyId,
           "staff_role_id": MMTApplication.currentUser?.id,
           "location_id": 0,
           "write_date": writeDate,
