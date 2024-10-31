@@ -83,4 +83,5 @@ class ConstString {
 
   static const String custVisitReport = "Customer Visit Report";
   static const String saleOrder = "Sale Order";
+  static const String customerDashboard = "Customer Dashboard";
 }

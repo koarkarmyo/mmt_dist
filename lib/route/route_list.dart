@@ -10,4 +10,6 @@ class RouteList {
   static const String productReportPage = 'product_report';
   static const String customerVisitPage = 'cust_visit_report';
   static const String todayOrderPage = 'today_order';
+  static const String todayDeliveryPage = 'today_delivery';
+  static const String customerDashboardPage = 'customer_dashboard';
 }

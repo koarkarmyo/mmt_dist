@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mmt_mobile/common_widget/constant_widgets.dart';
 import 'package:mmt_mobile/src/const_string.dart';
-import 'package:mmt_mobile/ui/widgets/customer_filter_widget.dart';
 import 'package:mmt_mobile/ui/widgets/date_range_picker_dialog.dart';
 import 'package:mmt_mobile/ui/widgets/search_box_text_field_widget.dart';
 
 import '../src/enum.dart';
-import '../utils/date_time_utils.dart';
 
 class SaleOrderPage extends StatefulWidget {
   const SaleOrderPage({super.key});
@@ -82,7 +80,6 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
       ),
     );
   }
-
 
   void _dateFilter() {
     _lQty = 0;

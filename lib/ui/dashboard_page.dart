@@ -289,6 +289,8 @@ class _DashboardPageState extends State<DashboardPage> {
                 Navigator.pushNamed(context, RouteList.customerVisitPage);
               }else if (process == "Today Order") {
                 Navigator.pushNamed(context, RouteList.todayOrderPage);
+              }else if (process == "Today Delivery") {
+                Navigator.pushNamed(context, RouteList.todayDeliveryPage);
               }
             },
             child: Card(
