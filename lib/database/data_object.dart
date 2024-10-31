@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
+import 'package:sqflite/sqlite_api.dart';
 
 import '../model/cust_visit.dart';
+import '../model/number_series.dart';
 import 'database_helper.dart';
 import 'db_constant.dart';
 
@@ -274,17 +276,16 @@ class DataObject {
   //   return saleOrderHeaders;
   // }
   //
-  // Future<NumberSeries?> getNumberSeries({required String moduleName}) async {
-  //   SqlFLiteHelper helper = SqlFLiteHelper();
-  //   List<Map<String, dynamic>> json = await helper.readDataByWhereArgs(
-  //       tableName: DBConstant.numberSeriesTable,
-  //       where: '${DBConstant.name} =? ',
-  //       whereArgs: [moduleName]);
-  //   if (json.isNotEmpty)
-  //     return NumberSeries.fromJsonDB(json.first);
-  //   else
-  //     null;
-  // }
+  Future<NumberSeries?> getNumberSeries({required String moduleName}) async {
+    List<Map<String, dynamic>> json = await DatabaseHelper.instance.readDataByWhereArgs(
+        tableName: DBConstant.numberSeriesTable,
+        where: '${DBConstant.name} =? ',
+        whereArgs: [moduleName]);
+    if (json.isNotEmpty)
+      return NumberSeries.fromJsonDB(json.first);
+    else
+      null;
+  }
   //
   // Future<List<VehicleInventoryModel>> getVehicleInventoryByProduct(
   //     int productId) async {

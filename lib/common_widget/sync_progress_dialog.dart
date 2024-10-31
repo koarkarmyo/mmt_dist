@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../src/const_dimen.dart';
 import '../src/style/app_color.dart';
@@ -50,7 +51,7 @@ class SyncProgressDialogState extends State<SyncProgressDialog> {
         child: Card(
           shape: RoundedRectangleBorder(
               borderRadius:
-              BorderRadius.circular(ConstantDimens.normalPadding)),
+                  BorderRadius.circular(ConstantDimens.normalPadding)),
           child: Container(
             padding: const EdgeInsets.all(ConstantDimens.pagePadding),
             width: 200,
@@ -59,11 +60,19 @@ class SyncProgressDialogState extends State<SyncProgressDialog> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
+                SizedBox(
                   height: 70,
-                  child: Center(
-                    child: Text('Sync Processing',
-                        style: Theme.of(context).textTheme.headlineSmall),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      const Text('Sync Processing',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 20)),
+                      SpinKitThreeBounce(
+                        size: 20,
+                        color: AppColors.primaryColorPale,
+                      )
+                    ],
                   ),
                 ),
                 Column(
@@ -85,8 +94,7 @@ class SyncProgressDialogState extends State<SyncProgressDialog> {
                             overflow: TextOverflow.clip,
                           ),
                         ),
-                        Text(
-                            '${(progressPercent * 100).toStringAsFixed(2)} %'),
+                        Text('${(progressPercent * 100).toStringAsFixed(2)} %'),
                       ],
                     ),
                     ConstantWidgets.SizedBoxHeight,

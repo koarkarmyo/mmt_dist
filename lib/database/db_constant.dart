@@ -15,7 +15,7 @@ class DBConstant {
   static const String mscmDeviceRouteTable = 'mscm_device_routes';
   static const String partnerRouteTable = 'partner_routes';
   static const String productTable = 'products';
-  static const String productUomTable = 'uom_uom';
+  static const String productUomTable = 'product_uom';
   static const String mscmUomTable = 'mscm_uom';
   static const String warehouseTable = 'warehouses';
   static const String dashboardTable = 'dashboards';

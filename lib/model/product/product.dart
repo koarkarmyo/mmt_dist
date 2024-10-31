@@ -45,6 +45,7 @@ class Product extends Equatable {
   int? productTmplId;
   String? productTmplName;
   int? uomCategoryId;
+  String? uomCategoryName;
   int? uomId;
   String? uomName;
   int? uomPoId;
@@ -79,7 +80,8 @@ class Product extends Equatable {
       this.serviceProductType,
       this.saleUomId,
       this.saleUomName,
-      this.uomCategoryId});
+      this.uomCategoryId,
+      this.uomCategoryName});
 
   Product.fromJson(dynamic json) {
     id = json['product_tmpl_id'];
@@ -105,6 +107,7 @@ class Product extends Equatable {
     writeDate = json['write_date'];
     categName = json['categ_name'];
     uomCategoryId = json['uom_category_id'];
+    uomCategoryName = json['uom_category_name'];
     productGroupId = json['product_group_id'];
     saleUomId = json['sale_uom_id'];
     saleUomName = json['sale_uom_name'];
@@ -142,6 +145,7 @@ class Product extends Equatable {
     map['product_group_id'] = productGroupId;
     map['detailed_type'] = this.productDetailType?.name;
     map['uom_category_id'] = this.uomCategoryId;
+    map['uom_category_name'] = this.uomCategoryName;
     map['sale_uom_id'] = this.saleUomId;
     map['sale_uom_name'] = this.saleUomName;
     map['service_product_type'] = this.serviceProductType?.name;
@@ -179,7 +183,7 @@ class Product extends Equatable {
     final map = <String, dynamic>{};
     map['id'] = id;
     // map['id'] = productId;
-    map['product_id'] = productId;
+    // map['product_id'] = productId;
     map['name'] = name;
     map['categ_id'] = categId;
     map['list_price'] = listPrice;
@@ -200,8 +204,8 @@ class Product extends Equatable {
     map['sale_uom_name'] = saleUomName;
     map['detailed_type'] = this.productDetailType?.name;
     map['service_product_type'] = this.serviceProductType?.name;
-    map['sale_ok'] = saleOk;
-    map['purchase_ok'] = purchaseOk;
+    map['sale_ok'] = saleOk! ? 1 : 0;
+    map['purchase_ok'] = purchaseOk! ? 1 : 0;
     return map;
   }
 
@@ -231,6 +235,7 @@ class Product extends Equatable {
     writeDate = json['write_date'];
     categName = json['categ_name'];
     uomCategoryId = json['uom_category_id'];
+    uomCategoryName = json['uom_category_name'];
     productGroupId = json['product_group_id'];
     saleUomId = json['sale_uom_id'];
     saleUomName = json['sale_uom_name'];

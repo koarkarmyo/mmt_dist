@@ -26,8 +26,8 @@ class UomLine extends Equatable {
   });
 
   UomLine.fromJson(dynamic json) {
-    uomId = json['uom_id'];
-    uomName = json['uom_name'];
+    uomId = json['id'];
+    uomName = json['name'];
     uomType = json['uom_type'];
     ratio = json['ratio'];
     uomCategoryId = json['uom_category_id'];
@@ -36,8 +36,8 @@ class UomLine extends Equatable {
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
-    map['uom_id'] = uomId;
-    map['uom_name'] = uomName;
+    map['id'] = uomId;
+    map['name'] = uomName;
     map['uom_type'] = uomType;
     map['ratio'] = ratio;
     map['uom_category_id'] = uomCategoryId;

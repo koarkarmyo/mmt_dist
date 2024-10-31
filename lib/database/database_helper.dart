@@ -134,6 +134,21 @@ class DatabaseHelper {
    await _createSyncHistoryTable(db);
    await _createChildCategoryTable(db);
     await _createCategoryTable(db);
+    await _createSaleOrderHeaderTable(db);
+    await _createSaleOrderLineTable(db);
+    await _createProductUomTable(db);
+  }
+
+  _createProductUomTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.productUomTable} '
+        '(${DBConstant.uomId} INTEGER,'
+        '${DBConstant.productId} INTEGER,'
+        '${DBConstant.uomName} TEXT,'
+        '${DBConstant.uomType} TEXT,'
+        '${DBConstant.ratio} DOUBLE,'
+        '${DBConstant.uomCategoryId} INTEGER,'
+        '${DBConstant.uomCategoryName} TEXT'
+        ')');
   }
 
   Future<void> _createSyncHistoryTable(Database db) async {
@@ -146,7 +161,7 @@ class DatabaseHelper {
   _createProductTable(Database db) async {
     return await db.execute('CREATE TABLE ${DBConstant.productTable} '
         '(${DBConstant.id} INTEGER,'
-        '${DBConstant.productId} INTEGER,'
+        // '${DBConstant.productId} INTEGER,'
         '${DBConstant.name} TEXT,'
         '${DBConstant.categId} INTEGER,'
         '${DBConstant.categName} TEXT,'
@@ -218,6 +233,67 @@ class DatabaseHelper {
     return await db.execute('CREATE TABLE ${DBConstant.childCategoryTable} '
         '(${DBConstant.parentId} INTEGER,'
         '${DBConstant.childId} INTEGER'
+        ')');
+  }
+
+  _createSaleOrderHeaderTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.saleOrderTable} '
+        '(${DBConstant.id} INTEGER,'
+        '${DBConstant.name} TEXT,'
+        '${DBConstant.partnerId} INTEGER,'
+        '${DBConstant.partnerName} TEXT,'
+        '${DBConstant.salePerson} INTEGER,'
+        '${DBConstant.vehicleId} INTEGER,'
+        '${DBConstant.isUpload} INTEGER,'
+        '${DBConstant.amountTotal} DOUBLE,'
+        '${DBConstant.dateOrder} TEXT,'
+        '${DBConstant.origin} TEXT,'
+        '${DBConstant.clientOrderRef} TEXT,'
+        '${DBConstant.reference} TEXT,'
+        '${DBConstant.state} TEXT,'
+        '${DBConstant.validityDate} TEXT,'
+        '${DBConstant.isExpired} INTEGER,'
+        '${DBConstant.requireSignature} INTEGER,'
+        '${DBConstant.requirePayment} TEXT,'
+        '${DBConstant.invoiceStatus} TEXT,'
+        '${DBConstant.note} TEXT,'
+        '${DBConstant.remark} TEXT,'
+        '${DBConstant.amountTax} TEXT,'
+        '${DBConstant.batchNo} INTEGER,'
+        '${DBConstant.batchName} TEXT,'
+        '${DBConstant.signature} TEXT,'
+        '${DBConstant.signedBy} TEXT,'
+        '${DBConstant.signedOn} TEXT,'
+        '${DBConstant.writeDate} TEXT,'
+        '${DBConstant.pickingNo} TEXT,'
+        '${DBConstant.commitmentDate} TEXT,'
+        '${DBConstant.deliveryStatus} TEXT,'
+        '${DBConstant.fromDirectSale} INTEGER,'
+        '${DBConstant.saleOrderTypeId} INTEGER,'
+        '${DBConstant.saleOrderTypeName} TEXT,'
+        '${DBConstant.latitude} DOUBLE,'
+        '${DBConstant.longitude} DOUBLE,'
+        '${DBConstant.pickingState} TEXT'
+        ')');
+  }
+
+  _createSaleOrderLineTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.saleOrderLineTable} '
+        '(${DBConstant.productId} INTEGER,'
+        '${DBConstant.id} INTEGER,'
+        '${DBConstant.productName} TEXT,'
+        '${DBConstant.orderNo} TEXT,'
+        '${DBConstant.orderId} INTEGER,'
+        '${DBConstant.saleType} TEXT,'
+        '${DBConstant.productUomQty} DOUBLE,'
+        '${DBConstant.productTemplateId} INTEGER,'
+        '${DBConstant.qtyDelivered} DOUBLE,'
+        '${DBConstant.qtyInvoiced} DOUBLE,'
+        '${DBConstant.productUom} INTEGER,'
+        '${DBConstant.productUomName} TEXT,'
+        '${DBConstant.priceUnit} DOUBLE,'
+        '${DBConstant.discount} DOUBLE,'
+        '${DBConstant.priceSubtotal} DOUBLE'
         ')');
   }
 }

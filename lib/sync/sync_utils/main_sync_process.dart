@@ -17,9 +17,6 @@ import '../models/sync_response.dart';
 import '../repo/api_repo/sync_api_repo.dart';
 import '../repo/db_repo/sync_action_repo/sync_action_db_repo.dart';
 
-
-
-
 class MainSyncProcess {
   static final SyncApiRepo _syncApiRepo = SyncApiRepo();
   static final SyncActionDBRepo _syncDBRepo = SyncActionDBRepo();
@@ -40,6 +37,7 @@ class MainSyncProcess {
   // static final DeliveryDBRepo _deliveryDBRepo = DeliveryDBRepo();
   // static final DeliveryApiRepo _deliveryApiRepo = DeliveryApiRepo();
   static CustVisitDBRepo _custVisitDBRepo = CustVisitDBRepo.instance;
+
   // static CustVisitApiRepo _custVisitApiRepo = CustVisitApiRepo();
 
   //
@@ -70,8 +68,8 @@ class MainSyncProcess {
     List<SyncActionGroup> groups = await _syncDBRepo.getSyncActionGroups();
     SyncActionGroup? group = groups.firstWhereOrNull(
         (element) => element.name?.contains(syncGroup) ?? false);
-    return await _syncDBRepo.getActionListByGroup(gpId:  group?.id ?? 0,
-        isManualSync: isManual);
+    return await _syncDBRepo.getActionListByGroup(
+        gpId: group?.id ?? 0, isManualSync: isManual);
   }
 
   Stream<AutoSyncResponse> get syncStream => _syncStream.stream;
@@ -463,6 +461,7 @@ class MainSyncProcess {
       await _saveLocationProcess(position);
     }
   }
+
 //
   static Future<void> _saveLocationProcess(Position position) async {
     try {
@@ -478,11 +477,13 @@ class MainSyncProcess {
           longitude: position.longitude,
           isUpload: 0);
 
-      bool dbInsertSuccess = await _custVisitDBRepo.saveCustVisit(custVisit);
+      // I commented this line because this is giving me an error. So PLEASE BE FUCKING SURE to uncomment if you have all the necessary data to save
+      // bool dbInsertSuccess = await _custVisitDBRepo.saveCustVisit(custVisit);
     } catch (e) {
       print('location_error : ' + e.toString());
     }
   }
+
 //
 //   static Future<bool> _sendCustVisit() async {
 // // await SyncUtils.saveCustVisit();
@@ -524,11 +525,11 @@ class MainSyncProcess {
 //       bool isNeedToSend = await _sendCustVisit();
 //       if (isNeedToSend) syncProcess = SyncProcess.Paginated;
 //     } else {
-     // api call
-      Response response = await _syncApiRepo.sendAction(actionName);
+    // api call
+    Response response = await _syncApiRepo.sendAction(actionName);
 
-      syncProcess = await SyncUtils.insertToDatabase(
-          actionName: actionName, response: response);
+    syncProcess = await SyncUtils.insertToDatabase(
+        actionName: actionName, response: response);
     // }
     return syncProcess;
   }
