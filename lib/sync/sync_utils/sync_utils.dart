@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:mmt_mobile/model/stock_location.dart';
 
 import '../../database/database_helper.dart';
 import '../../database/db_constant.dart';
 import '../../model/base_api_response.dart';
 import '../../model/category.dart';
 import '../../model/product/product.dart';
-
 
 enum SyncProcess {
   Finished,
@@ -27,7 +27,6 @@ class SyncUtils {
 
   static Future<SyncProcess> insertToDatabase(
       {required String actionName, required Response response}) async {
-
     switch (actionName) {
       // case 'get_route':
       //   return await _getRouteProcess(actionName, response);
@@ -41,6 +40,8 @@ class SyncUtils {
         return await _getCategoryProcess(actionName, response);
       case 'get_product':
         return await _getProductProcess(actionName, response);
+      case 'get_location':
+        return await _getLocationProcess(actionName, response);
       // case 'get_product_pricelist':
       //   return await _getPriceListProcess(actionName, response);
       // case 'get_customer_product':
@@ -108,12 +109,13 @@ class SyncUtils {
         whereArgs: [actionName],
         data: data);
     if (!success) {
-      final success =
-          await DatabaseHelper.instance.insertData(table: DBConstant.syncHistoryTable,values:  data);
+      final success = await DatabaseHelper.instance
+          .insertData(table: DBConstant.syncHistoryTable, values: data);
       return success;
     }
     return success;
   }
+
   //
   // static Future<SyncProcess> _getCustomerProcess(
   //     String actionName, Response response) async {
@@ -343,11 +345,48 @@ class SyncUtils {
   //   return SyncProcess.Finished;
   // }
   //
+  static Future<SyncProcess> _getLocationProcess(
+      String actionName, Response response) async {
+    Map<String, dynamic> res = response.data;
+    BaseApiResponse<StockLocation> baseResponse =
+        BaseApiResponse.fromJson(res, fromJson: StockLocation.fromJson);
+
+    if (baseResponse.data!.isEmpty) {
+      return Future.value(SyncProcess.Finished);
+    }
+
+    List<Map<String, dynamic>> dataList = baseResponse.data
+            ?.map(
+              (e) => e.toJsonDB(),
+            )
+            .toList() ??
+        [];
+
+    await DatabaseHelper.instance.deleteRows(
+        tableName: DBConstant.stockLocationTable,
+        where: DBConstant.id,
+        wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+
+    bool isInsertSuccess = await DatabaseHelper.instance
+        .insertDataListBath(DBConstant.stockLocationTable, dataList);
+
+    if (isInsertSuccess) {
+      return await _insertOrUpdateLastWriteDate(
+              actionName: actionName,
+              lastWriteDate: baseResponse.data!.last.writeDate!)
+          ? SyncProcess.Paginated
+          : SyncProcess.Fail;
+    }
+
+    return SyncProcess.Fail;
+  }
+
   static Future<SyncProcess> _getProductProcess(
       String actionName, Response response) async {
     Map<String, dynamic> res = response.data!;
 
-    BaseApiResponse<Product> baseResponse = BaseApiResponse.fromJson(res, fromJson: Product.fromJson);
+    BaseApiResponse<Product> baseResponse =
+        BaseApiResponse.fromJson(res, fromJson: Product.fromJson);
     if (baseResponse.data!.isEmpty) {
       return SyncProcess.Finished;
     }
@@ -366,10 +405,10 @@ class SyncUtils {
     // filter active = true
     List<Product> productsActive =
         baseResponse.data!.where((element) => element.active ?? false).toList();
-    List<Product> products = productsActive
-        .where((element) =>  element.id != null)
-        .toList();
-    print("Product List : ${productsActive.length} : ${baseResponse.data?.length}");
+    List<Product> products =
+        productsActive.where((element) => element.id != null).toList();
+    print(
+        "Product List : ${productsActive.length} : ${baseResponse.data?.length}");
     if (products.isEmpty) return SyncProcess.Finished;
     // change to json to insert database
     List<Map<String, dynamic>>? dataList = products.map((e) {
@@ -384,15 +423,14 @@ class SyncUtils {
       return e.toJsonDB();
     }).toList();
 
-
     // final insert uom list to database
-    bool uomInsertSuccess = await DatabaseHelper.instance.insertDataListBath(
-        DBConstant.productUomTable, uomListMap);
+    bool uomInsertSuccess = await DatabaseHelper.instance
+        .insertDataListBath(DBConstant.productUomTable, uomListMap);
     if (uomListMap.isEmpty) uomInsertSuccess = true;
 
     // insert product list to database
-    final bool productInsertSuccess =
-        await DatabaseHelper.instance.insertDataListBath(DBConstant.productTable, dataList);
+    final bool productInsertSuccess = await DatabaseHelper.instance
+        .insertDataListBath(DBConstant.productTable, dataList);
 
     print("Product : $uomInsertSuccess : $productInsertSuccess");
 
@@ -406,6 +444,7 @@ class SyncUtils {
 
     return SyncProcess.Fail;
   }
+
   //
   // static Future<SyncProcess> _getDashboardProcess(
   //     String actionName, Response response) async {
@@ -442,13 +481,16 @@ class SyncUtils {
   static Future<SyncProcess> _getCategoryProcess(
       String actionName, Response response) async {
     Map<String, dynamic> res = response.data!;
-    BaseApiResponse<Category> baseResponse = BaseApiResponse.fromJson(res, fromJson: Category.fromJson);
+    BaseApiResponse<Category> baseResponse =
+        BaseApiResponse.fromJson(res, fromJson: Category.fromJson);
     if (baseResponse.data!.isEmpty) {
       return SyncProcess.Finished;
     }
 
-    await DatabaseHelper.instance.deleteAllRow(tableName: DBConstant.childCategoryTable);
-    await DatabaseHelper.instance.deleteAllRow(tableName: DBConstant.categoryTable);
+    await DatabaseHelper.instance
+        .deleteAllRow(tableName: DBConstant.childCategoryTable);
+    await DatabaseHelper.instance
+        .deleteAllRow(tableName: DBConstant.categoryTable);
 
     // await _helper.deleteRows(
     //     tableName: DBConstant.childCategoryTable,
@@ -476,10 +518,11 @@ class SyncUtils {
     final bool childCategoryInsert = true;
 
     // insert category list to database
-    final bool categoryInsertSuccess =
-        await DatabaseHelper.instance.insertDataListBath(DBConstant.categoryTable, dataList);
+    final bool categoryInsertSuccess = await DatabaseHelper.instance
+        .insertDataListBath(DBConstant.categoryTable, dataList);
 
-    print("Last Write Date : ${baseResponse.data!.last.writeDate} : child Category insert : $childCategoryInsert, category insert : $categoryInsertSuccess");
+    print(
+        "Last Write Date : ${baseResponse.data!.last.writeDate} : child Category insert : $childCategoryInsert, category insert : $categoryInsertSuccess");
 
     if (childCategoryInsert && categoryInsertSuccess) {
       return await _insertOrUpdateLastWriteDate(
@@ -491,975 +534,975 @@ class SyncUtils {
 
     return SyncProcess.Finished;
   }
-  //
-  // static Future<SyncProcess> _getCustDashboardProcess(
-  //     String actionName, Response response) async {
-  //   // delete dashboards from database
-  //   await _helper.deleteAllRow(tableName: DBConstant.customerDashboardTable);
-  //   Map<String, dynamic> res = response.data!;
-  //   BaseApiResponse<Dashboard> baseResponse = BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //   // change to json to insert database
-  //   List<Map<String, dynamic>>? dataList =
-  //       baseResponse.data!.map((e) => e.toJsonDB()).toList();
-  //   // insert dashboard list to database
-  //   final success = await _helper.insertDataListBath(
-  //       DBConstant.customerDashboardTable, dataList);
-  //   // if (success) {
-  //   //   return await _insertOrUpdateLastWriteDate(
-  //   //           actionName: actionName,
-  //   //           lastWriteDate: baseResponse.data!.last.writeDate!)
-  //   //       ? SyncProcess.Paginated
-  //   //       : SyncProcess.Fail;
-  //   // }
-  //   return success ? SyncProcess.Finished : SyncProcess.Fail;
-  // }
-  //
-  // static Future<SyncProcess> _getPriceListProcess(
-  //     String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data!;
-  //   // BaseApiResponse<PriceList> baseResponse = BaseApiResponse.fromJson(res);
-  //   // if (baseResponse.data!.isEmpty) {
-  //   //   return SyncProcess.Finished;
-  //   // }
-  //
-  //   BaseApiResponse<ProductPriceListItem> baseResponse =
-  //       BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //
-  //   List<ProductPriceListItem> priceListItemList = baseResponse.data ?? [];
-  //
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.priceListItemTable,
-  //       where: '${DBConstant.id}',
-  //       wantDeleteRow: priceListItemList.map((e) => e.id).toList());
-  //
-  //   List<Map<String, dynamic>> jsonList =
-  //       priceListItemList.map((e) => e.toJson()).toList();
-  //
-  //   bool priceListItemInsertSuccess = await _helper.insertDataListBath(
-  //       DBConstant.priceListItemTable, jsonList);
-  //
-  //   if (priceListItemInsertSuccess) {
-  //     return await _insertOrUpdateLastWriteDate(
-  //             actionName: actionName,
-  //             lastWriteDate: priceListItemList.last.writeDate!)
-  //         ? SyncProcess.Paginated
-  //         : SyncProcess.Fail;
-  //   }
-  //
-  //   return priceListItemInsertSuccess
-  //       ? SyncProcess.Paginated
-  //       : SyncProcess.Fail;
-  // }
-  //
-  // static Future<SyncProcess> _getCustomerRegularSaleProductProcess(
-  //     String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data!;
-  //   BaseApiResponse<CustomerRegularSaleProduct> baseResponse =
-  //       BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //   // await _helper.deleteAllRow(tableName: DBConstant.customerProductTable);
-  //   // change to json to insert database
-  //   List<Map<String, dynamic>>? dataList =
-  //       baseResponse.data!.map((e) => e.toJson()).toList();
-  //   // delete response row from database
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.customerProductTable,
-  //       where: DBConstant.id,
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //   // insert dashboard list to database
-  //   final success = await _helper.insertDataListBath(
-  //       DBConstant.customerProductTable, dataList);
-  //
-  //   if (success) {
-  //     return await _insertOrUpdateLastWriteDate(
-  //             actionName: actionName,
-  //             lastWriteDate: baseResponse.data!.last.writeDate!)
-  //         ? SyncProcess.Paginated
-  //         : SyncProcess.Fail;
-  //   }
-  //   return success ? SyncProcess.Finished : SyncProcess.Fail;
-  // }
-  //
-  // static Future<SyncProcess> _getSaleOrderProcess(
-  //     String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data!;
-  //   BaseApiResponse<SaleOrderHeader> baseResponse =
-  //       BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //   List<SaleOrderLine> orderLines = [];
-  //   baseResponse.data?.forEach((e) {
-  //     e.orderLine?.forEach(
-  //         (element) => orderLines.add(element.copyWith(orderNo: e.name)));
-  //   });
-  //   // await _helper.deleteAllRow(tableName: DBConstant.customerProductTable);
-  //   // change to json to insert database
-  //   List<Map<String, dynamic>>? saleOrderJsonList = baseResponse.data!
-  //       .map((e) => e.copyWith(isUpload: 1).toJsonDB())
-  //       .toList();
-  //
-  //   List<Map<String, dynamic>>? saleOrderLineJsonList =
-  //       orderLines.map((e) => e.toJson()).toList();
-  //
-  //   // delete response row from database
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.saleOrderLineTable,
-  //       where: DBConstant.orderNo,
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.name).toList());
-  //
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.saleOrderTable,
-  //       where: DBConstant.name,
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.name).toList());
-  //
-  //   bool detailInsertSuccess = await _helper.insertDataListBath(
-  //       DBConstant.saleOrderLineTable, saleOrderLineJsonList);
-  //
-  //   bool hdrInsertSuccess = await _helper.insertDataListBath(
-  //       DBConstant.saleOrderTable, saleOrderJsonList);
-  //
-  //   if (detailInsertSuccess && hdrInsertSuccess) {
-  //     return await _insertOrUpdateLastWriteDate(
-  //             actionName: actionName,
-  //             lastWriteDate: baseResponse.data!.last.writeDate!)
-  //         ? SyncProcess.Paginated
-  //         : SyncProcess.Fail;
-  //   }
-  //
-  //   return detailInsertSuccess && hdrInsertSuccess
-  //       ? SyncProcess.Paginated
-  //       : SyncProcess.Fail;
-  // }
-  //
-  // static _getInventoryStock(String actionName, Response response) async {
-  //   int? locationId = MMTApplication.loginResponse?.currentLocationId;
-  //   if (actionName == 'get_wh_stock') {
-  //     locationId = MMTApplication.loginResponse?.warehouseStockLocationId;
-  //   }
-  //   Map<String, dynamic> jsonList = response.data;
-  //   BaseApiResponse<StockQuant> baseResponse =
-  //       BaseApiResponse.fromJson(jsonList);
-  //   await _helper.deleteData(DBConstant.stockQuantTable,
-  //       '${DBConstant.locationId} = ?', [locationId]);
-  //   // await _helper.deleteAllRow(tableName: DBConstant.stockQuantTable);
-  //   await _helper.deleteInsertData(
-  //       tableName: DBConstant.stockQuantTable,
-  //       jsonList: (baseResponse.data ?? []).map((e) => e.toJson()).toList());
-  //
-  //   return SyncProcess.Finished;
-  // }
-  //
-  // static _getMscmTownship(String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data!;
-  //   BaseApiResponse<Township> baseResponse = BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.wardTable,
-  //       where: '${DBConstant.townshipId}',
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.townshipTable,
-  //       where: '${DBConstant.id}',
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //
-  //   // change to json to insert database
-  //   List<Map<String, dynamic>> wardJsonList = [];
-  //   List<Map<String, dynamic>> townshipJsonList = [];
-  //   baseResponse.data?.forEach((township) {
-  //     townshipJsonList.add(township.toJsonDB());
-  //     township.wardIds?.forEach((ward) {
-  //       Map<String, dynamic> wardJson = ward.toJson();
-  //       wardJson.putIfAbsent(DBConstant.townshipId, () => township.id);
-  //       wardJsonList.add(wardJson);
-  //     });
-  //   });
-  //   // insert ward list to database
-  //   bool insertWard =
-  //       await _helper.insertDataListBath(DBConstant.wardTable, wardJsonList);
-  //   if (wardJsonList.isEmpty) insertWard = true;
-  //   bool insertTownship = await _helper.insertDataListBath(
-  //       DBConstant.townshipTable, townshipJsonList);
-  //
-  //   if (insertWard && insertTownship) {
-  //     return await _insertOrUpdateLastWriteDate(
-  //             actionName: actionName,
-  //             lastWriteDate: baseResponse.data!.last.writeDate!)
-  //         ? SyncProcess.Finished
-  //         : SyncProcess.Fail;
-  //   }
-  // }
-  //
-  // static _getMscmOutletType(String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data!;
-  //   BaseApiResponse<OutletType> baseResponse = BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.partnerOutletTypeTable,
-  //       where: DBConstant.id,
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //   // change to json to insert database
-  //   List<Map<String, dynamic>>? dataList =
-  //       baseResponse.data!.map((e) => e.toJson()).toList();
-  //   // insert partner list to database
-  //   final success = await _helper.insertDataListBath(
-  //       DBConstant.partnerOutletTypeTable, dataList);
-  //   if (success) {
-  //     return await _insertOrUpdateLastWriteDate(
-  //             actionName: actionName,
-  //             lastWriteDate: baseResponse.data!.last.writeDate!)
-  //         ? SyncProcess.Paginated
-  //         : SyncProcess.Fail;
-  //   }
-  //   return SyncProcess.Fail;
-  // }
-  //
-  // static _getTags(String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data!;
-  //   BaseApiResponse<Tag> baseResponse = BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.tagTable,
-  //       where: DBConstant.id,
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //   // change to json to insert database
-  //   List<Map<String, dynamic>>? dataList =
-  //       baseResponse.data!.map((e) => e.toJson()).toList();
-  //   // insert tag list to database
-  //   final success =
-  //       await _helper.insertDataListBath(DBConstant.tagTable, dataList);
-  //   if (success) {
-  //     return await _insertOrUpdateLastWriteDate(
-  //             actionName: actionName,
-  //             lastWriteDate: baseResponse.data!.last.writeDate!)
-  //         ? SyncProcess.Paginated
-  //         : SyncProcess.Fail;
-  //   }
-  //   return SyncProcess.Fail;
-  // }
-  //
-  // static _getMscmGrade(String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data!;
-  //   BaseApiResponse<PartnerGrade> baseResponse = BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.partnerGradeTable,
-  //       where: DBConstant.id,
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //   // change to json to insert database
-  //   List<Map<String, dynamic>>? dataList =
-  //       baseResponse.data!.map((e) => e.toJson()).toList();
-  //   // insert partner list to database
-  //   final success = await _helper.insertDataListBath(
-  //       DBConstant.partnerGradeTable, dataList);
-  //   if (success) {
-  //     return await _insertOrUpdateLastWriteDate(
-  //             actionName: actionName,
-  //             lastWriteDate: baseResponse.data!.last.writeDate!)
-  //         ? SyncProcess.Paginated
-  //         : SyncProcess.Fail;
-  //   }
-  //   return SyncProcess.Fail;
-  // }
-  //
-  // static _getDeliveryOrders(String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data;
-  //
-  //   BaseApiResponse<StockPickingModel> baseResponse =
-  //       BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //
-  //   List<StockMoveNewModel> stockMoveLines = [];
-  //
-  //   for (final stockPicking in baseResponse.data ?? <StockPickingModel>[]) {
-  //     stockMoveLines.addAll(stockPicking.moveIdsWithoutPackage ?? []);
-  //   }
-  //
-  //   List<Map<String, dynamic>> stockMoveJsonList = [];
-  //
-  //   for (final stockMove in stockMoveLines)
-  //     stockMoveJsonList.add(stockMove.toJson());
-  //
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.stockPickingModelTable,
-  //       where: DBConstant.id,
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.stockMoveModelTable,
-  //       where: DBConstant.id,
-  //       wantDeleteRow: stockMoveLines.map((e) => e.id).toList());
-  //
-  //   List<Map<String, dynamic>>? dataList =
-  //       baseResponse.data!.map((e) => e.toJsonDB()).toList();
-  //
-  //   final pickingInserted = await _helper.insertDataListBath(
-  //       DBConstant.stockPickingModelTable, dataList);
-  //
-  //   final moveInserted = await _helper.insertDataListBath(
-  //       DBConstant.stockMoveModelTable, stockMoveJsonList);
-  //
-  //   if (pickingInserted && moveInserted) {
-  //     return await _insertOrUpdateLastWriteDate(
-  //             actionName: actionName,
-  //             lastWriteDate: baseResponse.data!.last.writeDate!)
-  //         ? SyncProcess.Paginated
-  //         : SyncProcess.Fail;
-  //   }
-  //   return SyncProcess.Fail;
-  // }
-  //
-  // static Future<SyncProcess> saveCustVisit() async {
-  //   bool saved = true;
-  //   List<CustVisit> list = await _custVisitDBRepo.getDraftCustVisitList();
-  //   for (CustVisit custVisit in list) {
-  //     saved = await _custVisitApiRepo.saveCustVisit(custVisit);
-  //
-  //     if (saved) {
-  //       final cust = custVisit.copyWith(isUpload: 1);
-  //       await _helper.updateData(
-  //           table: DBConstant.custVisitTable,
-  //           where: '${DBConstant.customerId} = ? AND ${DBConstant.docDate} = ?',
-  //           whereArgs: [custVisit.customerId, custVisit.docDate],
-  //           data: cust.toJson());
-  //     } else {
-  //       return SyncProcess.Fail;
-  //     }
-  //   }
-  //   return SyncProcess.Finished;
-  // }
-  //
-  // static Future<bool> sendDraftSaleOrder() async {
-  //   List<SaleOrderHeader> saleOrderHdrList =
-  //       await _saleOrderDBRepo.getDraftSaleOrderHdrs();
-  //
-  //   bool isSuccess = true;
-  //
-  //   int index = 0;
-  //   await Future.doWhile(() async {
-  //     // break = false
-  //     if (index == saleOrderHdrList.length) {
-  //       return false;
-  //     }
-  //     //
-  //     SaleOrderHeader saleOrderHdr = saleOrderHdrList[index];
-  //     try {
-  //       // qty available check from server
-  //
-  //       // List<SaleOrderLine> saleOrderLines = await DataObject.instance.getSaleOrderLines(saleOrderHdr.id);
-  //       List<Map<String, dynamic>> saleOrderLineJson = await _sqlFLiteHelper
-  //           .readDataByWhereArgs(
-  //               tableName: DBConstant.saleOrderLineTable,
-  //               where: '${DBConstant.orderNo} =? ',
-  //               whereArgs: [saleOrderHdr.name]);
-  //       List<SaleOrderLine> saleOrderLine = [];
-  //
-  //       saleOrderLineJson.forEach((element) {
-  //         saleOrderLine.add(SaleOrderLine.fromJson(element));
-  //       });
-  //
-  //       final List<Map<String, dynamic>> saleOrderLineJsonApi =
-  //           saleOrderLine.map((e) => e.toJsonForSaleOrderApi()).toList();
-  //
-  //       BaseSingleApiResponse response;
-  //       Map<String, dynamic> headerJson = {};
-  //       Map<String, dynamic> cashCollectJson = {};
-  //
-  //       if (saleOrderHdr.fromDirectSale == true) {
-  //         CashCollect? cashCollect =
-  //             await _cashCollectDBRepo.getCashCollect(saleOrderHdr);
-  //         response = await _saleOrderApiRepo.directSaleApiCall(
-  //             saleOrderHeader: saleOrderHdr,
-  //             cashCollect: cashCollect,
-  //             saleOrderLineJson: saleOrderLineJsonApi);
-  //
-  //         headerJson = response.data!['sale_order'];
-  //         cashCollectJson = response.data!['cash_collect'];
-  //       } else {
-  //         //send to server
-  //         response = await _saleOrderApiRepo.sendApiCall(
-  //             saleOrderHdr, null, saleOrderLineJsonApi);
-  //         headerJson = response.data!;
-  //       }
-  //
-  //       SaleOrderHeader responseHeader = SaleOrderHeader.fromJson(headerJson);
-  //
-  //       responseHeader.isUpload = 1;
-  //
-  //       if (saleOrderHdr.fromDirectSale == true) {
-  //         CashCollect cashCollect = CashCollect.fromJson(cashCollectJson);
-  //         cashCollect.orderNo = responseHeader.name;
-  //         cashCollect.orderId = responseHeader.id;
-  //
-  //         responseHeader.fromDirectSale = true;
-  //
-  //         bool isUpdated = await _cashCollectDBRepo.updateCashCollect(
-  //             saleOrderHdr.name, cashCollect);
-  //       }
-  //
-  //       await _checkDuplicateAndDelete(responseHeader);
-  //       await _saleOrderDBRepo.updateResponseOrder(
-  //           preOrder: saleOrderHdr, curOrder: responseHeader);
-  //
-  //       index++;
-  //       if (index == saleOrderHdrList.length) {
-  //         return false;
-  //       }
-  //
-  //       return true;
-  //     } on DioError {
-  //       isSuccess = false;
-  //       return false;
-  //     } catch (e) {
-  //       isSuccess = false;
-  //       return false;
-  //     }
-  //   });
-  //   return isSuccess;
-  // }
-  //
-  // static Future<SyncProcess> _getWareHouse(
-  //     String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data!;
-  //   BaseApiResponse<Warehouse> baseResponse = BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //   List<Map<String, dynamic>>? dataList = baseResponse.data!
-  //       .map((e) => e.toJson())
-  //       .cast<Map<String, dynamic>>()
-  //       .toList();
-  //
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.warehouseTable,
-  //       where: DBConstant.id,
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //
-  //   final success =
-  //       await _helper.insertDataListBath(DBConstant.warehouseTable, dataList);
-  //   if (success) {
-  //     return SyncProcess.Finished;
-  //     // return await _insertOrUpdateLastWriteDate(
-  //     //     actionName: actionName,
-  //     //     lastWriteDate: baseResponse.data!.last.writeDate!)
-  //     //     ? SyncProcess.Paginated
-  //     //     : SyncProcess.Fail;
-  //   }
-  //   return SyncProcess.Fail;
-  // }
-  //
-  // static _checkDuplicateAndDelete(SaleOrderHeader responseHeader) async {}
-  //
-  // static _getCashCollectionProcess(String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data!;
-  //   BaseApiResponse<CashCollect> baseResponse = BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.cashCollectionTable,
-  //       where: DBConstant.id,
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //   // change to json to insert database
-  //   List<Map<String, dynamic>>? dataList =
-  //       baseResponse.data!.map((e) => e.toJson()).toList();
-  //
-  //   // insert partner list to database
-  //   final success = await _helper.insertDataListBath(
-  //       DBConstant.cashCollectionTable, dataList);
-  //   if (success) {
-  //     MMTApplication.totalCashCollectAmount = 0;
-  //     List<Map<String, dynamic>> cashCollectList =
-  //         await _helper.readAllData(tableName: DBConstant.cashCollectionTable);
-  //     cashCollectList.forEach((element) {
-  //       MMTApplication.totalCashCollectAmount +=
-  //           element[DBConstant.collectAmount];
-  //       print('xx : total : ${MMTApplication.totalCashCollectAmount}');
-  //     });
-  //     return await _insertOrUpdateLastWriteDate(
-  //             actionName: actionName,
-  //             lastWriteDate: baseResponse.data!.last.writeDate!)
-  //         ? SyncProcess.Paginated
-  //         : SyncProcess.Fail;
-  //   }
-  //   return SyncProcess.Fail;
-  // }
-  //
-  // static Future<bool> sendDeliveryOrder() async {
-  //   List<StockPickingModel> stockPickingList =
-  //       await _deliveryDBRepo.getStockPickingList();
-  //
-  //   bool isSuccess = true;
-  //   int index = 0;
-  //
-  //   await Future.doWhile(() async {
-  //     if (index == stockPickingList.length) {
-  //       return false;
-  //     }
-  //
-  //     StockPickingModel stockPickingModel = stockPickingList[index];
-  //     try {
-  //       List<StockMoveNewModel> stockMoves =
-  //           stockPickingModel.moveIdsWithoutPackage ?? [];
-  //
-  //       List<Map<String, dynamic>> jsonList =
-  //           stockMoves.map((e) => e.toJson()).toList();
-  //
-  //       BaseSingleApiResponse response;
-  //       Map<String, dynamic> headerJson = {};
-  //       Map<String, dynamic> cashCollectJson = {};
-  //
-  //       CashCollect? cashCollect;
-  //
-  //       if (stockPickingModel.state != DeliveryStatus.cancel) {
-  //         cashCollect = await _cashCollectDBRepo
-  //             .getCashCollectByOrderId(stockPickingModel.saleId ?? 0);
-  //       }
-  //
-  //       response = await _deliveryApiRepo.deliverySendApiCall(
-  //           stockPicking: stockPickingModel,
-  //           cashCollect: cashCollect,
-  //           stockMoveJsonList: jsonList);
-  //
-  //       headerJson = response.data!['delivery_order'];
-  //       cashCollectJson = response.data!['cash_collect'];
-  //       // }
-  //       // else {
-  //       //   //send to server
-  //       //   response = await _saleOrderApiRepo.sendApiCall(
-  //       //       saleOrderHdr, null, saleOrderLineJsonApi);
-  //       //   headerJson = response.data!;
-  //       // }
-  //
-  //       StockPickingModel responsePickingModel =
-  //           StockPickingModel.fromJson(headerJson);
-  //
-  //       if (stockPickingModel.state != DeliveryStatus.cancel) {
-  //         CashCollect responseCashCollect =
-  //             CashCollect.fromJson(cashCollectJson);
-  //
-  //         bool isUpdated = await _cashCollectDBRepo.updateCashCollect(
-  //             responsePickingModel.origin, responseCashCollect);
-  //       }
-  //
-  //       await _deliveryDBRepo.updateResponsePicking(responsePickingModel);
-  //
-  //       index++;
-  //       if (index == stockPickingList.length) {
-  //         isSuccess = true;
-  //         return false;
-  //       }
-  //
-  //       return true;
-  //     } on DioError catch (e) {
-  //       isSuccess = false;
-  //       return false;
-  //     } catch (e) {
-  //       isSuccess = false;
-  //       return false;
-  //     }
-  //   });
-  //   return isSuccess;
-  // }
-  //
-  // static _getSaleOrderTypeProcess(String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data!;
-  //   BaseApiResponse<SaleOrderType> baseResponse = BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.saleOrderTypeTable,
-  //       where: DBConstant.id,
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //   // change to json to insert database
-  //   List<Map<String, dynamic>>? dataList =
-  //       baseResponse.data!.map((e) => e.toJson()).toList();
-  //   // insert partner list to database
-  //   final success = await _helper.insertDataListBath(
-  //       DBConstant.saleOrderTypeTable, dataList);
-  //   if (success) {
-  //     return await _insertOrUpdateLastWriteDate(
-  //             actionName: actionName,
-  //             lastWriteDate: baseResponse.data!.last.writeDate!)
-  //         ? SyncProcess.Paginated
-  //         : SyncProcess.Fail;
-  //   }
-  //   return SyncProcess.Fail;
-  // }
-  //
-  // static _getStockOrder(String actionName, Response response) async {
-  //   BaseApiResponse<StockOrder> baseResponse =
-  //       BaseApiResponse.fromJson(response.data);
-  //
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.stockOrderTable,
-  //       where: DBConstant.id,
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //
-  //   List<StockOrderLine> stockOrderLines = [];
-  //   baseResponse.data?.forEach((element) {
-  //     stockOrderLines.addAll(element.stockOrderLine ?? []);
-  //   });
-  //
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.stockOrderLineTable,
-  //       where: DBConstant.orderId,
-  //       wantDeleteRow: stockOrderLines.map((e) => e.orderId).toList());
-  //
-  //   // change to json to insert database
-  //   // List<Map<String, dynamic>>? dataList =
-  //   //     baseResponse.data!.map((e) => e.toJson()).toList();
-  //
-  //   // final success = await _helper.insertDataListBath(
-  //   //     DBConstant.stockPickingBatchTable, dataList);
-  //
-  //   List<Map<String, dynamic>> stockOrderJson = [];
-  //   List<Map<String, dynamic>> stockOrderLineJson = [];
-  //
-  //   List<StockOrder> stockOrderList = baseResponse.data ?? [];
-  //
-  //   stockOrderList.forEach((stockOrder) {
-  //     stockOrderJson.add(stockOrder.toJsonDB());
-  //     stockOrder.stockOrderLine
-  //         ?.forEach((picking) => stockOrderLineJson.add((picking.toJsonDB())));
-  //   });
-  //
-  //   bool success = await _helper.insertDataListBath(
-  //       DBConstant.stockOrderTable, stockOrderJson);
-  //
-  //   await _helper.insertDataListBath(
-  //       DBConstant.stockOrderLineTable, stockOrderLineJson);
-  //   if (success) {
-  //     return await _insertOrUpdateLastWriteDate(
-  //             actionName: actionName,
-  //             lastWriteDate: baseResponse.data!.last.writeDate!)
-  //         ? SyncProcess.Paginated
-  //         : SyncProcess.Fail;
-  //   }
-  //   return SyncProcess.Fail;
-  // }
-  //
-  // static _getBatchList(String actionName, Response response) async {
-  //   BaseApiResponse<StockPickingBatch> baseResponse =
-  //       BaseApiResponse.fromJson(response.data);
-  //
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.stockPickingBatchTable,
-  //       where: DBConstant.id,
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //
-  //   List<StockPickingModel> stockPickingList = [];
-  //   baseResponse.data?.forEach((element) {
-  //     stockPickingList.addAll(element.pickingIds ?? []);
-  //   });
-  //
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.stockPickingModelTable,
-  //       where: DBConstant.id,
-  //       wantDeleteRow: stockPickingList.map((e) => e.id).toList());
-  //
-  //   // change to json to insert database
-  //   // List<Map<String, dynamic>>? dataList =
-  //   //     baseResponse.data!.map((e) => e.toJson()).toList();
-  //
-  //   // final success = await _helper.insertDataListBath(
-  //   //     DBConstant.stockPickingBatchTable, dataList);
-  //
-  //   List<Map<String, dynamic>> stockPickingBatch = [];
-  //   List<Map<String, dynamic>> pickingIds = [];
-  //
-  //   List<StockPickingBatch> batchList = baseResponse.data ?? [];
-  //
-  //   batchList.forEach((batch) {
-  //     stockPickingBatch.add(batch.toJsonDB());
-  //     batch.pickingIds
-  //         ?.forEach((picking) => pickingIds.add((picking.toJsonDB())));
-  //   });
-  //
-  //   bool success = await _helper.insertDataListBath(
-  //       DBConstant.stockPickingBatchTable, stockPickingBatch);
-  //
-  //   await _helper.insertDataListBath(
-  //       DBConstant.stockPickingModelTable, pickingIds);
-  //   if (success) {
-  //     return await _insertOrUpdateLastWriteDate(
-  //             actionName: actionName,
-  //             lastWriteDate: baseResponse.data!.last.writeDate!)
-  //         ? SyncProcess.Paginated
-  //         : SyncProcess.Fail;
-  //   }
-  //   return SyncProcess.Fail;
-  // }
-  //
-  // static _getCashCollection(String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data!;
-  //   BaseApiResponse<CashCollect> baseResponse = BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.cashCollectionTable,
-  //       where: DBConstant.id,
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //   // change to json to insert database
-  //   List<Map<String, dynamic>>? dataList =
-  //       baseResponse.data!.map((e) => e.toJson()).toList();
-  //   // insert partner list to database
-  //   final success = await _helper.insertDataListBath(
-  //       DBConstant.cashCollectionTable, dataList);
-  //   if (success) {
-  //     return await _insertOrUpdateLastWriteDate(
-  //             actionName: actionName,
-  //             lastWriteDate: baseResponse.data!.last.writeDate!)
-  //         ? SyncProcess.Paginated
-  //         : SyncProcess.Fail;
-  //   }
-  //   return SyncProcess.Fail;
-  // }
-  //
-  // static Future<SyncProcess> _getStockPickingType(
-  //     String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data!;
-  //
-  //   BaseApiResponse<StockPickingType> baseResponse =
-  //       BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.pickingTypeTable,
-  //       where: 'id',
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //   // filter active = true
-  //   List<StockPickingType> pickingTypes = baseResponse.data ?? [];
-  //   if (pickingTypes.isEmpty) return SyncProcess.Finished;
-  //   // change to json to insert database
-  //
-  //   List<Map<String, dynamic>>? dataList =
-  //       pickingTypes.map((e) => e.toJson()).toList();
-  //
-  //   // insert product list to database
-  //   final bool pickingTypeInserted =
-  //       await _helper.insertDataListBath(DBConstant.pickingTypeTable, dataList);
-  //
-  //   if (pickingTypeInserted) {
-  //     return await _insertOrUpdateLastWriteDate(
-  //             actionName: actionName,
-  //             lastWriteDate: baseResponse.data!.last.writeDate!)
-  //         ? SyncProcess.Paginated
-  //         : SyncProcess.Fail;
-  //   }
-  //
-  //   return SyncProcess.Fail;
-  // }
-  //
-  // static Future<SyncProcess> _getUomProcess(
-  //     String actionName, Response response) async {
-  //   // delete dashboards from database
-  //   Map<String, dynamic> res = response.data!;
-  //   BaseApiResponse<MSCMUomLine> baseResponse = BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //   // delete process
-  //   await _helper.deleteAllRow(tableName: DBConstant.mscmUomTable);
-  //   // await _helper.deleteRows(
-  //   //     tableName: DBConstant.dashboardTable,
-  //   //     where: DBConstant.id,
-  //   //     wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //
-  //   // change to json to insert database
-  //   List<Map<String, dynamic>>? dataList =
-  //       baseResponse.data?.map((e) => e.toJson()).toList();
-  //   // insert dashboard list to database
-  //   final success = await _helper.insertDataListBath(
-  //       DBConstant.mscmUomTable, dataList ?? []);
-  //   // if (success) {
-  //   //   return await _insertOrUpdateLastWriteDate(
-  //   //           actionName: actionName,
-  //   //           lastWriteDate: baseResponse.data!.last.writeDate!)
-  //   //       ? SyncProcess.Paginated
-  //   //       : SyncProcess.Fail;
-  //   // }
-  //   return SyncProcess.Finished;
-  // }
-  //
-  // static _getCoinBillProcess(String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data!;
-  //   BaseApiResponse<CoinBill> baseResponse = BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.coinBillTable,
-  //       where: DBConstant.id,
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //
-  //   List<Map<String, dynamic>>? dataList =
-  //       baseResponse.data?.map((e) => e.toJson()).toList();
-  //   // insert coin list to database
-  //   final success = await _helper.insertDataListBath(
-  //       DBConstant.coinBillTable, dataList ?? []);
-  //   if (!success) return SyncProcess.Fail;
-  //
-  //   return await _insertOrUpdateLastWriteDate(
-  //           actionName: actionName,
-  //           lastWriteDate: baseResponse.data!.last.writeDate!)
-  //       ? SyncProcess.Paginated
-  //       : SyncProcess.Fail;
-  // }
-  //
-  // static _getPaymentTransferProcess(
-  //     String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data!;
-  //   BaseApiResponse<MscmPaymentTransfer> baseResponse =
-  //       BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //   List<Map<String, dynamic>> paymentTransferLine = [];
-  //   List<Map<String, dynamic>>? dataList = baseResponse.data?.map((e) {
-  //     e.paymentCoinLine?.forEach((element) {
-  //       Map<String, dynamic> json = element.toJson();
-  //       json.putIfAbsent(DBConstant.transferId, () => e.id);
-  //       paymentTransferLine.add(json);
-  //     });
-  //     return e.toJsonDB();
-  //   }).toList();
-  //
-  //   MMTApplication.printJob(paymentTransferLine.toString());
-  //
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.paymentCoinLineTable,
-  //       where: '${DBConstant.transferId}',
-  //       wantDeleteRow: baseResponse.data?.map((e) => e.id).toList() ?? []);
-  //   //
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.paymentTransferTable,
-  //       where: '${DBConstant.id}',
-  //       wantDeleteRow: baseResponse.data?.map((e) => e.id).toList() ?? []);
-  //
-  //   final lineInsert = await _helper.insertDataListBath(
-  //       DBConstant.paymentCoinLineTable, paymentTransferLine);
-  //   // insert coin list to database
-  //   final success = await _helper.insertDataListBath(
-  //       DBConstant.paymentTransferTable, dataList ?? []);
-  //   if (!success) return SyncProcess.Fail;
-  //
-  //   MMTApplication.totalTransferAmount = 0;
-  //   List<Map<String, dynamic>> cashCollectList =
-  //       await _helper.readAllData(tableName: DBConstant.paymentTransferTable);
-  //   cashCollectList.forEach((element) {
-  //     MMTApplication.totalTransferAmount += element[DBConstant.amount];
-  //   });
-  //
-  //   return await _insertOrUpdateLastWriteDate(
-  //           actionName: actionName,
-  //           lastWriteDate: baseResponse.data!.last.writeDate!)
-  //       ? SyncProcess.Paginated
-  //       : SyncProcess.Fail;
-  // }
-  //
-  // static _get_account_payment_list(String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data!;
-  //
-  //   BaseApiResponse<AccountPayment> baseResponse =
-  //       BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.accountPaymentTable,
-  //       where: 'id',
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //   // filter active = true
-  //   List<AccountPayment> pickingTypes = baseResponse.data ?? [];
-  //   if (pickingTypes.isEmpty) return SyncProcess.Finished;
-  //   // change to json to insert database
-  //
-  //   List<Map<String, dynamic>>? dataList =
-  //       pickingTypes.map((e) => e.toJson()).toList();
-  //
-  //   // insert product list to database
-  //   final bool pickingTypeInserted = await _helper.insertDataListBath(
-  //       DBConstant.accountPaymentTable, dataList);
-  //
-  //   if (pickingTypeInserted) {
-  //     return await _insertOrUpdateLastWriteDate(
-  //             actionName: actionName,
-  //             lastWriteDate: baseResponse.data!.last.writeDate!)
-  //         ? SyncProcess.Paginated
-  //         : SyncProcess.Fail;
-  //   }
-  //
-  //   return SyncProcess.Fail;
-  // }
-  //
-  // static _get_journal_list(String actionName, Response response) async {
-  //   Map<String, dynamic> res = response.data!;
-  //
-  //   BaseApiResponse<AccountJournal> baseResponse =
-  //       BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //
-  //   await _helper.deleteRows(
-  //       tableName: DBConstant.accountJournalTable,
-  //       where: 'id',
-  //       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //   // filter active = true
-  //   List<AccountJournal> journalList = baseResponse.data ?? [];
-  //   if (journalList.isEmpty) return SyncProcess.Finished;
-  //   // change to json to insert database
-  //
-  //   List<Map<String, dynamic>>? dataList =
-  //       journalList.map((e) => e.toJson()).toList();
-  //
-  //   // insert product list to database
-  //   final bool pickingTypeInserted = await _helper.insertDataListBath(
-  //       DBConstant.accountJournalTable, dataList);
-  //
-  //   if (pickingTypeInserted) {
-  //     return await _insertOrUpdateLastWriteDate(
-  //             actionName: actionName,
-  //             lastWriteDate: baseResponse.data!.last.writeDate!)
-  //         ? SyncProcess.Finished
-  //         : SyncProcess.Fail;
-  //   }
-  //
-  //   return SyncProcess.Finished;
-  // }
+//
+// static Future<SyncProcess> _getCustDashboardProcess(
+//     String actionName, Response response) async {
+//   // delete dashboards from database
+//   await _helper.deleteAllRow(tableName: DBConstant.customerDashboardTable);
+//   Map<String, dynamic> res = response.data!;
+//   BaseApiResponse<Dashboard> baseResponse = BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//   // change to json to insert database
+//   List<Map<String, dynamic>>? dataList =
+//       baseResponse.data!.map((e) => e.toJsonDB()).toList();
+//   // insert dashboard list to database
+//   final success = await _helper.insertDataListBath(
+//       DBConstant.customerDashboardTable, dataList);
+//   // if (success) {
+//   //   return await _insertOrUpdateLastWriteDate(
+//   //           actionName: actionName,
+//   //           lastWriteDate: baseResponse.data!.last.writeDate!)
+//   //       ? SyncProcess.Paginated
+//   //       : SyncProcess.Fail;
+//   // }
+//   return success ? SyncProcess.Finished : SyncProcess.Fail;
+// }
+//
+// static Future<SyncProcess> _getPriceListProcess(
+//     String actionName, Response response) async {
+//   Map<String, dynamic> res = response.data!;
+//   // BaseApiResponse<PriceList> baseResponse = BaseApiResponse.fromJson(res);
+//   // if (baseResponse.data!.isEmpty) {
+//   //   return SyncProcess.Finished;
+//   // }
+//
+//   BaseApiResponse<ProductPriceListItem> baseResponse =
+//       BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//
+//   List<ProductPriceListItem> priceListItemList = baseResponse.data ?? [];
+//
+//   await _helper.deleteRows(
+//       tableName: DBConstant.priceListItemTable,
+//       where: '${DBConstant.id}',
+//       wantDeleteRow: priceListItemList.map((e) => e.id).toList());
+//
+//   List<Map<String, dynamic>> jsonList =
+//       priceListItemList.map((e) => e.toJson()).toList();
+//
+//   bool priceListItemInsertSuccess = await _helper.insertDataListBath(
+//       DBConstant.priceListItemTable, jsonList);
+//
+//   if (priceListItemInsertSuccess) {
+//     return await _insertOrUpdateLastWriteDate(
+//             actionName: actionName,
+//             lastWriteDate: priceListItemList.last.writeDate!)
+//         ? SyncProcess.Paginated
+//         : SyncProcess.Fail;
+//   }
+//
+//   return priceListItemInsertSuccess
+//       ? SyncProcess.Paginated
+//       : SyncProcess.Fail;
+// }
+//
+// static Future<SyncProcess> _getCustomerRegularSaleProductProcess(
+//     String actionName, Response response) async {
+//   Map<String, dynamic> res = response.data!;
+//   BaseApiResponse<CustomerRegularSaleProduct> baseResponse =
+//       BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//   // await _helper.deleteAllRow(tableName: DBConstant.customerProductTable);
+//   // change to json to insert database
+//   List<Map<String, dynamic>>? dataList =
+//       baseResponse.data!.map((e) => e.toJson()).toList();
+//   // delete response row from database
+//   await _helper.deleteRows(
+//       tableName: DBConstant.customerProductTable,
+//       where: DBConstant.id,
+//       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//   // insert dashboard list to database
+//   final success = await _helper.insertDataListBath(
+//       DBConstant.customerProductTable, dataList);
+//
+//   if (success) {
+//     return await _insertOrUpdateLastWriteDate(
+//             actionName: actionName,
+//             lastWriteDate: baseResponse.data!.last.writeDate!)
+//         ? SyncProcess.Paginated
+//         : SyncProcess.Fail;
+//   }
+//   return success ? SyncProcess.Finished : SyncProcess.Fail;
+// }
+//
+// static Future<SyncProcess> _getSaleOrderProcess(
+//     String actionName, Response response) async {
+//   Map<String, dynamic> res = response.data!;
+//   BaseApiResponse<SaleOrderHeader> baseResponse =
+//       BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//   List<SaleOrderLine> orderLines = [];
+//   baseResponse.data?.forEach((e) {
+//     e.orderLine?.forEach(
+//         (element) => orderLines.add(element.copyWith(orderNo: e.name)));
+//   });
+//   // await _helper.deleteAllRow(tableName: DBConstant.customerProductTable);
+//   // change to json to insert database
+//   List<Map<String, dynamic>>? saleOrderJsonList = baseResponse.data!
+//       .map((e) => e.copyWith(isUpload: 1).toJsonDB())
+//       .toList();
+//
+//   List<Map<String, dynamic>>? saleOrderLineJsonList =
+//       orderLines.map((e) => e.toJson()).toList();
+//
+//   // delete response row from database
+//   await _helper.deleteRows(
+//       tableName: DBConstant.saleOrderLineTable,
+//       where: DBConstant.orderNo,
+//       wantDeleteRow: baseResponse.data!.map((e) => e.name).toList());
+//
+//   await _helper.deleteRows(
+//       tableName: DBConstant.saleOrderTable,
+//       where: DBConstant.name,
+//       wantDeleteRow: baseResponse.data!.map((e) => e.name).toList());
+//
+//   bool detailInsertSuccess = await _helper.insertDataListBath(
+//       DBConstant.saleOrderLineTable, saleOrderLineJsonList);
+//
+//   bool hdrInsertSuccess = await _helper.insertDataListBath(
+//       DBConstant.saleOrderTable, saleOrderJsonList);
+//
+//   if (detailInsertSuccess && hdrInsertSuccess) {
+//     return await _insertOrUpdateLastWriteDate(
+//             actionName: actionName,
+//             lastWriteDate: baseResponse.data!.last.writeDate!)
+//         ? SyncProcess.Paginated
+//         : SyncProcess.Fail;
+//   }
+//
+//   return detailInsertSuccess && hdrInsertSuccess
+//       ? SyncProcess.Paginated
+//       : SyncProcess.Fail;
+// }
+//
+// static _getInventoryStock(String actionName, Response response) async {
+//   int? locationId = MMTApplication.loginResponse?.currentLocationId;
+//   if (actionName == 'get_wh_stock') {
+//     locationId = MMTApplication.loginResponse?.warehouseStockLocationId;
+//   }
+//   Map<String, dynamic> jsonList = response.data;
+//   BaseApiResponse<StockQuant> baseResponse =
+//       BaseApiResponse.fromJson(jsonList);
+//   await _helper.deleteData(DBConstant.stockQuantTable,
+//       '${DBConstant.locationId} = ?', [locationId]);
+//   // await _helper.deleteAllRow(tableName: DBConstant.stockQuantTable);
+//   await _helper.deleteInsertData(
+//       tableName: DBConstant.stockQuantTable,
+//       jsonList: (baseResponse.data ?? []).map((e) => e.toJson()).toList());
+//
+//   return SyncProcess.Finished;
+// }
+//
+// static _getMscmTownship(String actionName, Response response) async {
+//   Map<String, dynamic> res = response.data!;
+//   BaseApiResponse<Township> baseResponse = BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//
+//   await _helper.deleteRows(
+//       tableName: DBConstant.wardTable,
+//       where: '${DBConstant.townshipId}',
+//       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//   await _helper.deleteRows(
+//       tableName: DBConstant.townshipTable,
+//       where: '${DBConstant.id}',
+//       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//
+//   // change to json to insert database
+//   List<Map<String, dynamic>> wardJsonList = [];
+//   List<Map<String, dynamic>> townshipJsonList = [];
+//   baseResponse.data?.forEach((township) {
+//     townshipJsonList.add(township.toJsonDB());
+//     township.wardIds?.forEach((ward) {
+//       Map<String, dynamic> wardJson = ward.toJson();
+//       wardJson.putIfAbsent(DBConstant.townshipId, () => township.id);
+//       wardJsonList.add(wardJson);
+//     });
+//   });
+//   // insert ward list to database
+//   bool insertWard =
+//       await _helper.insertDataListBath(DBConstant.wardTable, wardJsonList);
+//   if (wardJsonList.isEmpty) insertWard = true;
+//   bool insertTownship = await _helper.insertDataListBath(
+//       DBConstant.townshipTable, townshipJsonList);
+//
+//   if (insertWard && insertTownship) {
+//     return await _insertOrUpdateLastWriteDate(
+//             actionName: actionName,
+//             lastWriteDate: baseResponse.data!.last.writeDate!)
+//         ? SyncProcess.Finished
+//         : SyncProcess.Fail;
+//   }
+// }
+//
+// static _getMscmOutletType(String actionName, Response response) async {
+//   Map<String, dynamic> res = response.data!;
+//   BaseApiResponse<OutletType> baseResponse = BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//   await _helper.deleteRows(
+//       tableName: DBConstant.partnerOutletTypeTable,
+//       where: DBConstant.id,
+//       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//   // change to json to insert database
+//   List<Map<String, dynamic>>? dataList =
+//       baseResponse.data!.map((e) => e.toJson()).toList();
+//   // insert partner list to database
+//   final success = await _helper.insertDataListBath(
+//       DBConstant.partnerOutletTypeTable, dataList);
+//   if (success) {
+//     return await _insertOrUpdateLastWriteDate(
+//             actionName: actionName,
+//             lastWriteDate: baseResponse.data!.last.writeDate!)
+//         ? SyncProcess.Paginated
+//         : SyncProcess.Fail;
+//   }
+//   return SyncProcess.Fail;
+// }
+//
+// static _getTags(String actionName, Response response) async {
+//   Map<String, dynamic> res = response.data!;
+//   BaseApiResponse<Tag> baseResponse = BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//   await _helper.deleteRows(
+//       tableName: DBConstant.tagTable,
+//       where: DBConstant.id,
+//       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//   // change to json to insert database
+//   List<Map<String, dynamic>>? dataList =
+//       baseResponse.data!.map((e) => e.toJson()).toList();
+//   // insert tag list to database
+//   final success =
+//       await _helper.insertDataListBath(DBConstant.tagTable, dataList);
+//   if (success) {
+//     return await _insertOrUpdateLastWriteDate(
+//             actionName: actionName,
+//             lastWriteDate: baseResponse.data!.last.writeDate!)
+//         ? SyncProcess.Paginated
+//         : SyncProcess.Fail;
+//   }
+//   return SyncProcess.Fail;
+// }
+//
+// static _getMscmGrade(String actionName, Response response) async {
+//   Map<String, dynamic> res = response.data!;
+//   BaseApiResponse<PartnerGrade> baseResponse = BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//   await _helper.deleteRows(
+//       tableName: DBConstant.partnerGradeTable,
+//       where: DBConstant.id,
+//       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//   // change to json to insert database
+//   List<Map<String, dynamic>>? dataList =
+//       baseResponse.data!.map((e) => e.toJson()).toList();
+//   // insert partner list to database
+//   final success = await _helper.insertDataListBath(
+//       DBConstant.partnerGradeTable, dataList);
+//   if (success) {
+//     return await _insertOrUpdateLastWriteDate(
+//             actionName: actionName,
+//             lastWriteDate: baseResponse.data!.last.writeDate!)
+//         ? SyncProcess.Paginated
+//         : SyncProcess.Fail;
+//   }
+//   return SyncProcess.Fail;
+// }
+//
+// static _getDeliveryOrders(String actionName, Response response) async {
+//   Map<String, dynamic> res = response.data;
+//
+//   BaseApiResponse<StockPickingModel> baseResponse =
+//       BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//
+//   List<StockMoveNewModel> stockMoveLines = [];
+//
+//   for (final stockPicking in baseResponse.data ?? <StockPickingModel>[]) {
+//     stockMoveLines.addAll(stockPicking.moveIdsWithoutPackage ?? []);
+//   }
+//
+//   List<Map<String, dynamic>> stockMoveJsonList = [];
+//
+//   for (final stockMove in stockMoveLines)
+//     stockMoveJsonList.add(stockMove.toJson());
+//
+//   await _helper.deleteRows(
+//       tableName: DBConstant.stockPickingModelTable,
+//       where: DBConstant.id,
+//       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//
+//   await _helper.deleteRows(
+//       tableName: DBConstant.stockMoveModelTable,
+//       where: DBConstant.id,
+//       wantDeleteRow: stockMoveLines.map((e) => e.id).toList());
+//
+//   List<Map<String, dynamic>>? dataList =
+//       baseResponse.data!.map((e) => e.toJsonDB()).toList();
+//
+//   final pickingInserted = await _helper.insertDataListBath(
+//       DBConstant.stockPickingModelTable, dataList);
+//
+//   final moveInserted = await _helper.insertDataListBath(
+//       DBConstant.stockMoveModelTable, stockMoveJsonList);
+//
+//   if (pickingInserted && moveInserted) {
+//     return await _insertOrUpdateLastWriteDate(
+//             actionName: actionName,
+//             lastWriteDate: baseResponse.data!.last.writeDate!)
+//         ? SyncProcess.Paginated
+//         : SyncProcess.Fail;
+//   }
+//   return SyncProcess.Fail;
+// }
+//
+// static Future<SyncProcess> saveCustVisit() async {
+//   bool saved = true;
+//   List<CustVisit> list = await _custVisitDBRepo.getDraftCustVisitList();
+//   for (CustVisit custVisit in list) {
+//     saved = await _custVisitApiRepo.saveCustVisit(custVisit);
+//
+//     if (saved) {
+//       final cust = custVisit.copyWith(isUpload: 1);
+//       await _helper.updateData(
+//           table: DBConstant.custVisitTable,
+//           where: '${DBConstant.customerId} = ? AND ${DBConstant.docDate} = ?',
+//           whereArgs: [custVisit.customerId, custVisit.docDate],
+//           data: cust.toJson());
+//     } else {
+//       return SyncProcess.Fail;
+//     }
+//   }
+//   return SyncProcess.Finished;
+// }
+//
+// static Future<bool> sendDraftSaleOrder() async {
+//   List<SaleOrderHeader> saleOrderHdrList =
+//       await _saleOrderDBRepo.getDraftSaleOrderHdrs();
+//
+//   bool isSuccess = true;
+//
+//   int index = 0;
+//   await Future.doWhile(() async {
+//     // break = false
+//     if (index == saleOrderHdrList.length) {
+//       return false;
+//     }
+//     //
+//     SaleOrderHeader saleOrderHdr = saleOrderHdrList[index];
+//     try {
+//       // qty available check from server
+//
+//       // List<SaleOrderLine> saleOrderLines = await DataObject.instance.getSaleOrderLines(saleOrderHdr.id);
+//       List<Map<String, dynamic>> saleOrderLineJson = await _sqlFLiteHelper
+//           .readDataByWhereArgs(
+//               tableName: DBConstant.saleOrderLineTable,
+//               where: '${DBConstant.orderNo} =? ',
+//               whereArgs: [saleOrderHdr.name]);
+//       List<SaleOrderLine> saleOrderLine = [];
+//
+//       saleOrderLineJson.forEach((element) {
+//         saleOrderLine.add(SaleOrderLine.fromJson(element));
+//       });
+//
+//       final List<Map<String, dynamic>> saleOrderLineJsonApi =
+//           saleOrderLine.map((e) => e.toJsonForSaleOrderApi()).toList();
+//
+//       BaseSingleApiResponse response;
+//       Map<String, dynamic> headerJson = {};
+//       Map<String, dynamic> cashCollectJson = {};
+//
+//       if (saleOrderHdr.fromDirectSale == true) {
+//         CashCollect? cashCollect =
+//             await _cashCollectDBRepo.getCashCollect(saleOrderHdr);
+//         response = await _saleOrderApiRepo.directSaleApiCall(
+//             saleOrderHeader: saleOrderHdr,
+//             cashCollect: cashCollect,
+//             saleOrderLineJson: saleOrderLineJsonApi);
+//
+//         headerJson = response.data!['sale_order'];
+//         cashCollectJson = response.data!['cash_collect'];
+//       } else {
+//         //send to server
+//         response = await _saleOrderApiRepo.sendApiCall(
+//             saleOrderHdr, null, saleOrderLineJsonApi);
+//         headerJson = response.data!;
+//       }
+//
+//       SaleOrderHeader responseHeader = SaleOrderHeader.fromJson(headerJson);
+//
+//       responseHeader.isUpload = 1;
+//
+//       if (saleOrderHdr.fromDirectSale == true) {
+//         CashCollect cashCollect = CashCollect.fromJson(cashCollectJson);
+//         cashCollect.orderNo = responseHeader.name;
+//         cashCollect.orderId = responseHeader.id;
+//
+//         responseHeader.fromDirectSale = true;
+//
+//         bool isUpdated = await _cashCollectDBRepo.updateCashCollect(
+//             saleOrderHdr.name, cashCollect);
+//       }
+//
+//       await _checkDuplicateAndDelete(responseHeader);
+//       await _saleOrderDBRepo.updateResponseOrder(
+//           preOrder: saleOrderHdr, curOrder: responseHeader);
+//
+//       index++;
+//       if (index == saleOrderHdrList.length) {
+//         return false;
+//       }
+//
+//       return true;
+//     } on DioError {
+//       isSuccess = false;
+//       return false;
+//     } catch (e) {
+//       isSuccess = false;
+//       return false;
+//     }
+//   });
+//   return isSuccess;
+// }
+//
+// static Future<SyncProcess> _getWareHouse(
+//     String actionName, Response response) async {
+//   Map<String, dynamic> res = response.data!;
+//   BaseApiResponse<Warehouse> baseResponse = BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//   List<Map<String, dynamic>>? dataList = baseResponse.data!
+//       .map((e) => e.toJson())
+//       .cast<Map<String, dynamic>>()
+//       .toList();
+//
+//   await _helper.deleteRows(
+//       tableName: DBConstant.warehouseTable,
+//       where: DBConstant.id,
+//       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//
+//   final success =
+//       await _helper.insertDataListBath(DBConstant.warehouseTable, dataList);
+//   if (success) {
+//     return SyncProcess.Finished;
+//     // return await _insertOrUpdateLastWriteDate(
+//     //     actionName: actionName,
+//     //     lastWriteDate: baseResponse.data!.last.writeDate!)
+//     //     ? SyncProcess.Paginated
+//     //     : SyncProcess.Fail;
+//   }
+//   return SyncProcess.Fail;
+// }
+//
+// static _checkDuplicateAndDelete(SaleOrderHeader responseHeader) async {}
+//
+// static _getCashCollectionProcess(String actionName, Response response) async {
+//   Map<String, dynamic> res = response.data!;
+//   BaseApiResponse<CashCollect> baseResponse = BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//   await _helper.deleteRows(
+//       tableName: DBConstant.cashCollectionTable,
+//       where: DBConstant.id,
+//       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//   // change to json to insert database
+//   List<Map<String, dynamic>>? dataList =
+//       baseResponse.data!.map((e) => e.toJson()).toList();
+//
+//   // insert partner list to database
+//   final success = await _helper.insertDataListBath(
+//       DBConstant.cashCollectionTable, dataList);
+//   if (success) {
+//     MMTApplication.totalCashCollectAmount = 0;
+//     List<Map<String, dynamic>> cashCollectList =
+//         await _helper.readAllData(tableName: DBConstant.cashCollectionTable);
+//     cashCollectList.forEach((element) {
+//       MMTApplication.totalCashCollectAmount +=
+//           element[DBConstant.collectAmount];
+//       print('xx : total : ${MMTApplication.totalCashCollectAmount}');
+//     });
+//     return await _insertOrUpdateLastWriteDate(
+//             actionName: actionName,
+//             lastWriteDate: baseResponse.data!.last.writeDate!)
+//         ? SyncProcess.Paginated
+//         : SyncProcess.Fail;
+//   }
+//   return SyncProcess.Fail;
+// }
+//
+// static Future<bool> sendDeliveryOrder() async {
+//   List<StockPickingModel> stockPickingList =
+//       await _deliveryDBRepo.getStockPickingList();
+//
+//   bool isSuccess = true;
+//   int index = 0;
+//
+//   await Future.doWhile(() async {
+//     if (index == stockPickingList.length) {
+//       return false;
+//     }
+//
+//     StockPickingModel stockPickingModel = stockPickingList[index];
+//     try {
+//       List<StockMoveNewModel> stockMoves =
+//           stockPickingModel.moveIdsWithoutPackage ?? [];
+//
+//       List<Map<String, dynamic>> jsonList =
+//           stockMoves.map((e) => e.toJson()).toList();
+//
+//       BaseSingleApiResponse response;
+//       Map<String, dynamic> headerJson = {};
+//       Map<String, dynamic> cashCollectJson = {};
+//
+//       CashCollect? cashCollect;
+//
+//       if (stockPickingModel.state != DeliveryStatus.cancel) {
+//         cashCollect = await _cashCollectDBRepo
+//             .getCashCollectByOrderId(stockPickingModel.saleId ?? 0);
+//       }
+//
+//       response = await _deliveryApiRepo.deliverySendApiCall(
+//           stockPicking: stockPickingModel,
+//           cashCollect: cashCollect,
+//           stockMoveJsonList: jsonList);
+//
+//       headerJson = response.data!['delivery_order'];
+//       cashCollectJson = response.data!['cash_collect'];
+//       // }
+//       // else {
+//       //   //send to server
+//       //   response = await _saleOrderApiRepo.sendApiCall(
+//       //       saleOrderHdr, null, saleOrderLineJsonApi);
+//       //   headerJson = response.data!;
+//       // }
+//
+//       StockPickingModel responsePickingModel =
+//           StockPickingModel.fromJson(headerJson);
+//
+//       if (stockPickingModel.state != DeliveryStatus.cancel) {
+//         CashCollect responseCashCollect =
+//             CashCollect.fromJson(cashCollectJson);
+//
+//         bool isUpdated = await _cashCollectDBRepo.updateCashCollect(
+//             responsePickingModel.origin, responseCashCollect);
+//       }
+//
+//       await _deliveryDBRepo.updateResponsePicking(responsePickingModel);
+//
+//       index++;
+//       if (index == stockPickingList.length) {
+//         isSuccess = true;
+//         return false;
+//       }
+//
+//       return true;
+//     } on DioError catch (e) {
+//       isSuccess = false;
+//       return false;
+//     } catch (e) {
+//       isSuccess = false;
+//       return false;
+//     }
+//   });
+//   return isSuccess;
+// }
+//
+// static _getSaleOrderTypeProcess(String actionName, Response response) async {
+//   Map<String, dynamic> res = response.data!;
+//   BaseApiResponse<SaleOrderType> baseResponse = BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//   await _helper.deleteRows(
+//       tableName: DBConstant.saleOrderTypeTable,
+//       where: DBConstant.id,
+//       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//   // change to json to insert database
+//   List<Map<String, dynamic>>? dataList =
+//       baseResponse.data!.map((e) => e.toJson()).toList();
+//   // insert partner list to database
+//   final success = await _helper.insertDataListBath(
+//       DBConstant.saleOrderTypeTable, dataList);
+//   if (success) {
+//     return await _insertOrUpdateLastWriteDate(
+//             actionName: actionName,
+//             lastWriteDate: baseResponse.data!.last.writeDate!)
+//         ? SyncProcess.Paginated
+//         : SyncProcess.Fail;
+//   }
+//   return SyncProcess.Fail;
+// }
+//
+// static _getStockOrder(String actionName, Response response) async {
+//   BaseApiResponse<StockOrder> baseResponse =
+//       BaseApiResponse.fromJson(response.data);
+//
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//
+//   await _helper.deleteRows(
+//       tableName: DBConstant.stockOrderTable,
+//       where: DBConstant.id,
+//       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//
+//   List<StockOrderLine> stockOrderLines = [];
+//   baseResponse.data?.forEach((element) {
+//     stockOrderLines.addAll(element.stockOrderLine ?? []);
+//   });
+//
+//   await _helper.deleteRows(
+//       tableName: DBConstant.stockOrderLineTable,
+//       where: DBConstant.orderId,
+//       wantDeleteRow: stockOrderLines.map((e) => e.orderId).toList());
+//
+//   // change to json to insert database
+//   // List<Map<String, dynamic>>? dataList =
+//   //     baseResponse.data!.map((e) => e.toJson()).toList();
+//
+//   // final success = await _helper.insertDataListBath(
+//   //     DBConstant.stockPickingBatchTable, dataList);
+//
+//   List<Map<String, dynamic>> stockOrderJson = [];
+//   List<Map<String, dynamic>> stockOrderLineJson = [];
+//
+//   List<StockOrder> stockOrderList = baseResponse.data ?? [];
+//
+//   stockOrderList.forEach((stockOrder) {
+//     stockOrderJson.add(stockOrder.toJsonDB());
+//     stockOrder.stockOrderLine
+//         ?.forEach((picking) => stockOrderLineJson.add((picking.toJsonDB())));
+//   });
+//
+//   bool success = await _helper.insertDataListBath(
+//       DBConstant.stockOrderTable, stockOrderJson);
+//
+//   await _helper.insertDataListBath(
+//       DBConstant.stockOrderLineTable, stockOrderLineJson);
+//   if (success) {
+//     return await _insertOrUpdateLastWriteDate(
+//             actionName: actionName,
+//             lastWriteDate: baseResponse.data!.last.writeDate!)
+//         ? SyncProcess.Paginated
+//         : SyncProcess.Fail;
+//   }
+//   return SyncProcess.Fail;
+// }
+//
+// static _getBatchList(String actionName, Response response) async {
+//   BaseApiResponse<StockPickingBatch> baseResponse =
+//       BaseApiResponse.fromJson(response.data);
+//
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//   await _helper.deleteRows(
+//       tableName: DBConstant.stockPickingBatchTable,
+//       where: DBConstant.id,
+//       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//
+//   List<StockPickingModel> stockPickingList = [];
+//   baseResponse.data?.forEach((element) {
+//     stockPickingList.addAll(element.pickingIds ?? []);
+//   });
+//
+//   await _helper.deleteRows(
+//       tableName: DBConstant.stockPickingModelTable,
+//       where: DBConstant.id,
+//       wantDeleteRow: stockPickingList.map((e) => e.id).toList());
+//
+//   // change to json to insert database
+//   // List<Map<String, dynamic>>? dataList =
+//   //     baseResponse.data!.map((e) => e.toJson()).toList();
+//
+//   // final success = await _helper.insertDataListBath(
+//   //     DBConstant.stockPickingBatchTable, dataList);
+//
+//   List<Map<String, dynamic>> stockPickingBatch = [];
+//   List<Map<String, dynamic>> pickingIds = [];
+//
+//   List<StockPickingBatch> batchList = baseResponse.data ?? [];
+//
+//   batchList.forEach((batch) {
+//     stockPickingBatch.add(batch.toJsonDB());
+//     batch.pickingIds
+//         ?.forEach((picking) => pickingIds.add((picking.toJsonDB())));
+//   });
+//
+//   bool success = await _helper.insertDataListBath(
+//       DBConstant.stockPickingBatchTable, stockPickingBatch);
+//
+//   await _helper.insertDataListBath(
+//       DBConstant.stockPickingModelTable, pickingIds);
+//   if (success) {
+//     return await _insertOrUpdateLastWriteDate(
+//             actionName: actionName,
+//             lastWriteDate: baseResponse.data!.last.writeDate!)
+//         ? SyncProcess.Paginated
+//         : SyncProcess.Fail;
+//   }
+//   return SyncProcess.Fail;
+// }
+//
+// static _getCashCollection(String actionName, Response response) async {
+//   Map<String, dynamic> res = response.data!;
+//   BaseApiResponse<CashCollect> baseResponse = BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//   await _helper.deleteRows(
+//       tableName: DBConstant.cashCollectionTable,
+//       where: DBConstant.id,
+//       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//   // change to json to insert database
+//   List<Map<String, dynamic>>? dataList =
+//       baseResponse.data!.map((e) => e.toJson()).toList();
+//   // insert partner list to database
+//   final success = await _helper.insertDataListBath(
+//       DBConstant.cashCollectionTable, dataList);
+//   if (success) {
+//     return await _insertOrUpdateLastWriteDate(
+//             actionName: actionName,
+//             lastWriteDate: baseResponse.data!.last.writeDate!)
+//         ? SyncProcess.Paginated
+//         : SyncProcess.Fail;
+//   }
+//   return SyncProcess.Fail;
+// }
+//
+// static Future<SyncProcess> _getStockPickingType(
+//     String actionName, Response response) async {
+//   Map<String, dynamic> res = response.data!;
+//
+//   BaseApiResponse<StockPickingType> baseResponse =
+//       BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//
+//   await _helper.deleteRows(
+//       tableName: DBConstant.pickingTypeTable,
+//       where: 'id',
+//       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//   // filter active = true
+//   List<StockPickingType> pickingTypes = baseResponse.data ?? [];
+//   if (pickingTypes.isEmpty) return SyncProcess.Finished;
+//   // change to json to insert database
+//
+//   List<Map<String, dynamic>>? dataList =
+//       pickingTypes.map((e) => e.toJson()).toList();
+//
+//   // insert product list to database
+//   final bool pickingTypeInserted =
+//       await _helper.insertDataListBath(DBConstant.pickingTypeTable, dataList);
+//
+//   if (pickingTypeInserted) {
+//     return await _insertOrUpdateLastWriteDate(
+//             actionName: actionName,
+//             lastWriteDate: baseResponse.data!.last.writeDate!)
+//         ? SyncProcess.Paginated
+//         : SyncProcess.Fail;
+//   }
+//
+//   return SyncProcess.Fail;
+// }
+//
+// static Future<SyncProcess> _getUomProcess(
+//     String actionName, Response response) async {
+//   // delete dashboards from database
+//   Map<String, dynamic> res = response.data!;
+//   BaseApiResponse<MSCMUomLine> baseResponse = BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//   // delete process
+//   await _helper.deleteAllRow(tableName: DBConstant.mscmUomTable);
+//   // await _helper.deleteRows(
+//   //     tableName: DBConstant.dashboardTable,
+//   //     where: DBConstant.id,
+//   //     wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//
+//   // change to json to insert database
+//   List<Map<String, dynamic>>? dataList =
+//       baseResponse.data?.map((e) => e.toJson()).toList();
+//   // insert dashboard list to database
+//   final success = await _helper.insertDataListBath(
+//       DBConstant.mscmUomTable, dataList ?? []);
+//   // if (success) {
+//   //   return await _insertOrUpdateLastWriteDate(
+//   //           actionName: actionName,
+//   //           lastWriteDate: baseResponse.data!.last.writeDate!)
+//   //       ? SyncProcess.Paginated
+//   //       : SyncProcess.Fail;
+//   // }
+//   return SyncProcess.Finished;
+// }
+//
+// static _getCoinBillProcess(String actionName, Response response) async {
+//   Map<String, dynamic> res = response.data!;
+//   BaseApiResponse<CoinBill> baseResponse = BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//
+//   await _helper.deleteRows(
+//       tableName: DBConstant.coinBillTable,
+//       where: DBConstant.id,
+//       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//
+//   List<Map<String, dynamic>>? dataList =
+//       baseResponse.data?.map((e) => e.toJson()).toList();
+//   // insert coin list to database
+//   final success = await _helper.insertDataListBath(
+//       DBConstant.coinBillTable, dataList ?? []);
+//   if (!success) return SyncProcess.Fail;
+//
+//   return await _insertOrUpdateLastWriteDate(
+//           actionName: actionName,
+//           lastWriteDate: baseResponse.data!.last.writeDate!)
+//       ? SyncProcess.Paginated
+//       : SyncProcess.Fail;
+// }
+//
+// static _getPaymentTransferProcess(
+//     String actionName, Response response) async {
+//   Map<String, dynamic> res = response.data!;
+//   BaseApiResponse<MscmPaymentTransfer> baseResponse =
+//       BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//   List<Map<String, dynamic>> paymentTransferLine = [];
+//   List<Map<String, dynamic>>? dataList = baseResponse.data?.map((e) {
+//     e.paymentCoinLine?.forEach((element) {
+//       Map<String, dynamic> json = element.toJson();
+//       json.putIfAbsent(DBConstant.transferId, () => e.id);
+//       paymentTransferLine.add(json);
+//     });
+//     return e.toJsonDB();
+//   }).toList();
+//
+//   MMTApplication.printJob(paymentTransferLine.toString());
+//
+//   await _helper.deleteRows(
+//       tableName: DBConstant.paymentCoinLineTable,
+//       where: '${DBConstant.transferId}',
+//       wantDeleteRow: baseResponse.data?.map((e) => e.id).toList() ?? []);
+//   //
+//   await _helper.deleteRows(
+//       tableName: DBConstant.paymentTransferTable,
+//       where: '${DBConstant.id}',
+//       wantDeleteRow: baseResponse.data?.map((e) => e.id).toList() ?? []);
+//
+//   final lineInsert = await _helper.insertDataListBath(
+//       DBConstant.paymentCoinLineTable, paymentTransferLine);
+//   // insert coin list to database
+//   final success = await _helper.insertDataListBath(
+//       DBConstant.paymentTransferTable, dataList ?? []);
+//   if (!success) return SyncProcess.Fail;
+//
+//   MMTApplication.totalTransferAmount = 0;
+//   List<Map<String, dynamic>> cashCollectList =
+//       await _helper.readAllData(tableName: DBConstant.paymentTransferTable);
+//   cashCollectList.forEach((element) {
+//     MMTApplication.totalTransferAmount += element[DBConstant.amount];
+//   });
+//
+//   return await _insertOrUpdateLastWriteDate(
+//           actionName: actionName,
+//           lastWriteDate: baseResponse.data!.last.writeDate!)
+//       ? SyncProcess.Paginated
+//       : SyncProcess.Fail;
+// }
+//
+// static _get_account_payment_list(String actionName, Response response) async {
+//   Map<String, dynamic> res = response.data!;
+//
+//   BaseApiResponse<AccountPayment> baseResponse =
+//       BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//
+//   await _helper.deleteRows(
+//       tableName: DBConstant.accountPaymentTable,
+//       where: 'id',
+//       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//   // filter active = true
+//   List<AccountPayment> pickingTypes = baseResponse.data ?? [];
+//   if (pickingTypes.isEmpty) return SyncProcess.Finished;
+//   // change to json to insert database
+//
+//   List<Map<String, dynamic>>? dataList =
+//       pickingTypes.map((e) => e.toJson()).toList();
+//
+//   // insert product list to database
+//   final bool pickingTypeInserted = await _helper.insertDataListBath(
+//       DBConstant.accountPaymentTable, dataList);
+//
+//   if (pickingTypeInserted) {
+//     return await _insertOrUpdateLastWriteDate(
+//             actionName: actionName,
+//             lastWriteDate: baseResponse.data!.last.writeDate!)
+//         ? SyncProcess.Paginated
+//         : SyncProcess.Fail;
+//   }
+//
+//   return SyncProcess.Fail;
+// }
+//
+// static _get_journal_list(String actionName, Response response) async {
+//   Map<String, dynamic> res = response.data!;
+//
+//   BaseApiResponse<AccountJournal> baseResponse =
+//       BaseApiResponse.fromJson(res);
+//   if (baseResponse.data!.isEmpty) {
+//     return SyncProcess.Finished;
+//   }
+//
+//   await _helper.deleteRows(
+//       tableName: DBConstant.accountJournalTable,
+//       where: 'id',
+//       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//   // filter active = true
+//   List<AccountJournal> journalList = baseResponse.data ?? [];
+//   if (journalList.isEmpty) return SyncProcess.Finished;
+//   // change to json to insert database
+//
+//   List<Map<String, dynamic>>? dataList =
+//       journalList.map((e) => e.toJson()).toList();
+//
+//   // insert product list to database
+//   final bool pickingTypeInserted = await _helper.insertDataListBath(
+//       DBConstant.accountJournalTable, dataList);
+//
+//   if (pickingTypeInserted) {
+//     return await _insertOrUpdateLastWriteDate(
+//             actionName: actionName,
+//             lastWriteDate: baseResponse.data!.last.writeDate!)
+//         ? SyncProcess.Finished
+//         : SyncProcess.Fail;
+//   }
+//
+//   return SyncProcess.Finished;
+// }
 }
 
 // static _getDeliveryOrders(String actionName, Response response) async {

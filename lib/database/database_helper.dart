@@ -12,7 +12,6 @@ class DatabaseHelper {
 
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
 
-
   // only have a single app-wide reference to the database
   static Database? _database;
 
@@ -22,19 +21,17 @@ class DatabaseHelper {
     return _database!;
   }
 
-
   Future<Database> _initDatabase() async {
     String path = join(await getDatabasesPath(), _databaseName);
-    return await openDatabase(path, version: _databaseVersion,
-        onCreate: _onCreateDatabase);
+    return await openDatabase(path,
+        version: _databaseVersion, onCreate: _onCreateDatabase);
   }
 
-  Future<bool> insertData({required String table, required Map<String,dynamic> values}) async{
-    int? id =  await  _database?.insert(table, values);
+  Future<bool> insertData(
+      {required String table, required Map<String, dynamic> values}) async {
+    int? id = await _database?.insert(table, values);
     return id != null;
   }
-  
-  
 
   Future deleteAllRow({required String tableName}) async {
     Database db = await database;
@@ -47,21 +44,19 @@ class DatabaseHelper {
 
   Future<bool> deleteRows(
       {required String tableName,
-        required String where,
-        required List wantDeleteRow}) async {
+      required String where,
+      required List wantDeleteRow}) async {
     Database db = await database;
     // db.rawQuery('DELETE FROM $tableName WHERE $where IN ($wantDeleteRow)');
     int affectedRow = await db.delete(tableName,
         where:
-        '$where IN (${List.filled(wantDeleteRow.length, '?').join(',')})',
+            '$where IN (${List.filled(wantDeleteRow.length, '?').join(',')})',
         whereArgs: wantDeleteRow);
 
     print("Deleted rows : $affectedRow : $tableName");
 
     return affectedRow == wantDeleteRow.length;
   }
-
-
 
   Future<bool> insertDataListBath(
       String tableName, List<Map<String, dynamic>> list) async {
@@ -78,9 +73,10 @@ class DatabaseHelper {
       {required String tableName, String? orderBy}) async {
     Database db = await database;
     List<Map<String, dynamic>> maps =
-    await db.query(tableName, orderBy: orderBy);
+        await db.query(tableName, orderBy: orderBy);
     return maps;
   }
+
   Future<List<Map<String, dynamic>>> readDataRaw(String query) async {
     Database db = await database;
     List<Map<String, dynamic>> list = await db.rawQuery(query);
@@ -89,11 +85,11 @@ class DatabaseHelper {
 
   Future<List<Map<String, dynamic>>> readDataByWhereArgs(
       {required String tableName,
-        List<String>? columns,
-        required String where,
-        int? limit,
-        String? orderBy,
-        required List<dynamic> whereArgs}) async {
+      List<String>? columns,
+      required String where,
+      int? limit,
+      String? orderBy,
+      required List<dynamic> whereArgs}) async {
     Database db = await database;
     List<Map<String, dynamic>> maps = await db.query(tableName,
         columns: columns,
@@ -106,9 +102,9 @@ class DatabaseHelper {
 
   Future<bool> updateData(
       {required String table,
-        required String where,
-        required List<dynamic> whereArgs,
-        required Map<String, dynamic> data}) async {
+      required String where,
+      required List<dynamic> whereArgs,
+      required Map<String, dynamic> data}) async {
     Database db = await database;
     final re = await db.update(table, data, where: where, whereArgs: whereArgs);
     return re > 0 ? true : false;
@@ -121,9 +117,7 @@ class DatabaseHelper {
         where: '${DBConstant.actionName} = ?',
         whereArgs: [actionName],
         limit: 1);
-    return list.isEmpty
-        ? null
-        : list.first[DBConstant.writeDate];
+    return list.isEmpty ? null : list.first[DBConstant.writeDate];
   }
 
   _onCreateDatabase(Database db, int version) async {
@@ -131,12 +125,13 @@ class DatabaseHelper {
     await _createSyncActionTable(db);
     await _createSyncGroupTable(db);
     await _createSyncActionLinkWithGroupTable(db);
-   await _createSyncHistoryTable(db);
-   await _createChildCategoryTable(db);
+    await _createSyncHistoryTable(db);
+    await _createChildCategoryTable(db);
     await _createCategoryTable(db);
     await _createSaleOrderHeaderTable(db);
     await _createSaleOrderLineTable(db);
     await _createProductUomTable(db);
+    await _createStockLocationTable(db);
   }
 
   _createProductUomTable(Database db) async {
@@ -156,6 +151,26 @@ class DatabaseHelper {
         '(${DBConstant.actionName} TEXT,'
         '${DBConstant.writeDate} TEXT'
         ')');
+  }
+
+  _createStockLocationTable(Database db) async {
+    return await db.execute('''
+      CREATE TABLE ${DBConstant.stockLocationTable} (
+        ${DBConstant.id} INTEGER PRIMARY KEY,
+        ${DBConstant.name} TEXT,
+        ${DBConstant.locationId} INTEGER,
+        ${DBConstant.locationName} TEXT,
+        ${DBConstant.companyId} INTEGER,
+        ${DBConstant.companyName} TEXT,
+        ${DBConstant.removalStrategyId} INTEGER,
+        ${DBConstant.removalStrategyName} TEXT,
+        ${DBConstant.usage} TEXT,
+        ${DBConstant.scrapLocation} INTEGER,
+        ${DBConstant.returnLocation} INTEGER,
+        ${DBConstant.replenishLocation} INTEGER,
+        ${DBConstant.writeDate} TEXT
+      )
+    ''');
   }
 
   _createProductTable(Database db) async {
@@ -203,11 +218,11 @@ class DatabaseHelper {
   _createSyncActionLinkWithGroupTable(Database db) async {
     return await db
         .execute('CREATE TABLE ${DBConstant.syncActionWithGroupTable}'
-        '(${DBConstant.actionId} INTEGER,'
-        '${DBConstant.actionName} TEXT,'
-        '${DBConstant.actionGroupID} INTEGER,'
-        '${DBConstant.actionGroupName} TEXT'
-        ')');
+            '(${DBConstant.actionId} INTEGER,'
+            '${DBConstant.actionName} TEXT,'
+            '${DBConstant.actionGroupID} INTEGER,'
+            '${DBConstant.actionGroupName} TEXT'
+            ')');
   }
 
   _createSyncGroupTable(Database db) async {

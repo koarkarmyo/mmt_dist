@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mmt_mobile/database/product_repo/product_db_repo.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
@@ -76,6 +77,8 @@ class _DashboardPageState extends State<DashboardPage> {
     manualSyncStreamListener();
     _syncActionCubit = context.read<SyncActionCubit>()
       ..getSyncAction(isManualSync: true);
+
+    ProductDBRepo.instance.getProductList();
   }
 
   @override
