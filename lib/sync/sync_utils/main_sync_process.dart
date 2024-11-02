@@ -58,7 +58,7 @@ class MainSyncProcess {
       await startAutoSyncProcess(forceStart: false);
     });
 
-    Timer.periodic(const Duration(minutes: 4), (timer) async {
+    Timer.periodic(const Duration(minutes: 1), (timer) async {
       await _locationSaver();
     });
   }
@@ -113,13 +113,17 @@ class MainSyncProcess {
   }
 
   Future<void> _startAutoSync() async {
+    print("Starting auto sync");
+
     // is auto sync is running
     _syncProcessIsRunning = true;
     //
     String actionName = '';
+    int limit = 100;
     _isAutoSync = true;
     if (_autoSyncProcess.isNotEmpty) {
       actionName = _autoSyncProcess.first.name ?? '';
+      limit = _autoSyncProcess.first.syncLimit ?? 100;
       print('xxFFxx::${_autoSyncProcess.first.description}');
       _sendToView(_syncResponse(
         name: actionName,
@@ -138,7 +142,7 @@ class MainSyncProcess {
       /// don't write like this, should be use [completer]
       /// api call
       ///
-      SyncProcess syncProcess = await _sendApiRequest(actionName);
+      SyncProcess syncProcess = await _sendApiRequest(actionName, limit: limit);
 
       // await Future.delayed(Duration(milliseconds: 500));
 
@@ -264,7 +268,8 @@ class MainSyncProcess {
     }
 
     try {
-      SyncProcess syncProcess = await _sendApiRequest(actionName);
+      SyncProcess syncProcess =
+          await _sendApiRequest(actionName, limit: actionList.first.syncLimit);
 
       if (syncProcess == SyncProcess.Paginated) {
         await _startManualSync(actionList);
@@ -501,7 +506,7 @@ class MainSyncProcess {
 //     return true;
 //   }
 //
-  Future<SyncProcess> _sendApiRequest(String actionName) async {
+  Future<SyncProcess> _sendApiRequest(String actionName, {int? limit}) async {
     SyncProcess syncProcess = SyncProcess.Finished;
 //     // await Future.delayed(const Duration(milliseconds: 1000));
 //     // Completer<void> completer = Completer();
@@ -526,7 +531,7 @@ class MainSyncProcess {
 //       if (isNeedToSend) syncProcess = SyncProcess.Paginated;
 //     } else {
     // api call
-    Response response = await _syncApiRepo.sendAction(actionName);
+    Response response = await _syncApiRepo.sendAction(actionName, limit: limit);
 
     syncProcess = await SyncUtils.insertToDatabase(
         actionName: actionName, response: response);

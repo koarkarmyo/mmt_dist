@@ -19,6 +19,7 @@ class SyncResponse {
     this.actionGroupName,
     this.description,
     this.solutionId,
+    this.syncLimit
   });
 
   SyncResponse.fromJson(dynamic json) {
@@ -32,6 +33,7 @@ class SyncResponse {
     actionGroupId = json['action_group_id'];
     description = json['description'];
     solutionId = json['solution_id'];
+    syncLimit = json['sync_limit'];
   }
 
   int? id;
@@ -44,6 +46,7 @@ class SyncResponse {
   String? description;
   int? actionGroupId;
   String? solutionId;
+  int? syncLimit;
   List<SyncActionGroup>? syncActionGroup;
 
   Map<String, dynamic> toJson() {
@@ -59,6 +62,7 @@ class SyncResponse {
     map['solution_id'] = solutionId;
     map['description'] = description;
     map['action_group'] = syncActionGroup?.map((e) => e.toJson(),).toList();
+    map['sync_limit'] = syncLimit;
     return map;
   }
 
@@ -74,6 +78,7 @@ class SyncResponse {
     map['action_group_id'] = actionGroupId;
     map['solution_id'] = solutionId;
     map['description'] = description;
+    map['sync_limit'] = syncLimit;
     return map;
   }
 
@@ -88,6 +93,7 @@ class SyncResponse {
     actionGroupId = json['action_group_id'];
     solutionId = json['solution_id'];
     description = json['description'];
+    syncLimit = json['sync_limit'];
   }
 
    bool checkActionGroup({ int? groupId, String? groupName}){

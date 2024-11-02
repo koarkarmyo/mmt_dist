@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:mmt_mobile/model/stock_location.dart';
+import 'package:mmt_mobile/ui/loading/stock_loading_add_page.dart';
 import 'package:sqflite/sqlite_api.dart';
 
 import '../model/cust_visit.dart';
@@ -6,8 +8,6 @@ import '../model/number_series.dart';
 import '../model/price_list/product_price_list_item.dart';
 import 'database_helper.dart';
 import 'db_constant.dart';
-
-
 
 class DataObject {
   static final DataObject instance = DataObject._();
@@ -45,12 +45,37 @@ class DataObject {
           where: where,
           whereArgs: arg);
     } else {
-      priceJson = await DatabaseHelper.instance.readAllData(
-          tableName: DBConstant.priceListItemTable);
+      priceJson = await DatabaseHelper.instance
+          .readAllData(tableName: DBConstant.priceListItemTable);
     }
     print('xxxxxxxx::::');
     return priceJson.map((e) => ProductPriceListItem.fromJson(e)).toList();
   }
+
+  Future<List<StockLocation>> getStockLocationList() async {
+    List<StockLocation> stockLocationList = [];
+
+    try {
+      List<Map<String, dynamic>> stockLocationJsonList = await DatabaseHelper
+          .instance
+          .readAllData(tableName: DBConstant.stockLocationTable);
+
+      stockLocationJsonList.forEach(
+        (element) {
+          stockLocationList.add(StockLocation.fromJsonDB(element));
+        },
+      );
+    } on Exception {
+      return [];
+    }
+
+    stockLocationList.forEach(
+      (element) => print(element.toJson()),
+    );
+
+    return stockLocationList;
+  }
+
   //
   // Future<List<PriceListItem>> getPriceListItems() async {
   //   List<Map<String, dynamic>> priceJson;
@@ -279,15 +304,17 @@ class DataObject {
   // }
   //
   Future<NumberSeries?> getNumberSeries({required String moduleName}) async {
-    List<Map<String, dynamic>> json = await DatabaseHelper.instance.readDataByWhereArgs(
-        tableName: DBConstant.numberSeriesTable,
-        where: '${DBConstant.name} =? ',
-        whereArgs: [moduleName]);
+    List<Map<String, dynamic>> json = await DatabaseHelper.instance
+        .readDataByWhereArgs(
+            tableName: DBConstant.numberSeriesTable,
+            where: '${DBConstant.name} =? ',
+            whereArgs: [moduleName]);
     if (json.isNotEmpty)
       return NumberSeries.fromJsonDB(json.first);
     else
       null;
   }
+
   //
   // Future<List<VehicleInventoryModel>> getVehicleInventoryByProduct(
   //     int productId) async {
@@ -411,8 +438,9 @@ class DataObject {
   //
   Future<bool> insertCustVisit(CustVisit custVisit) async {
     return DatabaseHelper.instance.insertData(
-       table:   DBConstant.custVisitTable, values:  custVisit.toJson());
+        table: DBConstant.custVisitTable, values: custVisit.toJson());
   }
+
   //
   // Future<List<CustVisit>> getCustVisitedList(
   //     {int? custId, CustVisitTypes? custVisitType}) async {
@@ -485,123 +513,123 @@ class DataObject {
     }
   }
 
-  // Future<void> updateVehicleInventory(
-  //     List<VehicleInventoryModel> vehicleInventoryList) async {
-  //   await Future.forEach<VehicleInventoryModel>(vehicleInventoryList,
-  //       (vehicleInventoryModel) async {
-  //     await _sqlFLiteHelper.updateData(
-  //         table: DBConstant.vehicleInventoryTable,
-  //         where: '${DBConstant.productId} =? ',
-  //         whereArgs: [
-  //           vehicleInventoryModel.productId
-  //         ],
-  //         data: {
-  //           DBConstant.productUomQty: vehicleInventoryModel.productUomQty
-  //         });
-  //   });
-  // }
-  //
-  // Future<List<CustVisit>> getCustVisit(
-  //     {required String date, int? saleOrderTypeId}) async {
-  //   List<CustVisit> custVisits = [];
-  //   List args = ['$date%'];
-  //   String saleOrderTypeQuery = '';
-  //   if (saleOrderTypeId != null) {
-  //     saleOrderTypeQuery = 'AND ${DBConstant.saleOrderTypeId} =?';
-  //     args.add(1);
-  //   }
-  //   List<Map<String, dynamic>> jsonList =
-  //       await _sqlFLiteHelper.readDataByWhereArgs(
-  //     tableName: DBConstant.custVisitTable,
-  //     where: '${DBConstant.docDate} LIKE ? $saleOrderTypeQuery',
-  //     whereArgs: args,
-  //   );
-  //
-  //   for (Map<String, dynamic> jsonV in jsonList) {
-  //     CustVisit custVisit = CustVisit.fromJson(jsonV);
-  //     custVisits.add(custVisit);
-  //   }
-  //
-  //   return custVisits;
-  // }
-  //
-  // Future<List<SyncResponse>> getAutoSyncActionListByGroup(
-  //     String groupName) async {
-  //   List<SyncResponse> syncActionList = [];
-  //   List<Map<String, dynamic>> list = await _sqlFLiteHelper.readDataByWhereArgs(
-  //       tableName: DBConstant.mscmSyncActionTable,
-  //       // where:
-  //       //     '${DBConstant.isAutoSync} = ? AND ${DBConstant.actionGroupName} = ?',
-  //       where: '${DBConstant.isAutoSync} = ?',
-  //       whereArgs: [1]);
-  //   list.forEach((element) {
-  //     syncActionList.add(SyncResponse.fromJsonDB(element));
-  //   });
-  //   return syncActionList;
-  // }
-  //
-  // Future<List<SyncResponse>> getSyncActionList({bool? isAutoSync}) async {
-  //   List<SyncResponse> syncActionList = [];
-  //   List<Map<String, dynamic>> list;
-  //   if (isAutoSync != null) {
-  //     list = await _sqlFLiteHelper.readDataByWhereArgs(
-  //         tableName: DBConstant.mscmSyncActionTable,
-  //         where: '${DBConstant.isAutoSync} = ?',
-  //         whereArgs: [(isAutoSync ? 1 : 0)]);
-  //   } else {
-  //     list = await _sqlFLiteHelper.readAllData(
-  //         tableName: DBConstant.mscmSyncActionTable);
-  //   }
-  //   list.forEach((element) {
-  //     syncActionList.add(SyncResponse.fromJsonDB(element));
-  //   });
-  //   return syncActionList;
-  // }
-  //
-  // Future<List<PriceListItem>> getPriceListItem() async {
-  //   List<PriceListItem> _priceListItems = [];
-  //   List<Map<String, dynamic>> jsonList = await _sqlFLiteHelper.readAllData(
-  //       tableName: DBConstant.priceListItemTable,
-  //       orderBy: '${DBConstant.fixedPrice} DESC');
-  //   for (Map value in jsonList) {
-  //     _priceListItems.add(PriceListItem.fromJson(value));
-  //   }
-  //   return _priceListItems;
-  // }
-  //
-  // Future<bool> insertUrl(String serverUrl) async {
-  //   return _configInsert(ShKeys.serverUrlKey, serverUrl);
-  // }
-  //
-  // Future<bool> insertUsername(String username) async {
-  //   return _configInsert(ShKeys.username, username);
-  // }
-  //
-  // Future<bool> insertPassword(String password) async {
-  //   return _configInsert(ShKeys.password, password);
-  // }
-  //
-  // Future<bool> _configInsert(String key, String value) async {
-  //   List data = await _sqlFLiteHelper.readDataByWhereArgs(
-  //       tableName: DBConstant.configTable,
-  //       where: '${DBConstant.name} = ?',
-  //       whereArgs: [key]);
-  //   if (data.isNotEmpty) {
-  //     return _sqlFLiteHelper.updateData(
-  //         table: DBConstant.configTable,
-  //         where: '${DBConstant.name} = ?',
-  //         whereArgs: [
-  //           key
-  //         ],
-  //         data: {
-  //           DBConstant.name: key,
-  //           DBConstant.value: value,
-  //         });
-  //   } else {
-  //     return _sqlFLiteHelper.insertData(DBConstant.configTable, {
-  //       DBConstant.name: key,
-  //       DBConstant.value: value,
-  //     });
-  //   }
-  // }
+// Future<void> updateVehicleInventory(
+//     List<VehicleInventoryModel> vehicleInventoryList) async {
+//   await Future.forEach<VehicleInventoryModel>(vehicleInventoryList,
+//       (vehicleInventoryModel) async {
+//     await _sqlFLiteHelper.updateData(
+//         table: DBConstant.vehicleInventoryTable,
+//         where: '${DBConstant.productId} =? ',
+//         whereArgs: [
+//           vehicleInventoryModel.productId
+//         ],
+//         data: {
+//           DBConstant.productUomQty: vehicleInventoryModel.productUomQty
+//         });
+//   });
+// }
+//
+// Future<List<CustVisit>> getCustVisit(
+//     {required String date, int? saleOrderTypeId}) async {
+//   List<CustVisit> custVisits = [];
+//   List args = ['$date%'];
+//   String saleOrderTypeQuery = '';
+//   if (saleOrderTypeId != null) {
+//     saleOrderTypeQuery = 'AND ${DBConstant.saleOrderTypeId} =?';
+//     args.add(1);
+//   }
+//   List<Map<String, dynamic>> jsonList =
+//       await _sqlFLiteHelper.readDataByWhereArgs(
+//     tableName: DBConstant.custVisitTable,
+//     where: '${DBConstant.docDate} LIKE ? $saleOrderTypeQuery',
+//     whereArgs: args,
+//   );
+//
+//   for (Map<String, dynamic> jsonV in jsonList) {
+//     CustVisit custVisit = CustVisit.fromJson(jsonV);
+//     custVisits.add(custVisit);
+//   }
+//
+//   return custVisits;
+// }
+//
+// Future<List<SyncResponse>> getAutoSyncActionListByGroup(
+//     String groupName) async {
+//   List<SyncResponse> syncActionList = [];
+//   List<Map<String, dynamic>> list = await _sqlFLiteHelper.readDataByWhereArgs(
+//       tableName: DBConstant.mscmSyncActionTable,
+//       // where:
+//       //     '${DBConstant.isAutoSync} = ? AND ${DBConstant.actionGroupName} = ?',
+//       where: '${DBConstant.isAutoSync} = ?',
+//       whereArgs: [1]);
+//   list.forEach((element) {
+//     syncActionList.add(SyncResponse.fromJsonDB(element));
+//   });
+//   return syncActionList;
+// }
+//
+// Future<List<SyncResponse>> getSyncActionList({bool? isAutoSync}) async {
+//   List<SyncResponse> syncActionList = [];
+//   List<Map<String, dynamic>> list;
+//   if (isAutoSync != null) {
+//     list = await _sqlFLiteHelper.readDataByWhereArgs(
+//         tableName: DBConstant.mscmSyncActionTable,
+//         where: '${DBConstant.isAutoSync} = ?',
+//         whereArgs: [(isAutoSync ? 1 : 0)]);
+//   } else {
+//     list = await _sqlFLiteHelper.readAllData(
+//         tableName: DBConstant.mscmSyncActionTable);
+//   }
+//   list.forEach((element) {
+//     syncActionList.add(SyncResponse.fromJsonDB(element));
+//   });
+//   return syncActionList;
+// }
+//
+// Future<List<PriceListItem>> getPriceListItem() async {
+//   List<PriceListItem> _priceListItems = [];
+//   List<Map<String, dynamic>> jsonList = await _sqlFLiteHelper.readAllData(
+//       tableName: DBConstant.priceListItemTable,
+//       orderBy: '${DBConstant.fixedPrice} DESC');
+//   for (Map value in jsonList) {
+//     _priceListItems.add(PriceListItem.fromJson(value));
+//   }
+//   return _priceListItems;
+// }
+//
+// Future<bool> insertUrl(String serverUrl) async {
+//   return _configInsert(ShKeys.serverUrlKey, serverUrl);
+// }
+//
+// Future<bool> insertUsername(String username) async {
+//   return _configInsert(ShKeys.username, username);
+// }
+//
+// Future<bool> insertPassword(String password) async {
+//   return _configInsert(ShKeys.password, password);
+// }
+//
+// Future<bool> _configInsert(String key, String value) async {
+//   List data = await _sqlFLiteHelper.readDataByWhereArgs(
+//       tableName: DBConstant.configTable,
+//       where: '${DBConstant.name} = ?',
+//       whereArgs: [key]);
+//   if (data.isNotEmpty) {
+//     return _sqlFLiteHelper.updateData(
+//         table: DBConstant.configTable,
+//         where: '${DBConstant.name} = ?',
+//         whereArgs: [
+//           key
+//         ],
+//         data: {
+//           DBConstant.name: key,
+//           DBConstant.value: value,
+//         });
+//   } else {
+//     return _sqlFLiteHelper.insertData(DBConstant.configTable, {
+//       DBConstant.name: key,
+//       DBConstant.value: value,
+//     });
+//   }
+// }
 }

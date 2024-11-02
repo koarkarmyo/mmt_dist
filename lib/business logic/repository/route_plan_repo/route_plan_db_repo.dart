@@ -13,7 +13,7 @@ class RoutePlanDBRepo extends BaseDBRepo {
     List<RouteLine> routePlanLineList = [];
 
     List<Map<String, dynamic>> jsonList = await helper.readDataByWhereArgs(
-        tableName: DBConstant.mscmRouteTable,
+        tableName: DBConstant.routeTable,
         where: '${DBConstant.dateStart} like ?',
         whereArgs: ['%$date%']);
 

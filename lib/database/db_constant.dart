@@ -11,7 +11,7 @@ class DBConstant {
   static const String mscmUserTable = 'mscm_users';
   static const String companyTable = 'company';
   static const String mscmDeviceTable = 'mscm_devices';
-  static const String mscmRouteTable = 'mscm_routes';
+  static const String routeTable = 'routes';
   static const String mscmRouteLineTable = 'mscm_route_lines';
   static const String mscmDeviceRouteTable = 'mscm_device_routes';
   static const String partnerRouteTable = 'partner_routes';
@@ -92,6 +92,10 @@ class DBConstant {
   static const String scrapLocation = 'scrap_location';
   static const String returnLocation = 'return_location';
   static const String replenishLocation = 'replenish_location';
+  static const String countryId = 'country_id';
+  static const String countryName = 'country_name';
+  static const String syncLimit = 'sync_limit';
+  static const String partnerSaleType = "partner_sale_type";
 
   static const String customerRank = 'customer_rank';
   static const String supplierRank = 'supplier_rank';
@@ -280,6 +284,7 @@ class DBConstant {
   static const String discountPolicy = 'discount_policy';
   static const String displayName = 'display_name';
   static const String currencyName = 'currency_name';
+
   //
   static const String documentType = 'document_type';
   static const String originDocumentNo = 'origin_document_no';

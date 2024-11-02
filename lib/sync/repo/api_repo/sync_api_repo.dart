@@ -21,7 +21,7 @@ class SyncApiRepo extends BaseApiRepo {
   }
 
   Future<Response> sendAction(String actionName,
-      {bool isUpload = false}) async {
+      {bool isUpload = false, int? limit}) async {
     bool isUploadedData = true;
 
     if (isUpload) {
@@ -35,7 +35,7 @@ class SyncApiRepo extends BaseApiRepo {
       }
     }
 
-    final data = await ApiRequest.createActionRequest(actionName);
+    final data = await ApiRequest.createActionRequest(actionName, limit: limit);
     Response response =
         await postMethodCall(additionalPath: '/api/sync/', bodyData: data);
     // print(response);

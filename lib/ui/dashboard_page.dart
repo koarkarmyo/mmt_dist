@@ -2,7 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mmt_mobile/database/data_object.dart';
+import 'package:mmt_mobile/database/db_repo/currency_db_repo.dart';
+import 'package:mmt_mobile/database/db_repo/res_partner_repo.dart';
 import 'package:mmt_mobile/database/product_repo/product_db_repo.dart';
+import 'package:mmt_mobile/model/res_partner.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
@@ -78,7 +82,6 @@ class _DashboardPageState extends State<DashboardPage> {
     _syncActionCubit = context.read<SyncActionCubit>()
       ..getSyncAction(isManualSync: true);
 
-    ProductDBRepo.instance.getProductList();
   }
 
   @override
@@ -228,7 +231,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 builder: (context, selectedTitleIndex, _) {
                   return Container(
                     width: 250,
-                    height: selectedTitleIndex == index ?80 :70,
+                    height: selectedTitleIndex == index ? 80 : 70,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       color: selectedTitleIndex == index
@@ -288,11 +291,11 @@ class _DashboardPageState extends State<DashboardPage> {
                 Navigator.pushNamed(context, RouteList.contactPage);
               } else if (process == "Product Report") {
                 Navigator.pushNamed(context, RouteList.productReportPage);
-              }else if (process == "Customer Visit") {
+              } else if (process == "Customer Visit") {
                 Navigator.pushNamed(context, RouteList.customerVisitPage);
-              }else if (process == "Today Order") {
+              } else if (process == "Today Order") {
                 Navigator.pushNamed(context, RouteList.todayOrderPage);
-              }else if (process == "Today Delivery") {
+              } else if (process == "Today Delivery") {
                 Navigator.pushNamed(context, RouteList.todayDeliveryPage);
               }
             },

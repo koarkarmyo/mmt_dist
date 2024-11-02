@@ -132,6 +132,10 @@ class DatabaseHelper {
     await _createSaleOrderLineTable(db);
     await _createProductUomTable(db);
     await _createStockLocationTable(db);
+    await _createResPartnerTable(db);
+    await _createPriceListTable(db);
+    await _createCurrencyTable(db);
+    await _createRouteTable(db);
   }
 
   _createProductUomTable(Database db) async {
@@ -143,6 +147,52 @@ class DatabaseHelper {
         '${DBConstant.ratio} DOUBLE,'
         '${DBConstant.uomCategoryId} INTEGER,'
         '${DBConstant.uomCategoryName} TEXT'
+        ')');
+  }
+
+  _createRouteTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.routeTable} '
+        '(${DBConstant.id} INTEGER,'
+        '${DBConstant.dateStart} TEXT,'
+        '${DBConstant.routeName} TEXT,'
+        '${DBConstant.routeId} INTEGER,'
+        '${DBConstant.saleManId} INTEGER,'
+        '${DBConstant.saleManName} TEXT,'
+        '${DBConstant.writeDate} TEXT'
+        ')');
+  }
+
+  _createResPartnerTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.resPartnerTable} '
+        '(${DBConstant.id} INTEGER PRIMARY KEY,' // Assuming id is the primary key
+        '${DBConstant.name} TEXT,'
+        '${DBConstant.street} TEXT,' // Changed to TEXT to fit the model
+        '${DBConstant.stateId} INTEGER,'
+        '${DBConstant.stateName} TEXT,'
+        '${DBConstant.city} TEXT,' // Changed to TEXT to fit the model
+        '${DBConstant.countryId} INTEGER,'
+        '${DBConstant.countryName} TEXT,'
+        '${DBConstant.companyId} INTEGER,'
+        '${DBConstant.companyName} TEXT,'
+        '${DBConstant.zip} TEXT,'
+        '${DBConstant.phone} TEXT,'
+        '${DBConstant.mobile} TEXT,'
+        '${DBConstant.writeDate} TEXT,'
+        '${DBConstant.partnerSaleType} TEXT'
+        // Store writeDate as TEXT for easy date formatting
+        ')');
+  }
+
+  _createPriceListTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.priceListTable} '
+        '(${DBConstant.id} INTEGER,'
+        '${DBConstant.name} INTEGER,'
+        '${DBConstant.currencyId} INTEGER,'
+        '${DBConstant.companyId} INTEGER,'
+        '${DBConstant.discountPolicy} TEXT,'
+        '${DBConstant.displayName} TEXT,'
+        '${DBConstant.writeDate} TEXT,'
+        '${DBConstant.currencyName} TEXT'
         ')');
   }
 
@@ -211,6 +261,7 @@ class DatabaseHelper {
         '${DBConstant.iSManualSync} INTEGER,'
         '${DBConstant.isUpload} INTEGER,'
         '${DBConstant.description} TEXT,'
+        '${DBConstant.syncLimit} INTEGER, '
         '${DBConstant.solutionId} TEXT'
         ')');
   }
@@ -223,6 +274,18 @@ class DatabaseHelper {
             '${DBConstant.actionGroupID} INTEGER,'
             '${DBConstant.actionGroupName} TEXT'
             ')');
+  }
+
+  _createCurrencyTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.currencyTable} '
+        '(${DBConstant.id} INTEGER,'
+        '${DBConstant.name} TEXT,'
+        '${DBConstant.fullName} TEXT,'
+        '${DBConstant.rate} DOUBLE,'
+        '${DBConstant.symbol} TEXT,'
+        '${DBConstant.decimalPlaces} INTEGER,'
+        '${DBConstant.writeDate} TEXT'
+        ')');
   }
 
   _createSyncGroupTable(Database db) async {

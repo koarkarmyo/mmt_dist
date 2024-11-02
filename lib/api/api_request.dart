@@ -133,7 +133,7 @@ class ApiRequest {
     };
   }
 
-  static createActionRequest(String actionName) async {
+  static createActionRequest(String actionName, {int? limit}) async {
     final String? writeDate =
         await DatabaseHelper.instance.getLastWriteDate(actionName: actionName);
 
@@ -246,6 +246,7 @@ class ApiRequest {
           "company_id": MMTApplication.currentUser?.companyId,
           "staff_role_id": MMTApplication.currentUser?.id,
           "location_id": 0,
+          "sync_limit": limit,
           "write_date": writeDate,
           "employee_id": MMTApplication.currentUser?.id
         });

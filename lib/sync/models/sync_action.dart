@@ -11,6 +11,7 @@ class SyncAction {
   bool? isUpload;
   String? description;
   String? solutionId;
+  int? limit;
   List<SyncActionGroup>? actionGroup;
 
   SyncAction({
@@ -23,6 +24,7 @@ class SyncAction {
     this.description,
     this.solutionId,
     this.actionGroup,
+    this.limit
   });
 
   Map<String, dynamic> toJson() {
@@ -35,6 +37,7 @@ class SyncAction {
       'is_upload': this.isUpload == true ? 1 : 0,
       'description': this.description,
       'solution_id': this.solutionId,
+      'sync_limit' : this.limit
     };
   }
 
@@ -79,6 +82,7 @@ class SyncAction {
       description: map['description'],
       solutionId: map['solution_id'],
       actionGroup: actionGroups,
+      limit: map['sync_limit']
     );
   }
 
