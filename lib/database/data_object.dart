@@ -3,6 +3,7 @@ import 'package:sqflite/sqlite_api.dart';
 
 import '../model/cust_visit.dart';
 import '../model/number_series.dart';
+import '../model/price_list/product_price_list_item.dart';
 import 'database_helper.dart';
 import 'db_constant.dart';
 
@@ -35,20 +36,21 @@ class DataObject {
   //     return null;
   // }
   //
-  // Future<List<ProductPriceListItem>> getPriceList(
-  //     {String? where, List<String>? arg}) async {
-  //   List<Map<String, dynamic>> priceJson;
-  //   if (where != null && arg != null)
-  //     priceJson = await _sqlFLiteHelper.readDataByWhereArgs(
-  //         tableName: DBConstant.priceListItemTable,
-  //         where: where,
-  //         whereArgs: arg);
-  //   else
-  //     priceJson = await _sqlFLiteHelper.readAllData(
-  //         tableName: DBConstant.priceListItemTable);
-  //   print('xxxxxxxx::::');
-  //   return priceJson.map((e) => ProductPriceListItem.fromJson(e)).toList();
-  // }
+  Future<List<ProductPriceListItem>> getPriceList(
+      {String? where, List<String>? arg}) async {
+    List<Map<String, dynamic>> priceJson;
+    if (where != null && arg != null) {
+      priceJson = await DatabaseHelper.instance.readDataByWhereArgs(
+          tableName: DBConstant.priceListItemTable,
+          where: where,
+          whereArgs: arg);
+    } else {
+      priceJson = await DatabaseHelper.instance.readAllData(
+          tableName: DBConstant.priceListItemTable);
+    }
+    print('xxxxxxxx::::');
+    return priceJson.map((e) => ProductPriceListItem.fromJson(e)).toList();
+  }
   //
   // Future<List<PriceListItem>> getPriceListItems() async {
   //   List<Map<String, dynamic>> priceJson;

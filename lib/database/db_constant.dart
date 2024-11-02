@@ -6,6 +6,7 @@ class DBConstant {
   /*
         Tables
   */
+  static const String stockLocationTable = 'stock_location';
   static const String currencyTable = 'currency_table';
   static const String mscmUserTable = 'mscm_users';
   static const String companyTable = 'company';
@@ -84,6 +85,13 @@ class DBConstant {
   /*
         Columns
   */
+
+  static const String removalStrategyId = 'removal_strategy_id';
+  static const String removalStrategyName = 'removal_strategy_name';
+  static const String usage = 'usage';
+  static const String scrapLocation = 'scrap_location';
+  static const String returnLocation = 'return_location';
+  static const String replenishLocation = 'replenish_location';
 
   static const String customerRank = 'customer_rank';
   static const String supplierRank = 'supplier_rank';
