@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mmt_mobile/common_widget/constant_widgets.dart';
 import 'package:mmt_mobile/src/const_string.dart';
 
@@ -10,19 +11,26 @@ class CustomerDashboardPage extends StatefulWidget {
 }
 
 class _CustomerDashboardPageState extends State<CustomerDashboardPage> {
-  
-  List<String> items = ["Sale Order","Customer Feedback","Quotation","Delivery","Direct Sale","Payment Collection"];
-  
+  List<String> items = [
+    "Sale Order",
+    "Customer Feedback",
+    "Quotation",
+    "Delivery",
+    "Direct Sale",
+    "Payment Collection"
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(ConstString.customerDashboard),
       ),
+      // backgroundColor: Colors.blue.shade50,
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.0,vertical: 10),
             child: Row(
               children: [
                 Icon(
@@ -43,7 +51,15 @@ class _CustomerDashboardPageState extends State<CustomerDashboardPage> {
                 height: 80,
                 width: 120,
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2), // Shadow color
+                      spreadRadius: 0.1,                      // Extends the shadow
+                      blurRadius: 1,                        // Blurs the shadow
+                      offset: Offset(0, 1),                 // Positioning of shadow (x, y)
+                    ),
+                  ],
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
@@ -75,8 +91,16 @@ class _CustomerDashboardPageState extends State<CustomerDashboardPage> {
                 height: 80,
                 width: 120,
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2), // Shadow color
+                      spreadRadius: 0.1,                      // Extends the shadow
+                      blurRadius: 1,                        // Blurs the shadow
+                      offset: Offset(0, 1),                 // Positioning of shadow (x, y)
+                    ),
+                  ],
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -107,8 +131,16 @@ class _CustomerDashboardPageState extends State<CustomerDashboardPage> {
                 height: 80,
                 width: 120,
                 decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2), // Shadow color
+                      spreadRadius: 0.1,                      // Extends the shadow
+                      blurRadius: 1,                        // Blurs the shadow
+                      offset: Offset(0, 1),                 // Positioning of shadow (x, y)
+                    ),
+                  ],
                   borderRadius: BorderRadius.circular(10),
-                  color: Colors.blue.shade50,
+                  color: Colors.white,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -137,16 +169,29 @@ class _CustomerDashboardPageState extends State<CustomerDashboardPage> {
             ],
           ),
           ConstantWidgets.SizedBoxHeightL,
-          GridView.builder(itemCount: items.length,
-            gridDelegate:
-                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,mainAxisExtent:80,
-                crossAxisSpacing: 10,childAspectRatio: 4),
-            shrinkWrap: true,
-            itemBuilder: (BuildContext context, int index) {
-              return Card(
-                child: Center(child: Text(items[index])),
-              );
-            },
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: GridView.builder(
+              itemCount: items.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisExtent: 150,
+                  crossAxisSpacing: 10,
+
+              ),
+              shrinkWrap: true,
+              itemBuilder: (BuildContext context, int index) {
+                return Card(color: Colors.white,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(FontAwesomeIcons.tasks,size: 35,),
+                      Text(items[index],style: TextStyle(fontSize: 16),),
+                    ],
+                  ),
+                );
+              },
+            ),
           )
         ],
       ),

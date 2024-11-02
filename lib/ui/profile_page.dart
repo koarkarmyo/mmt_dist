@@ -7,6 +7,7 @@ import 'package:mmt_mobile/common_widget/constant_widgets.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
+import 'package:mmt_mobile/src/mmt_application.dart';
 import 'package:mmt_mobile/src/style/app_color.dart';
 import 'package:collection/collection.dart';
 
@@ -164,14 +165,14 @@ class _ProfilePageState extends State<ProfilePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ConstantWidgets.SizedBoxHeight,
-                const Text(
-                  "Wai Lin Naing",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                Text(
+                  MMTApplication.currentUser?.name ?? "",
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
                 ConstantWidgets.SizedBoxHeight,
-                _buildInfoRow(Icons.phone, "09-777789648"),
-                _buildInfoRow(Icons.email_outlined, "wailinnaing@gmial.com"),
-                _buildInfoRow(Icons.device_unknown, "SR1"),
+                _buildInfoRow(Icons.phone, MMTApplication.currentUser?.phone ?? '----------'),
+                _buildInfoRow(Icons.email_outlined, MMTApplication.currentUser?.email ?? '----------'),
+                _buildInfoRow(Icons.device_unknown, MMTApplication.currentUser?.defaultLocationName ?? '----------'),
               ],
             ),
           ],

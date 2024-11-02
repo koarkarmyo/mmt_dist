@@ -23,6 +23,12 @@ class _TodayDeliveryPageState extends State<TodayDeliveryPage> {
   final List<String> items = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
   List<DeliveryFilterTypes> filterList = [DeliveryFilterTypes.all];
 
+  final List<List<String>> data = [
+    ["Row 1, Col 1", "Done", "Row 1, Col 3"],
+    ["Row 2, Col 1", "Done", "Row 2, Col 3"],
+    ["Row 3, Col 1", "Due", "Row 3, Col 3"],
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,27 +64,20 @@ class _TodayDeliveryPageState extends State<TodayDeliveryPage> {
             ConstantWidgets.SizedBoxHeight,
             DateRangePickerKDialog(
               (value) {
-                (value) {
-                  dateRange = value;
-                  final fromDate = DateTime(dateRange.first.year,
-                      dateRange.first.month, dateRange.first.day);
-                  final toDate = DateTime(dateRange.last.year,
-                      dateRange.last.month, dateRange.last.day + 1);
-                  dateRange = [fromDate, toDate];
-                  _dateFilter();
-                };
-                firstDate:
-                DateTime(2021, 1, 1);
-                endDate:
-                DateTime.now();
-                showClearBtn:
-                true;
-                onClear:
-                () {
-                  dateRange.clear();
-                  dateRange = defaultDate;
-                  _dateFilter();
-                };
+                dateRange = value;
+                final fromDate = DateTime(dateRange.first.year,
+                    dateRange.first.month, dateRange.first.day);
+                final toDate = DateTime(dateRange.last.year,
+                    dateRange.last.month, dateRange.last.day + 1);
+                dateRange = [fromDate, toDate];
+                _dateFilter();
+              },
+              firstDate: DateTime(2021, 1, 1),
+              endDate: DateTime.now(),
+              showClearBtn: true,
+              onClear: () {
+                dateRange.clear();
+                _dateFilter();
               },
             ),
             ConstantWidgets.SizedBoxHeight,
@@ -101,26 +100,14 @@ class _TodayDeliveryPageState extends State<TodayDeliveryPage> {
 
                   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                   children: [
-
-                    // ...data.map((row) {
-                    //   return TableRow(
-                    //     children: row.map((cell) {
-                    //       return Padding(
-                    //         padding: const EdgeInsets.all(8.0),
-                    //         child: Text(cell, textAlign: TextAlign.center),
-                    //       );
-                    //     }).toList(),
-                    //   );
-                    // }).toList(),
-
-
                     TableRow(
                       decoration: BoxDecoration(
-                          color: Colors.blue.shade100,
+                        color: Colors.blue.shade100,
                       ),
                       children: const [
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal:10.0,vertical: 5),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 10.0, vertical: 5),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -133,44 +120,55 @@ class _TodayDeliveryPageState extends State<TodayDeliveryPage> {
                         Text("Done Date", textAlign: TextAlign.center),
                       ],
                     ),
-                    const TableRow(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal:10.0,vertical: 5),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("SO2410260000028"),
-                              Text("Myat Thit Sar"),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 5.0),
-                          child: Text("Done"),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 5.0),
-                          child: Text("31/10/24"),
-                        ),
-                      ],
-                    ),
-                    const TableRow(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal:10.0,vertical: 5),
-                          child: Text("Row 2, Col 1"),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 5.0),
-                          child: Text("Done"),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 5.0),
-                          child: Text("31/10/24"),
-                        ),
-                      ],
-                    ),
+                    ...data.map((row) {
+                      return TableRow(
+                        children: row.map((cell) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(cell, textAlign: TextAlign.start),
+                          );
+                        }).toList(),
+                      );
+                    }),
+
+                    // const TableRow(
+                    //   children: [
+                    //     Padding(
+                    //       padding: EdgeInsets.symmetric(horizontal:10.0,vertical: 5),
+                    //       child: Column(
+                    //         crossAxisAlignment: CrossAxisAlignment.start,
+                    //         children: [
+                    //           Text("SO2410260000028"),
+                    //           Text("Myat Thit Sar"),
+                    //         ],
+                    //       ),
+                    //     ),
+                    //     Padding(
+                    //       padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    //       child: Text("Done"),
+                    //     ),
+                    //     Padding(
+                    //       padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    //       child: Text("31/10/24"),
+                    //     ),
+                    //   ],
+                    // ),
+                    // const TableRow(
+                    //   children: [
+                    //     Padding(
+                    //       padding: EdgeInsets.symmetric(horizontal:10.0,vertical: 5),
+                    //       child: Text("Row 2, Col 1"),
+                    //     ),
+                    //     Padding(
+                    //       padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    //       child: Text("Done"),
+                    //     ),
+                    //     Padding(
+                    //       padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    //       child: Text("31/10/24"),
+                    //     ),
+                    //   ],
+                    // ),
                   ],
                 );
               },
