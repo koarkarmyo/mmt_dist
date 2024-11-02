@@ -5,6 +5,7 @@ class Employee {
     this.name,
     this.id,
     this.phone,
+    this.email,
     this.defaultLocationId,
     this.defaultLocationName,
     this.companyId,
@@ -15,6 +16,7 @@ class Employee {
     name = json['name'];
     id = json['id'];
     phone = json['phone'];
+    phone = json['email'];
     defaultLocationId = json['default_location_id'];
     defaultLocationName = json['default_location_name'];
     companyId = json['company_id'];
@@ -29,6 +31,7 @@ class Employee {
   String? name;
   int? id;
   String? phone;
+  String? email;
   int? defaultLocationId;
   String? defaultLocationName;
   int? companyId;
@@ -39,6 +42,7 @@ class Employee {
     map['name'] = name;
     map['id'] = id;
     map['phone'] = phone;
+    map['email'] = email;
     map['default_location_id'] = defaultLocationId;
     map['default_location_name'] = defaultLocationName;
     map['company_id'] = companyId;

@@ -22,7 +22,7 @@ class _CustomerVisitReportPageState extends State<CustomerVisitReportPage> {
   void onDateRangeSelected(List<DateTime> dateRange) {
     setState(() {
       formattedDate =
-      "${DateFormat('dd/MM/yyyy').format(dateRange[0])} - ${DateFormat('dd/MM/yyyy').format(dateRange[1])}";
+          "${DateFormat('dd/MM/yyyy').format(dateRange[0])} - ${DateFormat('dd/MM/yyyy').format(dateRange[1])}";
     });
   }
 
@@ -48,8 +48,8 @@ class _CustomerVisitReportPageState extends State<CustomerVisitReportPage> {
         children: [
           Padding(
             padding: const EdgeInsets.all(10.0),
-            child: DateRangePickerKDialog((value) {
-                  (value) {
+            child: DateRangePickerKDialog(
+              (value) {
                 dateRange = value;
                 final fromDate = DateTime(dateRange.first.year,
                     dateRange.first.month, dateRange.first.day);
@@ -57,27 +57,31 @@ class _CustomerVisitReportPageState extends State<CustomerVisitReportPage> {
                     dateRange.last.month, dateRange.last.day + 1);
                 dateRange = [fromDate, toDate];
                 _callFilter();
-              };
-              firstDate: DateTime(2021, 1, 1);
-              endDate: DateTime.now();
-              showClearBtn: true;
+              },
+              firstDate: DateTime(2021, 1, 1),
+              endDate: DateTime.now(),
+              showClearBtn: true,
               onClear: () {
-              dateRange.clear();
-              dateRange = defaultDate;
-              _callFilter();
-              };
-            },)
+                dateRange.clear();
+                _callFilter();
+              },
+            ),
           ),
           Expanded(
             child: Container(
               width: double.maxFinite,
-              decoration: BoxDecoration(color: Colors.blue.shade50,borderRadius: const BorderRadius.only(topRight: Radius.circular(25),topLeft: Radius.circular(25))),
+              decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(25),
+                      topLeft: Radius.circular(25))),
             ),
           )
         ],
       ),
     );
   }
+
   void _callFilter() {
     _lQty = 0;
     _bQty = 0;
@@ -94,5 +98,4 @@ class _CustomerVisitReportPageState extends State<CustomerVisitReportPage> {
     //         endDate: dateRange.last.toString()),
     //   );
   }
-
 }

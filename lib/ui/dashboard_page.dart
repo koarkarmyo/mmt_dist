@@ -10,6 +10,7 @@ import 'package:mmt_mobile/model/res_partner.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
+import 'package:mmt_mobile/src/mmt_application.dart';
 import '../common_widget/alert_dialog.dart';
 import '../common_widget/bottom_sheet_selection_widget.dart';
 import '../common_widget/sync_progress_dialog.dart';
@@ -93,77 +94,75 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
+    return Scaffold(
+      backgroundColor: Colors.grey.shade100,
+      appBar: AppBar(
         backgroundColor: Colors.grey.shade100,
-        appBar: AppBar(
-          backgroundColor: Colors.grey.shade100,
-          automaticallyImplyLeading: false,
-          title: Row(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(25),
-                    color: Colors.white),
-                child: IconButton(
-                  onPressed: () {
-                    debugPrint("Profile");
-                    Navigator.of(context).pushNamed(RouteList.profilePage);
-                  },
-                  icon: const Icon(Icons.person_2_rounded, size: 30),
-                ),
-              ),
-              const SizedBox(
-                width: 8,
-              ),
-              const Text("Sr1", style: TextStyle(fontSize: 18)),
-            ],
-          ),
-          actions: [
-            // IconButton(onPressed: () {
-            //
-            // }, icon: Icon(Icons.sync,size: 30,))
-            BlocBuilder<SyncActionCubit, SyncActionState>(
-              builder: (context, state) {
-                state.actionGroupList.forEach(
-                  (element) => print(element.name),
-                );
-                return PopupMenuButton<String>(
-                  color: Colors.white,
-                  onSelected: (String value) {
-                    // Handle the selected value
-                    _showSyncActionSelectWidget(
-                        listTitle: value,
-                        actionList: state.actionList
-                            .where(
-                              (element) =>
-                                  element.checkActionGroup(groupName: value),
-                            )
-                            .toList());
-                  },
-                  itemBuilder: (BuildContext context) => state.actionGroupList
-                      .map((item) => PopupMenuItem<String>(
-                            value: item.name,
-                            child: Text(item.name ?? ''),
-                          ))
-                      .toList(),
-                  icon: const Icon(Icons.sync), // This is the IconButton
-                );
-              },
-            )
-          ],
-        ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        automaticallyImplyLeading: false,
+        title: Row(
           children: [
-            const Text(
-              "Dashboard",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ).padding(padding: 10.allPadding),
-            buildWorkingPart(),
-            // Move the process list to follow the title list
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25), color: Colors.white),
+              child: IconButton(
+                onPressed: () {
+                  debugPrint("Profile");
+                  Navigator.of(context).pushNamed(RouteList.profilePage);
+                },
+                icon: const Icon(Icons.person_2_rounded, size: 30),
+              ),
+            ),
+            const SizedBox(
+              width: 8,
+            ),
+            Text(MMTApplication.currentUser?.name ?? '',
+                style: TextStyle(fontSize: 18)),
           ],
         ),
+        actions: [
+          // IconButton(onPressed: () {
+          //
+          // }, icon: Icon(Icons.sync,size: 30,))
+          BlocBuilder<SyncActionCubit, SyncActionState>(
+            builder: (context, state) {
+              state.actionGroupList.forEach(
+                (element) => print(element.name),
+              );
+              return PopupMenuButton<String>(
+                color: Colors.white,
+                onSelected: (String value) {
+                  // Handle the selected value
+                  _showSyncActionSelectWidget(
+                      listTitle: value,
+                      actionList: state.actionList
+                          .where(
+                            (element) =>
+                                element.checkActionGroup(groupName: value),
+                          )
+                          .toList());
+                },
+                itemBuilder: (BuildContext context) => state.actionGroupList
+                    .map((item) => PopupMenuItem<String>(
+                          value: item.name,
+                          child: Text(item.name ?? ''),
+                        ))
+                    .toList(),
+                icon: const Icon(Icons.sync), // This is the IconButton
+              );
+            },
+          )
+        ],
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Dashboard",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ).padding(padding: 10.allPadding),
+          buildWorkingPart(),
+          // Move the process list to follow the title list
+        ],
       ),
     );
   }
@@ -229,7 +228,15 @@ class _DashboardPageState extends State<DashboardPage> {
               child: ValueListenableBuilder<int>(
                 valueListenable: selectedTitleIndexNotifier,
                 builder: (context, selectedTitleIndex, _) {
-                  return Container(
+                  return
+                      //   InkWell(
+                      //   onTap: () {
+                      //   // innerState(() {
+                      //     selectedTitleIndexNotifier.value = index;
+                      //   // },);
+                      // },
+                      //   child:
+                      Container(
                     width: 250,
                     height: selectedTitleIndex == index ? 80 : 70,
                     decoration: BoxDecoration(
@@ -297,6 +304,8 @@ class _DashboardPageState extends State<DashboardPage> {
                 Navigator.pushNamed(context, RouteList.todayOrderPage);
               } else if (process == "Today Delivery") {
                 Navigator.pushNamed(context, RouteList.todayDeliveryPage);
+              } else if (process == "Account Payments") {
+                Navigator.pushNamed(context, RouteList.accountPayment);
               }
             },
             child: Card(

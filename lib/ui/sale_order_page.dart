@@ -17,8 +17,6 @@ class SaleOrderPage extends StatefulWidget {
 class _SaleOrderPageState extends State<SaleOrderPage> {
   String formattedDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
   late List<DateTime> dateRange = [];
-  double _lQty = 0;
-  double _bQty = 0;
   List<DateTime> defaultDate = [];
   final List<String> items = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
   List<DeliveryFilterTypes> filterList = [DeliveryFilterTypes.all];
@@ -27,13 +25,15 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(ConstString.saleOrder),
+        title: const Text(ConstString.saleOrder),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: Column(
           children: [
-            SearchBoxTextField(hintText: "Customer",),
+            SearchBoxTextField(
+              hintText: "Customer",
+            ),
             ConstantWidgets.SizedBoxHeight,
             Row(
               children: [
@@ -54,27 +54,25 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
                 _createDeliveryFilterWidget(),
               ],
             ),
-
             ConstantWidgets.SizedBoxHeight,
-            DateRangePickerKDialog((value) {
-                  (value) {
+            DateRangePickerKDialog(
+              (value) {
                 dateRange = value;
                 final fromDate = DateTime(dateRange.first.year,
                     dateRange.first.month, dateRange.first.day);
                 final toDate = DateTime(dateRange.last.year,
                     dateRange.last.month, dateRange.last.day + 1);
                 dateRange = [fromDate, toDate];
-                _dateFilter();
-              };
-              firstDate: DateTime(2021, 1, 1);
-              endDate: DateTime.now();
-              showClearBtn: true;
+                callFilter();
+              },
+              firstDate: DateTime(2021, 1, 1),
+              endDate: DateTime.now(),
+              showClearBtn: true,
               onClear: () {
                 dateRange.clear();
-                dateRange = defaultDate;
-                _dateFilter();
-              };
-            },)
+                callFilter();
+              },
+            ),
           ],
         ),
       ),
@@ -82,8 +80,6 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
   }
 
   void _dateFilter() {
-    _lQty = 0;
-    _bQty = 0;
     // if (_filter == SaleOrderReportFilter.unsoldProduct) {
     //   _saleOrderReportBloc.add(
     //     FetchUnsoldProductReportEvent(
@@ -98,10 +94,10 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
     //   );
   }
 
-  _createDeliveryFilterWidget() {
+  Widget _createDeliveryFilterWidget() {
     return StatefulBuilder(builder: (context, innerState) {
       return PopupMenuButton<DeliveryFilterTypes>(
-        color: Colors.blue,
+        // color: Colors.blue,
         onSelected: (value) {},
         itemBuilder: (context) {
           return [
@@ -135,7 +131,7 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
                         ? Icons.check_box
                         : Icons.check_box_outline_blank_rounded),
                     ConstantWidgets.SizedBoxWidthL,
-                    Text('${filterType.getConstValue()}')
+                    Text(filterType.getConstValue())
                   ],
                 ),
               ),
@@ -148,7 +144,7 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
             borderRadius: BorderRadius.circular(5),
             border: Border.all(color: Colors.white),
           ),
-          child: Icon(Icons.tune),
+          child: const Icon(Icons.tune),
         ),
       );
     });
@@ -165,27 +161,24 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
       //     timeInSecForIosWeb: 1,
       //     textColor: Colors.white);
 
-
-
-    //   _orderHistoryBloc.add(OrderHistoryCustFetchByDateRangeEvent(
-    //       soNo: name,
-    //       customerName: customerName,
-    //       startDate: dateRange.first.toString(),
-    //       endDate: endDate.toString(),
-    //       custId: -1,
-    //       saleOrderReqType: saleOrderReqTypes,
-    //       deliveryStatus: DeliveryStatus.assigned,
-    //       deliveryFilterType: _deliveryFilterTypes,
-    //       filterList: filterList));
-    // } else {
-    //   _orderHistoryBloc.add(OrderHistoryCustFetchByDateRangeEvent(
-    //       deliveryStatus: DeliveryStatus.assigned,
-    //       soNo: name,
-    //       custId: -1,
-    //       saleOrderReqType: saleOrderReqTypes,
-    //       deliveryFilterType: _deliveryFilterTypes,
-    //       filterList: filterList));
+      //   _orderHistoryBloc.add(OrderHistoryCustFetchByDateRangeEvent(
+      //       soNo: name,
+      //       customerName: customerName,
+      //       startDate: dateRange.first.toString(),
+      //       endDate: endDate.toString(),
+      //       custId: -1,
+      //       saleOrderReqType: saleOrderReqTypes,
+      //       deliveryStatus: DeliveryStatus.assigned,
+      //       deliveryFilterType: _deliveryFilterTypes,
+      //       filterList: filterList));
+      // } else {
+      //   _orderHistoryBloc.add(OrderHistoryCustFetchByDateRangeEvent(
+      //       deliveryStatus: DeliveryStatus.assigned,
+      //       soNo: name,
+      //       custId: -1,
+      //       saleOrderReqType: saleOrderReqTypes,
+      //       deliveryFilterType: _deliveryFilterTypes,
+      //       filterList: filterList));
     }
   }
-
 }
