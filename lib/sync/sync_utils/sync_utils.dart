@@ -625,7 +625,7 @@ class SyncUtils {
 
     await DatabaseHelper.instance.deleteRows(
         tableName: DBConstant.priceListItemTable,
-        where: '${DBConstant.id}',
+        where: DBConstant.id,
         wantDeleteRow: priceListItemList.map((e) => e.id).toList());
 
     List<Map<String, dynamic>> jsonList =

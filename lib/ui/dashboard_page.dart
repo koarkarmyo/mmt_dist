@@ -82,7 +82,6 @@ class _DashboardPageState extends State<DashboardPage> {
     manualSyncStreamListener();
     _syncActionCubit = context.read<SyncActionCubit>()
       ..getSyncAction(isManualSync: true);
-
   }
 
   @override
