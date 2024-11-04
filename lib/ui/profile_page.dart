@@ -19,6 +19,7 @@ import '../model/tag.dart';
 import '../route/route_list.dart';
 import '../share_preference/sh_keys.dart';
 import '../share_preference/sh_utils.dart';
+import '../src/const_string.dart';
 import '../src/enum.dart';
 import '../sync/bloc/sync_action_bloc/sync_action_bloc_cubit.dart';
 import '../sync/models/sync_response.dart';
@@ -64,40 +65,48 @@ class _ProfilePageState extends State<ProfilePage> {
               builder: (context, state) {
                 return _buildButton(
                     onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          List<String?> selectionList = [];
-                          state.actionList.forEach(
-                            (element) => selectionList.add(element.name),
-                          );
-                          return BottomSheetSelectionWidget(
-                              selectedValueList: selectActionList,
-                              onTap: () {
-                                List<SyncResponse> syncList = [];
-                                state.actionList.forEachIndexed(
-                                  (index, element) {
-                                    if (selectActionList.value[index]) {
-                                      syncList.add(element);
-                                    }
-                                  },
-                                );
+                      if (MainSyncProcess.instance.syncProcessIsRunning) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          duration: const Duration(seconds: 1),
+                          content: const Text("Auto Sync is running"),
+                          backgroundColor: AppColors.dangerColor,
+                        ));
+                      } else {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            List<String?> selectionList = [];
+                            state.actionList.forEach(
+                              (element) => selectionList.add(element.name),
+                            );
+                            return BottomSheetSelectionWidget(
+                                selectedValueList: selectActionList,
+                                onTap: () {
+                                  List<SyncResponse> syncList = [];
+                                  state.actionList.forEachIndexed(
+                                    (index, element) {
+                                      if (selectActionList.value[index]) {
+                                        syncList.add(element);
+                                      }
+                                    },
+                                  );
 
-                                MainSyncProcess.instance
-                                    .startManualSyncProcess(syncList);
-                                context.pop();
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return SyncProgressDialog(
-                                      key: _dialogKey,
-                                    );
-                                  },
-                                );
-                              },
-                              selectionList: selectionList);
-                        },
-                      );
+                                  MainSyncProcess.instance
+                                      .startManualSyncProcess(syncList);
+                                  context.pop();
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return SyncProgressDialog(
+                                        key: _dialogKey,
+                                      );
+                                    },
+                                  );
+                                },
+                                selectionList: selectionList);
+                          },
+                        );
+                      }
                     },
                     label: "Master Sync",
                     icon: Icons.sync,
@@ -106,7 +115,6 @@ class _ProfilePageState extends State<ProfilePage> {
               },
             ),
             const SizedBox(height: 10),
-            _syncWidget(),
             const SizedBox(
               height: 10,
             ),
@@ -135,12 +143,12 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _syncWidget() {
-    return const ListTile(
-      title: Text("Delivery Sync"),
-      subtitle: Text("sync action name"),
-    );
-  }
+  // Widget _syncWidget() {
+  //   return const ListTile(
+  //     title: Text("Delivery Sync"),
+  //     subtitle: Text("sync action name"),
+  //   );
+  // }
 
   Widget _buildProfileCard() {
     return Card(
@@ -167,12 +175,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 ConstantWidgets.SizedBoxHeight,
                 Text(
                   MMTApplication.currentUser?.name ?? "",
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w600),
                 ),
                 ConstantWidgets.SizedBoxHeight,
-                _buildInfoRow(Icons.phone, MMTApplication.currentUser?.phone ?? '----------'),
-                _buildInfoRow(Icons.email_outlined, MMTApplication.currentUser?.email ?? '----------'),
-                _buildInfoRow(Icons.device_unknown, MMTApplication.currentUser?.defaultLocationName ?? '----------'),
+                _buildInfoRow(Icons.phone,
+                    MMTApplication.currentUser?.phone ?? '----------'),
+                _buildInfoRow(Icons.email_outlined,
+                    MMTApplication.currentUser?.email ?? '----------'),
+                _buildInfoRow(
+                    Icons.device_unknown,
+                    MMTApplication.currentUser?.defaultLocationName ??
+                        '----------'),
               ],
             ),
           ],
@@ -245,7 +259,8 @@ class _ProfilePageState extends State<ProfilePage> {
               debugPrint("Copy Database");
             }),
             const Divider(),
-            _buildSettingsOption("Version", null, null, trailingText: "1.2.1"),
+            _buildSettingsOption("Version", null, null,
+                trailingText: ConstString.version),
           ],
         ),
       ),

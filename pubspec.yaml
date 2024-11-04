@@ -50,6 +50,8 @@ dependencies:
   location: ^7.0.1
   google_fonts: ^6.2.1
   geolocator: ^13.0.1
+  scroll_to_index: any
+
 
 
 dev_dependencies:

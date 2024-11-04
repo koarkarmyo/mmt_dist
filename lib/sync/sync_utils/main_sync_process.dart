@@ -51,9 +51,10 @@ class MainSyncProcess {
   MainSyncProcess._() {
     _syncStream = StreamController<AutoSyncResponse>.broadcast();
 
-    Timer.periodic(const Duration(minutes: 4), (timer) async {
+    Timer.periodic(const Duration(minutes: 1), (timer) async {
       if (_autoSyncProcess.isEmpty) {
         _autoSyncProcess = await getSyncList('MASTER', isManual: false);
+        print("Automatic sync : ${_autoSyncProcess.length}");
       }
       await startAutoSyncProcess(forceStart: false);
     });
@@ -80,8 +81,10 @@ class MainSyncProcess {
     List<SyncResponse> process = await getSyncList(syncGroup, isManual: false);
     if (isImmediate) {
       _autoSyncProcess.insertAll(0, process);
+      print('Force Auto Sync : ${_autoSyncProcess.length}');
     } else {
       _autoSyncProcess.addAll(process);
+      print('Force Auto Sync : ${_autoSyncProcess.length}');
     }
     if (!_syncProcessIsRunning) await startAutoSyncProcess(forceStart: true);
   }
@@ -115,6 +118,8 @@ class MainSyncProcess {
   Future<void> _startAutoSync() async {
     print("Starting auto sync");
 
+    print('Force Auto Sync : in _startAutoSync : ${_autoSyncProcess.length}');
+
     // is auto sync is running
     _syncProcessIsRunning = true;
     //
@@ -130,6 +135,7 @@ class MainSyncProcess {
         isFinished: _autoSyncProcess.isEmpty,
       ));
     } else {
+      print("Auto Sync is empty : ${_autoSyncProcess.isEmpty}");
       _syncProcessIsRunning = false;
       _sendToView(_syncResponse(
         name: actionName,
@@ -145,7 +151,6 @@ class MainSyncProcess {
       SyncProcess syncProcess = await _sendApiRequest(actionName, limit: limit);
 
       // await Future.delayed(Duration(milliseconds: 500));
-
       // SyncProcess syncProcess = SyncProcess.Finished;
       if (syncProcess == SyncProcess.Paginated) {
         await _startAutoSync();

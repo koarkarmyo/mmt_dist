@@ -26,7 +26,7 @@ class RoutePlanDBRepo extends BaseDBRepo {
     if (routePlanList.isNotEmpty) {
       List<Map<String, dynamic>> jsonLineList =
           await helper.readDataByWhereArgs(
-              tableName: DBConstant.mscmRouteLineTable,
+              tableName: DBConstant.routeLineTable,
               where: '${DBConstant.routePlanId} = ?',
               whereArgs: [routePlanList.first.id],
               orderBy: DBConstant.number);

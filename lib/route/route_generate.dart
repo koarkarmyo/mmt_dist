@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mmt_mobile/business%20logic/bloc/dashboard/dashboard_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/fetch_database/fetch_database_cubit.dart';
 import 'package:mmt_mobile/common_widget/text_widget.dart';
 import 'package:mmt_mobile/route/route_list.dart';
@@ -51,7 +52,9 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
       return _buildPageRoute(
           routeSettings,
           MultiBlocProvider(
-            providers: [BlocProvider(create: (context) => SyncActionCubit())],
+            providers: [BlocProvider(create: (context) => SyncActionCubit()),
+            BlocProvider(create: (context) => DashboardCubit())
+            ],
             child: const DashboardPage(),
           ));
     case RouteList.profilePage:

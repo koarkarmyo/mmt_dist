@@ -7,6 +7,7 @@ import '../../database/db_constant.dart';
 import '../../model/base_api_response.dart';
 import '../../model/category.dart';
 import '../../model/currency.dart';
+import '../../model/dashboard.dart';
 import '../../model/price_list/product_price_list_item.dart';
 import '../../model/product/product.dart';
 import '../../model/route/route_plan.dart';
@@ -36,8 +37,8 @@ class SyncUtils {
         return await _getRouteProcess(actionName, response);
       // case 'get_customer':
       //   return await _getCustomerProcess(actionName, response);
-      // case 'get_dashboard':
-      //   return await _getDashboardProcess(actionName, response);
+      case 'get_dashboard':
+        return await _getDashboardProcess(actionName, response);
       // case 'get_cust_dashboard':
       //   return _getCustDashboardProcess(actionName, response);
       case 'get_category':
@@ -48,7 +49,7 @@ class SyncUtils {
         return await _getLocationProcess(actionName, response);
       case 'get_partner':
         return await _getResPartnerProcess(actionName, response);
-      case 'get_pricelist':
+      case 'get_product_pricelist':
         return await _getPriceListProcess(actionName, response);
       // case 'get_customer_product':
       //   return await _getCustomerRegularSaleProductProcess(
@@ -322,7 +323,7 @@ class SyncUtils {
         where: '${DBConstant.id}',
         wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
     await DatabaseHelper.instance.deleteRows(
-        tableName: DBConstant.mscmRouteLineTable,
+        tableName: DBConstant.routeLineTable,
         where: '${DBConstant.routePlanId}',
         wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
 
@@ -344,7 +345,7 @@ class SyncUtils {
     }
 
     final routeWithPartnerInsertSuccess = await DatabaseHelper.instance
-        .insertDataListBath(DBConstant.mscmRouteLineTable, lineList);
+        .insertDataListBath(DBConstant.routeLineTable, lineList);
     if (routeWithPartnerInsertSuccess && routeInsertSuccess) {
       bool isSuccess = await _insertOrUpdateLastWriteDate(
           actionName: actionName,
@@ -492,38 +493,38 @@ class SyncUtils {
   }
 
   //
-  // static Future<SyncProcess> _getDashboardProcess(
-  //     String actionName, Response response) async {
-  //   // delete dashboards from database
-  //   Map<String, dynamic> res = response.data!;
-  //   BaseApiResponse<Dashboard> baseResponse = BaseApiResponse.fromJson(res);
-  //   if (baseResponse.data!.isEmpty) {
-  //     return SyncProcess.Finished;
-  //   }
-  //
-  //   // delete process
-  //   await _helper.deleteAllRow(tableName: DBConstant.dashboardTable);
-  //   // await _helper.deleteRows(
-  //   //     tableName: DBConstant.dashboardTable,
-  //   //     where: DBConstant.id,
-  //   //     wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-  //
-  //   // change to json to insert database
-  //   List<Map<String, dynamic>>? dataList =
-  //       baseResponse.data!.map((e) => e.toJsonDB()).toList();
-  //   // insert dashboard list to database
-  //   final success =
-  //       await _helper.insertDataListBath(DBConstant.dashboardTable, dataList);
-  //   // if (success) {
-  //   //   return await _insertOrUpdateLastWriteDate(
-  //   //           actionName: actionName,
-  //   //           lastWriteDate: baseResponse.data!.last.writeDate!)
-  //   //       ? SyncProcess.Paginated
-  //   //       : SyncProcess.Fail;
-  //   // }
-  //   return SyncProcess.Finished;
-  // }
-  //
+  static Future<SyncProcess> _getDashboardProcess(
+      String actionName, Response response) async {
+    // delete dashboards from database
+    Map<String, dynamic> res = response.data!;
+    BaseApiResponse<Dashboard> baseResponse = BaseApiResponse.fromJson(res, fromJson: Dashboard.fromJson);
+    if (baseResponse.data!.isEmpty) {
+      return SyncProcess.Finished;
+    }
+
+    // delete process
+    await DatabaseHelper.instance.deleteAllRow(tableName: DBConstant.dashboardTable);
+    // await _helper.deleteRows(
+    //     tableName: DBConstant.dashboardTable,
+    //     where: DBConstant.id,
+    //     wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+
+    // change to json to insert database
+    List<Map<String, dynamic>>? dataList =
+        baseResponse.data!.map((e) => e.toJsonDB()).toList();
+    // insert dashboard list to database
+    final success =
+        await DatabaseHelper.instance.insertDataListBath(DBConstant.dashboardTable, dataList);
+    if (success) {
+      return await _insertOrUpdateLastWriteDate(
+              actionName: actionName,
+              lastWriteDate: baseResponse.data!.last.writeDate!)
+          ? SyncProcess.Paginated
+          : SyncProcess.Fail;
+    }
+    return SyncProcess.Finished;
+  }
+
   static Future<SyncProcess> _getCategoryProcess(
       String actionName, Response response) async {
     Map<String, dynamic> res = response.data!;
@@ -623,6 +624,8 @@ class SyncUtils {
 
     List<ProductPriceListItem> priceListItemList = baseResponse.data ?? [];
 
+    print("Price List : ${priceListItemList.length}");
+
     await DatabaseHelper.instance.deleteRows(
         tableName: DBConstant.priceListItemTable,
         where: DBConstant.id,
@@ -633,6 +636,8 @@ class SyncUtils {
 
     bool priceListItemInsertSuccess = await DatabaseHelper.instance
         .insertDataListBath(DBConstant.priceListItemTable, jsonList);
+
+    print("Price List Insert: $priceListItemInsertSuccess");
 
     if (priceListItemInsertSuccess) {
       return await _insertOrUpdateLastWriteDate(

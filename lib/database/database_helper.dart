@@ -133,9 +133,31 @@ class DatabaseHelper {
     await _createProductUomTable(db);
     await _createStockLocationTable(db);
     await _createResPartnerTable(db);
-    await _createPriceListTable(db);
     await _createCurrencyTable(db);
     await _createRouteTable(db);
+    await _createRouteLineTable(db);
+    await _createDashboardTable(db);
+    await _createCustomerDashboardTable(db);
+    await _createPriceListItemTable(db);
+  }
+
+  _createPriceListItemTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.priceListItemTable} '
+        '(${DBConstant.id} INTEGER,'
+        '${DBConstant.priceListId} INTEGER,'
+        '${DBConstant.priceListName} TEXT,'
+        '${DBConstant.productTemplId} INTEGER,'
+        '${DBConstant.productTmplName} TEXT,'
+        '${DBConstant.productUom} INTEGER,'
+        '${DBConstant.productUomName} TEXT,'
+        '${DBConstant.categId} INTEGER,'
+        '${DBConstant.minQuantity} DOUBLE,'
+        '${DBConstant.priceDiscount} DOUBLE,'
+        '${DBConstant.fixedPrice} DOUBLE,'
+        '${DBConstant.dateStart} TEXT,'
+        '${DBConstant.dateEnd} TEXT,'
+        '${DBConstant.writeDate} TEXT'
+        ')');
   }
 
   _createProductUomTable(Database db) async {
@@ -183,23 +205,52 @@ class DatabaseHelper {
         ')');
   }
 
-  _createPriceListTable(Database db) async {
-    return await db.execute('CREATE TABLE ${DBConstant.priceListTable} '
-        '(${DBConstant.id} INTEGER,'
-        '${DBConstant.name} INTEGER,'
-        '${DBConstant.currencyId} INTEGER,'
-        '${DBConstant.companyId} INTEGER,'
-        '${DBConstant.discountPolicy} TEXT,'
-        '${DBConstant.displayName} TEXT,'
-        '${DBConstant.writeDate} TEXT,'
-        '${DBConstant.currencyName} TEXT'
-        ')');
-  }
-
   Future<void> _createSyncHistoryTable(Database db) async {
     return await db.execute('CREATE TABLE ${DBConstant.syncHistoryTable} '
         '(${DBConstant.actionName} TEXT,'
         '${DBConstant.writeDate} TEXT'
+        ')');
+  }
+
+  _createDashboardTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.dashboardTable} '
+        '(${DBConstant.id} INTEGER,'
+        '${DBConstant.dashboardId} INTEGER,'
+        '${DBConstant.icon} TEXT,'
+        '${DBConstant.isFolder} INTEGER,'
+        '${DBConstant.actionUrl} TEXT,'
+        '${DBConstant.parentId} INTEGER,'
+        '${DBConstant.priority} INTEGER,'
+        '${DBConstant.solutionId} TEXT,'
+        '${DBConstant.parentUrl} TEXT,'
+        '${DBConstant.dashboardName} TEXT,'
+        '${DBConstant.writeDate} TEXT,'
+        '${DBConstant.staffRoleId} INTEGER,'
+        '${DBConstant.description} TEXT,'
+        '${DBConstant.staffRoleName} TEXT,'
+        '${DBConstant.dashboardTableGroupId} INTEGER,'
+        '${DBConstant.dashboardTableGroupName} TEXT'
+        ')');
+  }
+
+  _createCustomerDashboardTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.customerDashboardTable} '
+        '(${DBConstant.id} INTEGER,'
+        '${DBConstant.dashboardId} INTEGER,'
+        '${DBConstant.icon} TEXT,'
+        '${DBConstant.isFolder} INTEGER,'
+        '${DBConstant.actionUrl} TEXT,'
+        '${DBConstant.parentId} INTEGER,'
+        '${DBConstant.priority} INTEGER,'
+        '${DBConstant.solutionId} TEXT,'
+        '${DBConstant.parentUrl} TEXT,'
+        '${DBConstant.dashboardName} TEXT,'
+        '${DBConstant.writeDate} TEXT,'
+        '${DBConstant.staffRoleId} INTEGER,'
+        '${DBConstant.description} TEXT,'
+        '${DBConstant.staffRoleName} TEXT,'
+        '${DBConstant.dashboardTableGroupId} INTEGER,'
+        '${DBConstant.dashboardTableGroupName} TEXT'
         ')');
   }
 
@@ -248,6 +299,19 @@ class DatabaseHelper {
         '${DBConstant.saleUomName} TEXT,'
         '${DBConstant.saleOK} TEXT,'
         '${DBConstant.purchaseOK} TEXT,'
+        '${DBConstant.writeDate} TEXT'
+        ')');
+  }
+
+  _createRouteLineTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.routeLineTable} '
+        '(${DBConstant.id} INTEGER,'
+        '${DBConstant.routePlanId} INTEGER,'
+        '${DBConstant.number} INTEGER,'
+        '${DBConstant.sequence} INTEGER,'
+        '${DBConstant.partnerId} INTEGER,'
+        '${DBConstant.routePlanName} TEXT,'
+        '${DBConstant.partnerName} TEXT,'
         '${DBConstant.writeDate} TEXT'
         ')');
   }

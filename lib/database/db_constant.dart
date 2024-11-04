@@ -12,7 +12,7 @@ class DBConstant {
   static const String companyTable = 'company';
   static const String mscmDeviceTable = 'mscm_devices';
   static const String routeTable = 'routes';
-  static const String mscmRouteLineTable = 'mscm_route_lines';
+  static const String routeLineTable = 'mscm_route_lines';
   static const String mscmDeviceRouteTable = 'mscm_device_routes';
   static const String partnerRouteTable = 'partner_routes';
   static const String productTable = 'products';
