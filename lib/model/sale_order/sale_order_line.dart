@@ -13,6 +13,8 @@ class SaleOrderLine {
   SaleType? saleType;
   double? productUomQty;
   UomLine? uomLine;
+  UomLine? pkUomLine;
+  UomLine? pcUomLine;
   double? pkQty;
   double? pcQty;
   double? singleItemPrice;
@@ -29,6 +31,8 @@ class SaleOrderLine {
     this.productUomQty,
     this.orderNo,
     this.uomLine,
+    this.pkUomLine,
+    this.pcUomLine,
     this.pkQty,
     this.pcQty,
     this.singleItemPrice,
@@ -90,6 +94,8 @@ class SaleOrderLine {
     SaleType? saleType,
     double? productUomQty,
     UomLine? uomLine,
+    UomLine? pkUomLine,
+    UomLine? pcUomLine,
     double? pkQty,
     double? pcQty,
     double? singleItemPrice,
@@ -102,9 +108,15 @@ class SaleOrderLine {
         productId: productId ?? this.productId,
         productName: productName ?? this.productName,
         uomLine: uomLine ?? this.uomLine,
+        pkUomLine: pkUomLine ?? this.pkUomLine,
+        pcUomLine: pcUomLine ?? this.pcUomLine,
         pcQty: pcQty ?? this.pcQty,
         pkQty: pkQty ?? this.pkQty,
         productUomQty: productUomQty ?? this.productUomQty,
+      singleItemPrice: singleItemPrice ?? this.singlePCPrice,
+      singlePCPrice:  singlePCPrice ?? this.singlePCPrice,
+      singlePKPrice: singlePKPrice ?? this.singlePKPrice,
+      subTotal: subTotal ?? this.subTotal
     );
   }
 

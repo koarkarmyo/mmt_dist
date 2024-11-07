@@ -51,40 +51,46 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     print('SESSION::::${MMTApplication.session?.toJson()}');
 
     emit(state.copyWith(status: LoginStatus.loading));
-    try {
-      Employee? employee = await LoginApiRepo()
-          .employeeLogin(username: event.username, password: event.password);
+    // try {
+    Employee? employee = await LoginApiRepo()
+        .employeeLogin(username: event.username, password: event.password);
 
-      print("Login User : ${employee?.toJson()}");
+    print("Login User : ${employee?.toJson()}");
 
-      if (employee == null) {
-        emit(state.copyWith(status: LoginStatus.fail));
-        await Future.delayed(1.second);
-        emit(state.copyWith(status: LoginStatus.initial));
+    if (employee == null) {
+      emit(state.copyWith(status: LoginStatus.fail));
+      await Future.delayed(1.second);
+      emit(state.copyWith(status: LoginStatus.initial));
+    } else {
+      MMTApplication.currentUser = employee;
+      MMTApplication.currentUser?.useLooseBox =
+          employee.companyList?.firstOrNull?.useLooseUom == true;
+      SharePrefUtils()
+          .saveString(ShKeys.currentUser, jsonEncode(employee.toJson()));
+      bool _saveSyncActionSuccess =
+          await _saveSyncAction(syncActionList: employee.syncActionList ?? []);
+      print("Save Sync Action : $_saveSyncActionSuccess");
+      if (!_saveSyncActionSuccess) {
+        emit(state.copyWith(
+            status: LoginStatus.fail, error: "Sync Action Save Fail"));
       } else {
-        MMTApplication.currentUser = employee;
-        SharePrefUtils()
-            .saveString(ShKeys.currentUser, jsonEncode(employee.toJson()));
-        bool _saveSyncActionSuccess = await _saveSyncAction(
-            syncActionList: employee.syncActionList ?? []);
-        if (!_saveSyncActionSuccess) {
-          emit(state.copyWith(
-              status: LoginStatus.fail, error: "Sync Action Save Fail"));
-        } else {
-          emit(state.copyWith(status: LoginStatus.success));
-        }
+        emit(state.copyWith(status: LoginStatus.success));
       }
-    } on DioException {
-      _emitFail();
-    } on OdooException {
-      _emitFail();
-    } on Error {
-      _emitFail();
     }
+    // } on DioException {
+    //   _emitFail();
+    // } on OdooException {
+    //   _emitFail();
+    // } on Error {
+    //   _emitFail();
+    // }
   }
 
   Future<bool> _saveSyncAction(
       {required List<SyncAction> syncActionList}) async {
+    if (syncActionList.isEmpty) {
+      return true;
+    }
     try {
       List<Map<String, dynamic>> actionJson = [];
       List<Map<String, dynamic>> groupList = [];
@@ -164,6 +170,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       if (sessionKey != null) {
         Map<String, dynamic> data = await json.decode(sessionKey);
         MMTApplication.session = Session.fromJson(data);
+      }
+      if (currentUser != null) {
+        Map<String, dynamic> data = await json.decode(currentUser);
+        MMTApplication.currentUser = Employee.fromJson(data);
+        MMTApplication.currentUser?.useLooseBox =
+            MMTApplication.currentUser?.companyList?.firstOrNull?.useLooseUom ==
+                true;
       }
       if (currentUser != null && sessionKey != null) {
         // add the session id to the request

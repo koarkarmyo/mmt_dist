@@ -55,7 +55,7 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
             (productId) => _cartCubit.removeFocItem(productId: productId);
       } else if (data['extra_type'] == 'coupon') {
         _addItemFunction = (deliveryItem) =>
-            _cartCubit.addCartCouponItem(focItem: deliveryItem);
+            _cartCubit.addCartCouponItem(coupon: deliveryItem);
         _removeItemFunction =
             (productId) => _cartCubit.removeCouponItem(productId: productId);
       }
@@ -211,12 +211,10 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
   Widget _productItem({required Product product}) {
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, state) {
-
         List<SaleOrderLine> _itemList = [];
-        if(extraType == 'foc'){
+        if (extraType == 'foc') {
           _itemList.addAll(state.focItemList);
-        }
-        else if(extraType == 'coupon'){
+        } else if (extraType == 'coupon') {
           _itemList.addAll(state.couponList);
         }
 

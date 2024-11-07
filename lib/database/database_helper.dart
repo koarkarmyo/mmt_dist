@@ -234,6 +234,21 @@ class DatabaseHelper {
         ')');
   }
 
+  _createCompanyTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.companyTable} '
+        '(${DBConstant.id} INTEGER,'
+        '${DBConstant.name} TEXT,'
+        '${DBConstant.logo} TEXT,'
+        '${DBConstant.street} TEXT,'
+        '${DBConstant.street2} TEXT,'
+        '${DBConstant.phone} TEXT,'
+        '${DBConstant.mobile} TEXT,'
+        '${DBConstant.website} TEXT,'
+        '${DBConstant.useLooseUom} INTEGER,'
+        '${DBConstant.email} TEXT'
+        ')');
+  }
+
   _createCustomerDashboardTable(Database db) async {
     return await db.execute('CREATE TABLE ${DBConstant.customerDashboardTable} '
         '(${DBConstant.id} INTEGER,'
@@ -375,15 +390,15 @@ class DatabaseHelper {
   _createJournalListTable(Database db) async {
     return await db.execute(
       'CREATE TABLE ${DBConstant.accountJournalTable} '
-          '('
-          '${DBConstant.id} INTEGER,'
-          '${DBConstant.name} TEXT,'
-          '${DBConstant.writeDate} TEXT,'
-          '${DBConstant.type} TEXT,'
-          '${DBConstant.defaultAccountCurrentBalance} DOUBLE,'
-          '${DBConstant.companyId} INTEGER,'
-          '${DBConstant.companyName} TEXT'
-          ')',
+      '('
+      '${DBConstant.id} INTEGER,'
+      '${DBConstant.name} TEXT,'
+      '${DBConstant.writeDate} TEXT,'
+      '${DBConstant.type} TEXT,'
+      '${DBConstant.defaultAccountCurrentBalance} DOUBLE,'
+      '${DBConstant.companyId} INTEGER,'
+      '${DBConstant.companyName} TEXT'
+      ')',
     );
   }
 

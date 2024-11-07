@@ -4,6 +4,7 @@ import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/customer/customer_bloc.dart';
 import 'package:mmt_mobile/business%20logic/bloc/product/product_cubit.dart';
 import 'package:mmt_mobile/common_widget/alert_dialog.dart';
+import 'package:mmt_mobile/src/enum.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
@@ -14,6 +15,7 @@ import '../../model/product/product.dart';
 import '../../model/product/uom_lines.dart';
 import '../../model/sale_order/sale_order_line.dart';
 import '../../route/route_list.dart';
+import '../../src/mmt_application.dart';
 
 class FocItemPage extends StatefulWidget {
   const FocItemPage({super.key});
@@ -73,6 +75,8 @@ class _FocItemPageState extends State<FocItemPage> {
 
   Widget _productItem({required Product product}) {
     TextEditingController _qtyController = TextEditingController();
+    TextEditingController _pkController = TextEditingController();
+    TextEditingController _pcController = TextEditingController();
 
     // focusNode.addListener(() {
     //   if (focusNode.hasFocus) {
@@ -92,8 +96,16 @@ class _FocItemPageState extends State<FocItemPage> {
         } else {
           SaleOrderLine? deliveryItem = state.focItemList[index];
           double number = deliveryItem.productUomQty ?? 0;
+          double pkNumber = deliveryItem.pkQty ?? 0;
+          double pcNumber = deliveryItem.pcQty ?? 0;
           _qtyController.text =
               (number % 1 == 0) ? number.toInt().toString() : number.toString();
+          _pkController.text = (pkNumber % 1 == 0)
+              ? pkNumber.toInt().toString()
+              : pkNumber.toString();
+          _pcController.text = (pcNumber % 1 == 0)
+              ? pcNumber.toInt().toString()
+              : pcNumber.toString();
           return ListTile(
             contentPadding: 10.horizontalPadding,
             // Adjust padding here
@@ -110,71 +122,152 @@ class _FocItemPageState extends State<FocItemPage> {
               // Minimize column height
               crossAxisAlignment: CrossAxisAlignment.end,
               // Aligns widgets to the right
-              children: [
-                SizedBox(
-                  width: 80, // Set a fixed width for the TextField
-                  child: TextField(
-                    keyboardType: TextInputType.number,
-                    onTap: () {
-                      _qtyController.selection =
-                          TextSelection(baseOffset: 0, extentOffset: _qtyController.text.length);
-                    },
-                    onTapOutside: (event) {
-                      // Unfocus when tapping anywhere outside the TextField
-                      FocusScope.of(context).unfocus();
-                    },
-                    autofocus: false,
-                    controller: _qtyController,
-                    onChanged: (value) {
-                      _cartCubit.addCartFocItem(
-                          focItem: SaleOrderLine(
-                              productId: product.id,
-                              productName: product.name,
-                              productUomQty: (_qtyController.text != '')
-                                  ? double.tryParse(_qtyController.text)
-                                  : 0,
-                              uomLine: product.uomLines?.first));
-                    },
-                    textAlign: TextAlign.right,
-                    decoration: const InputDecoration(
-                      isDense: true, // Reduces height of the TextField
-                      contentPadding:
-                          EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                      border: OutlineInputBorder(),
-                      hintText: 'Qty',
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                // Spacing between TextField and Dropdown
-                Container(
-                  padding: 7.allPadding,
-                  decoration: BoxDecoration(
-                      border: Border.all(), borderRadius: 4.borderRadius),
-                  child: DropdownButton<UomLine>(
-                    value: deliveryItem?.uomLine ?? product.uomLines?.first,
-                    items: product.uomLines
-                        ?.map((UomLine value) => DropdownMenuItem<UomLine>(
-                              value: value,
-                              child: Text(value.uomName ?? ''),
-                            ))
-                        .toList(),
-                    onChanged: (UomLine? newValue) {
-                      // Handle selection change
-                      _cartCubit.addCartFocItem(
-                          focItem: SaleOrderLine(
-                              productId: product.id,
-                              productName: product.name,
-                              productUomQty: (_qtyController.text != '')
-                                  ? double.tryParse(_qtyController.text)
-                                  : 0,
-                              uomLine: newValue));
-                    },
-                    hint: const Text('uom'),
-                    isDense: true,
-                  ),
-                ),
-              ],
+              children: MMTApplication.currentUser?.useLooseBox ?? false
+                  ? [
+                      SizedBox(
+                        width: 80, // Set a fixed width for the TextField
+                        child: TextField(
+                          keyboardType: TextInputType.number,
+                          onTap: () {
+                            _pkController.selection = TextSelection(
+                                baseOffset: 0,
+                                extentOffset: _pkController.text.length);
+                          },
+                          onTapOutside: (event) {
+                            // Unfocus when tapping anywhere outside the TextField
+                            FocusScope.of(context).unfocus();
+                          },
+                          autofocus: false,
+                          controller: _pkController,
+                          onChanged: (value) {
+                            _cartCubit.addCartFocItem(
+                                looseBoxType: LooseBoxType.pk,
+                                focItem: deliveryItem.copyWith(
+                                  pkUomLine: UomLine(
+                                      uomId: product.looseUomId,
+                                      uomName: product.looseUomName),
+                                  pkQty: (_pkController.text != '')
+                                      ? double.tryParse(_pkController.text)
+                                      : 0,
+                                ));
+                          },
+                          decoration: const InputDecoration(
+                              isDense: true,
+                              // Reduces height of the TextField
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 8),
+                              border: OutlineInputBorder(),
+                              hintText: 'PK',
+                              label: Text("PK")),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 80, // Set a fixed width for the TextField
+                        child: TextField(
+                          keyboardType: TextInputType.number,
+                          onTap: () {
+                            _pcController.selection = TextSelection(
+                                baseOffset: 0,
+                                extentOffset: _pcController.text.length);
+                          },
+                          onTapOutside: (event) {
+                            // Unfocus when tapping anywhere outside the TextField
+                            FocusScope.of(context).unfocus();
+                          },
+                          autofocus: false,
+                          controller: _pcController,
+                          onChanged: (value) {
+                            _cartCubit.addCartFocItem(
+                                looseBoxType: LooseBoxType.pc,
+                                focItem: deliveryItem.copyWith(
+                                  pcUomLine: UomLine(
+                                      uomId: product.looseUomId,
+                                      uomName: product.looseUomName),
+                                  pcQty: (_pcController.text != '')
+                                      ? double.tryParse(_pcController.text)
+                                      : 0,
+                                ));
+                          },
+                          decoration: const InputDecoration(
+                              isDense: true,
+                              // Reduces height of the TextField
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 8),
+                              border: OutlineInputBorder(),
+                              hintText: 'PC',
+                              label: Text("PC")),
+                        ),
+                      ),
+                    ]
+                  : [
+                      SizedBox(
+                        width: 80, // Set a fixed width for the TextField
+                        child: TextField(
+                          keyboardType: TextInputType.number,
+                          onTap: () {
+                            _qtyController.selection = TextSelection(
+                                baseOffset: 0,
+                                extentOffset: _qtyController.text.length);
+                          },
+                          onTapOutside: (event) {
+                            // Unfocus when tapping anywhere outside the TextField
+                            FocusScope.of(context).unfocus();
+                          },
+                          autofocus: false,
+                          controller: _qtyController,
+                          onChanged: (value) {
+                            _cartCubit.addCartFocItem(
+                                focItem: SaleOrderLine(
+                                    productId: product.id,
+                                    productName: product.name,
+                                    productUomQty: (_qtyController.text != '')
+                                        ? double.tryParse(_qtyController.text)
+                                        : 0,
+                                    uomLine: product.uomLines?.first));
+                          },
+                          textAlign: TextAlign.right,
+                          decoration: const InputDecoration(
+                            isDense: true, // Reduces height of the TextField
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 8),
+                            border: OutlineInputBorder(),
+                            hintText: 'Qty',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      // Spacing between TextField and Dropdown
+                      Container(
+                        padding: 7.allPadding,
+                        decoration: BoxDecoration(
+                            border: Border.all(), borderRadius: 4.borderRadius),
+                        child: DropdownButton<UomLine>(
+                          value:
+                              deliveryItem?.uomLine ?? product.uomLines?.first,
+                          items: product.uomLines
+                              ?.map(
+                                  (UomLine value) => DropdownMenuItem<UomLine>(
+                                        value: value,
+                                        child: Text(value.uomName ?? ''),
+                                      ))
+                              .toList(),
+                          onChanged: (UomLine? newValue) {
+                            // Handle selection change
+                            _cartCubit.addCartFocItem(
+                                focItem: SaleOrderLine(
+                                    productId: product.id,
+                                    productName: product.name,
+                                    productUomQty: (_qtyController.text != '')
+                                        ? double.tryParse(_qtyController.text)
+                                        : 0,
+                                    uomLine: newValue));
+                          },
+                          hint: const Text('uom'),
+                          isDense: true,
+                        ),
+                      ),
+                    ],
             ),
           ).padding(padding: 8.verticalPadding);
         }

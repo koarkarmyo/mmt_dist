@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
-import 'package:mmt_mobile/business%20logic/bloc/fetch_database/fetch_database_cubit.dart';
-import 'package:mmt_mobile/business%20logic/bloc/login/login_bloc.dart';
-import 'package:mmt_mobile/common_widget/alert_dialog.dart';
-import 'package:mmt_mobile/model/delivery/delivery_item.dart';
+import 'package:mmt_mobile/model/sale_order/sale_order_line.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/src/mmt_application.dart';
@@ -21,6 +18,7 @@ class SaleSummaryPage extends StatefulWidget {
 class _SaleSummaryPageState extends State<SaleSummaryPage> {
   final ValueNotifier<DateTime?> _deliveryDate = ValueNotifier(DateTime.now());
   late CartCubit _cartCubit;
+  double _discountAmount = 0;
 
   @override
   void initState() {
@@ -115,12 +113,22 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
   }
 
   Widget _totalWidget() {
-    return Column(
-      children: [
-        _dataRow(title: "subtotal", value: 1000),
-        _dataRow(title: "discount total", value: 1000),
-        _dataRow(title: "total", value: 1000),
-      ],
+    return BlocBuilder<CartCubit, CartState>(
+      builder: (context, state) {
+        double subtotal = 0;
+        state.itemList.forEach(
+          (element) {
+            subtotal += element.subTotal ?? 0;
+          },
+        );
+        return Column(
+          children: [
+            _dataRow(title: "subtotal", value: subtotal),
+            _dataRow(title: "discount total", value: _discountAmount),
+            _dataRow(title: "total", value: subtotal - _discountAmount),
+          ],
+        );
+      },
     ).padding(padding: 16.allPadding);
   }
 
@@ -130,7 +138,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
       children: [
         Text(
           title,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         Text(
           "${value.toString()} K",
@@ -188,11 +196,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
     return PopupMenuButton<String>(
       elevation: 0.5,
       color: Colors.white,
-      onSelected: (String value) {
-        // Handle the selected value
-        // _filterProductCategory = value;
-        // _productCubit.searchProduct(categoryName: value);
-      },
+      onSelected: (String value) {},
       itemBuilder: (BuildContext context) =>
           [PopupMenuItem(child: Text("Disc")), PopupMenuItem(child: Text("%"))],
       icon: Container(
@@ -221,40 +225,12 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
         List<Widget> columnItem = [];
         state.focItemList.forEach(
           (item) {
-            columnItem.add(ListTile(
-              title: Text(item.productName ?? 'product'),
-              subtitle: (MMTApplication.currentUser?.useLooseBox ?? true)
-                  ? Text("${item.pkQty} PK | ${item.pcQty} PC")
-                  : Text(
-                      "${item.productUomQty.toString()} ${item.uomLine?.uomName}  x ${item.singleItemPrice ?? 0}"),
-              trailing: const Text(
-                "200000 Ks",
-                style: TextStyle(fontSize: 14),
-              ),
-            ));
+            columnItem.add(_itemListTileWidget(item: item));
           },
         );
         return Column(
           children: columnItem,
         );
-
-        // return (state.itemList.isEmpty)
-        //     ? Container()
-        //     : Flexible(
-        //         child: ListView.builder(
-        //           itemCount: state.focItemList.length,
-        //           shrinkWrap: true,
-        //           physics: const NeverScrollableScrollPhysics(),
-        //           itemBuilder: (context, index) {
-        //             DeliveryItem item = state.focItemList[index];
-        //             return ListTile(
-        //               title: Text(item.productName ?? 'product'),
-        //               subtitle: Text(
-        //                   "${item.deliverBQty.toString()} ${item.uomLine?.uomName} x ${item.bPrice}"),
-        //             );
-        //           },
-        //         ),
-        //       );
       },
     );
   }
@@ -265,38 +241,12 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
         List<Widget> columnItem = [];
         state.couponList.forEach(
           (item) {
-            columnItem.add(ListTile(
-              title: Text(item.productName ?? 'product'),
-              subtitle: Text(
-                  "${item.productUomQty.toString()} ${item.uomLine?.uomName}  x ${item.singleItemPrice ?? 0}"),
-              trailing: const Text(
-                "200000 Ks",
-                style: TextStyle(fontSize: 14),
-              ),
-            ));
+            columnItem.add(_itemListTileWidget(item: item));
           },
         );
         return Column(
           children: columnItem,
         );
-
-        // return (state.itemList.isEmpty)
-        //     ? Container()
-        //     : Flexible(
-        //         child: ListView.builder(
-        //           itemCount: state.focItemList.length,
-        //           shrinkWrap: true,
-        //           physics: const NeverScrollableScrollPhysics(),
-        //           itemBuilder: (context, index) {
-        //             DeliveryItem item = state.focItemList[index];
-        //             return ListTile(
-        //               title: Text(item.productName ?? 'product'),
-        //               subtitle: Text(
-        //                   "${item.deliverBQty.toString()} ${item.uomLine?.uomName} x ${item.bPrice}"),
-        //             );
-        //           },
-        //         ),
-        //       );
       },
     );
   }
@@ -331,43 +281,32 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
         List<Widget> columnItem = [];
         state.itemList.forEach(
           (item) {
-            columnItem.add(ListTile(
-              title: Text(item.productName ?? 'product'),
-              subtitle: (MMTApplication.currentUser?.useLooseBox ?? true)
-                  ? Text("${item.pkQty} PK | ${item.pcQty} PC")
-                  : Text(
-                      "${item.productUomQty.toString()} ${item.uomLine?.uomName}  x ${item.singleItemPrice ?? 0}"),
-              trailing: const Text(
-                "200000 Ks",
-                style: TextStyle(fontSize: 14),
-              ),
-            ));
+            columnItem.add(_itemListTileWidget(item: item));
           },
         );
         return Column(
           children: columnItem,
         );
-
-        // return Flexible(
-        //   flex: 4,
-        //   child: ListView.builder(
-        //     shrinkWrap: true,
-        //     itemCount: state.itemList.length,
-        //     itemBuilder: (context, index) {
-        //       DeliveryItem item = state.itemList[index];
-        //       return ListTile(
-        //         title: Text(item.productName ?? 'product'),
-        //         subtitle: Text(
-        //             "${item.deliverBQty.toString()} ${item.uomLine?.uomName}  x ${item.bPrice ?? 0}"),
-        //         trailing: const Text(
-        //           "200000 Ks",
-        //           style: TextStyle(fontSize: 14),
-        //         ),
-        //       );
-        //     },
-        //   ),
-        // );
       },
+    );
+  }
+
+  Widget _itemListTileWidget({required SaleOrderLine item}) {
+    return ListTile(
+      title: Text(item.productName ?? 'product'),
+      subtitle: (MMTApplication.currentUser?.useLooseBox ?? false)
+          ? Text(item.subTotal.toString())
+          : Text(
+              "${item.productUomQty.toString()} ${item.uomLine?.uomName}  x ${item.singleItemPrice ?? 0} K"),
+      trailing: (MMTApplication.currentUser?.useLooseBox ?? false)
+          ? Text(
+              " ${(((item.pkQty ?? 0) * (item.singlePKPrice ?? 0)) + ((item.pcQty ?? 0) * (item.singlePCPrice ?? 0))).toString()} K",
+              style: TextStyle(fontSize: 14),
+            )
+          : Text(
+              "${(item.productUomQty ?? 0) * (item.singleItemPrice ?? 0)} K",
+              style: const TextStyle(fontSize: 14),
+            ),
     );
   }
 }

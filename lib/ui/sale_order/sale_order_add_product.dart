@@ -9,6 +9,7 @@ import 'package:mmt_mobile/common_widget/alert_dialog.dart';
 import 'package:mmt_mobile/common_widget/constant_widgets.dart';
 import 'package:mmt_mobile/model/delivery/delivery_item.dart';
 import 'package:mmt_mobile/model/product/uom_lines.dart';
+import 'package:mmt_mobile/src/enum.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/src/mmt_application.dart';
@@ -221,7 +222,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
             // Minimize column height
             crossAxisAlignment: CrossAxisAlignment.end,
             // Aligns widgets to the right
-            children: MMTApplication.currentUser?.useLooseBox ?? true
+            children: MMTApplication.currentUser?.useLooseBox ?? false
                 ? [
                     SizedBox(
                       width: 80, // Set a fixed width for the TextField
@@ -230,7 +231,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                         onTap: () {
                           _pkController.selection = TextSelection(
                               baseOffset: 0,
-                              extentOffset: _qtyController.text.length);
+                              extentOffset: _pkController.text.length);
                         },
                         onTapOutside: (event) {
                           // Unfocus when tapping anywhere outside the TextField
@@ -240,6 +241,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                         controller: _pkController,
                         onChanged: (value) {
                           _cartCubit.addCartSaleItem(
+                              looseBoxType: LooseBoxType.pk,
                               saleItem: deliveryItem?.copyWith(
                                     pkQty: (_pkController.text != '')
                                         ? double.tryParse(_pkController.text)
@@ -251,7 +253,9 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                                       pkQty: (_pkController.text != '')
                                           ? double.tryParse(_pkController.text)
                                           : 0,
-                                      uomLine: product.uomLines?.first));
+                                      pkUomLine: UomLine(
+                                          uomId: product.boxUomId,
+                                          uomName: product.boxUomName)));
                         },
                         decoration: const InputDecoration(
                             isDense: true,
@@ -281,17 +285,21 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                         controller: _pcController,
                         onChanged: (value) {
                           _cartCubit.addCartSaleItem(
+                              looseBoxType: LooseBoxType.pc,
                               saleItem: deliveryItem?.copyWith(
-                                pcQty: (_pcController.text != '')
-                                    ? double.tryParse(_pcController.text)
-                                    : 0,
-                              ) ?? SaleOrderLine(
-                                  productId: product.id,
-                                  productName: product.name,
-                                  pcQty: (_pcController.text != '')
-                                      ? double.tryParse(_pcController.text)
-                                      : 0,
-                                  uomLine: product.uomLines?.first));
+                                    pcQty: (_pcController.text != '')
+                                        ? double.tryParse(_pcController.text)
+                                        : 0,
+                                  ) ??
+                                  SaleOrderLine(
+                                      productId: product.id,
+                                      productName: product.name,
+                                      pcQty: (_pcController.text != '')
+                                          ? double.tryParse(_pcController.text)
+                                          : 0,
+                                      pcUomLine: UomLine(
+                                          uomId: product.looseUomId,
+                                          uomName: product.looseUomName)));
                         },
                         decoration: const InputDecoration(
                             isDense: true,
@@ -328,7 +336,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                                   productUomQty: (_qtyController.text != '')
                                       ? double.tryParse(_qtyController.text)
                                       : 0,
-                                  uomLine: product.uomLines?.first));
+                                  uomLine: product.uomLines?.firstOrNull));
                         },
                         textAlign: TextAlign.right,
                         decoration: const InputDecoration(
@@ -347,7 +355,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                       decoration: BoxDecoration(
                           border: Border.all(), borderRadius: 4.borderRadius),
                       child: DropdownButton<UomLine>(
-                        value: deliveryItem?.uomLine ?? product.uomLines?.first,
+                        value: deliveryItem?.uomLine ?? product.uomLines?.firstOrNull,
                         items: product.uomLines
                             ?.map((UomLine value) => DropdownMenuItem<UomLine>(
                                   value: value,

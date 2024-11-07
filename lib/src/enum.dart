@@ -20,6 +20,8 @@ extension SyncExtension on UploadBeforeSync{
   }
 }
 
+enum LooseBoxType {pk, pc}
+
 enum LanguageCode { eng, mm }
 enum ViewTypes { list, grid }
 enum OrderStates { draft, send, sale, done, cancel }
