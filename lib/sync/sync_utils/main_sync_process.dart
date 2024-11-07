@@ -59,7 +59,7 @@ class MainSyncProcess {
       await startAutoSyncProcess(forceStart: false);
     });
 
-    Timer.periodic(const Duration(minutes: 1), (timer) async {
+    Timer.periodic(const Duration(minutes: 5), (timer) async {
       await _locationSaver();
     });
   }

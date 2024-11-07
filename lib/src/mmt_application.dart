@@ -2,7 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mmt_mobile/model/language_model.dart';
 import 'package:mmt_mobile/model/login_response.dart';
+import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:odoo_rpc/odoo_rpc.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
 import '../model/employee.dart';
 import '../model/number_series.dart';
@@ -10,6 +13,7 @@ import '../model/odoo_session.dart';
 import '../model/product/product.dart';
 import '../model/product/uom_lines.dart';
 import 'package:collection/collection.dart';
+import '../route/route_list.dart';
 import 'enum.dart';
 
 class MMTApplication {
@@ -32,8 +36,6 @@ class MMTApplication {
   static int qtyDigit = loginResponse?.deviceId?.qtyDigit ?? 0;
   static int priceDigit = loginResponse?.deviceId?.priceDigit ?? 0;
   static late NumberSeries? generatedNoSeries = null;
-
-
 
   static UomLine? getReferenceUomLine(List<UomLine> uomLines) {
     return uomLines
@@ -128,7 +130,6 @@ class MMTApplication {
     return sb.toString();
   }
 
-
   static String _spacerAdd(StringBuffer buffer, bool goNextLine) {
     return buffer.isEmpty ? '' : (goNextLine ? '\n' : ' ');
   }
@@ -147,5 +148,48 @@ class MMTApplication {
           ?.firstWhereOrNull((element) => element.uomId == product.looseUomId);
     }
     return null;
+  }
+
+  // static Future<String?> scanBarcodeNormal(
+  //     {required BuildContext context}) async {
+  //   try {
+  //
+  //
+  //     Map<String, dynamic>? value =
+  //     await context.pushTo(route: RouteList.scannerPage);
+  //
+  //     if (value != null && value.containsKey('data')) {
+  //       return value['data'] as String?;
+  //     } else {
+  //       return null;
+  //     }
+  //   } on Exception {
+  //     return null;
+  //   }
+  // }
+
+  static Future<String?> scanBarcode({required BuildContext context}) async {
+    return await SimpleBarcodeScanner.scanBarcode(
+      context,
+      barcodeAppBar: const BarcodeAppBar(
+        appBarTitle: 'Test',
+        centerTitle: false,
+        enableBackButton: true,
+        backButtonIcon: Icon(Icons.arrow_back_ios),
+      ),
+      isShowFlashIcon: true,
+      delayMillis: 2000,
+      cameraFace: CameraFace.back,
+    );
+  }
+
+  Future<PermissionStatus> _getCameraPermission() async {
+    var status = await Permission.camera.status;
+    if (!status.isGranted) {
+      final result = await Permission.camera.request();
+      return result;
+    } else {
+      return status;
+    }
   }
 }

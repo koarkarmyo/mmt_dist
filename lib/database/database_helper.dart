@@ -128,6 +128,7 @@ class DatabaseHelper {
     await _createSyncHistoryTable(db);
     await _createChildCategoryTable(db);
     await _createCategoryTable(db);
+    await _createJournalListTable(db);
     await _createSaleOrderHeaderTable(db);
     await _createSaleOrderLineTable(db);
     await _createProductUomTable(db);
@@ -369,6 +370,21 @@ class DatabaseHelper {
         '${DBConstant.parentPath} TEXT,'
         '${DBConstant.writeDate} TEXT'
         ')');
+  }
+
+  _createJournalListTable(Database db) async {
+    return await db.execute(
+      'CREATE TABLE ${DBConstant.accountJournalTable} '
+          '('
+          '${DBConstant.id} INTEGER,'
+          '${DBConstant.name} TEXT,'
+          '${DBConstant.writeDate} TEXT,'
+          '${DBConstant.type} TEXT,'
+          '${DBConstant.defaultAccountCurrentBalance} DOUBLE,'
+          '${DBConstant.companyId} INTEGER,'
+          '${DBConstant.companyName} TEXT'
+          ')',
+    );
   }
 
   _createChildCategoryTable(Database db) async {

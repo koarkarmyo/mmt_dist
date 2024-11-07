@@ -9,7 +9,8 @@ class Employee {
     this.defaultLocationId,
     this.defaultLocationName,
     this.companyId,
-    this.syncActionList
+    this.syncActionList,
+    this.useLooseBox
   });
 
   Employee.fromJson(Map<String,dynamic> json) {
@@ -20,6 +21,7 @@ class Employee {
     defaultLocationId = json['default_location_id'];
     defaultLocationName = json['default_location_name'];
     companyId = json['company_id'];
+    useLooseBox = json['use_loose_box'];
     if(json['sync_action'] != null){
       syncActionList = [];
       for (var element in (json['sync_action'] as List<dynamic>)) {
@@ -36,6 +38,7 @@ class Employee {
   String? defaultLocationName;
   int? companyId;
   List<SyncAction>? syncActionList ;
+  bool? useLooseBox;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -47,6 +50,7 @@ class Employee {
     map['default_location_name'] = defaultLocationName;
     map['company_id'] = companyId;
     map['sync_action'] = syncActionList;
+    map['use_loose_box'] = useLooseBox;
     return map;
   }
 }

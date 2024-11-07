@@ -153,28 +153,37 @@ class _DashboardPageState extends State<DashboardPage> {
                     if (MainSyncProcess.instance.syncProcessIsRunning) {
                       bool isAutoSync = snapshot.data?.isAutoSync ?? false;
 
-                      return Row(
-                        children: [
-                          Text(
-                            "Auto Sync",
-                            style: TextStyle(color: AppColors.dangerColor),
-                          ).padding(padding: 8.horizontalPadding),
-                          CircleAvatar(
-                            backgroundColor: Colors.white,
-                            radius: 15,
-                            child: Padding(
-                              padding: const EdgeInsets.all(6),
-                              child: CircularProgressIndicator.adaptive(
-                                  backgroundColor: isAutoSync
-                                      ? AppColors.dangerColor
-                                      : AppColors.primaryColor,
-                                  valueColor:
-                                      const AlwaysStoppedAnimation<Color>(
-                                          Colors.white),
-                                  strokeWidth: 3),
-                            ),
-                          ).padding(padding: const EdgeInsets.only(right: 16))
-                        ],
+                      return GestureDetector(
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            duration: const Duration(seconds: 1),
+                            content: const Text("Auto Sync is in progress. Please wait"),
+                            backgroundColor: AppColors.dangerColor,
+                          ));
+                        },
+                        child: Row(
+                          children: [
+                            Text(
+                              "Auto Sync",
+                              style: TextStyle(color: AppColors.dangerColor),
+                            ).padding(padding: 8.horizontalPadding),
+                            CircleAvatar(
+                              backgroundColor: Colors.white,
+                              radius: 15,
+                              child: Padding(
+                                padding: const EdgeInsets.all(6),
+                                child: CircularProgressIndicator.adaptive(
+                                    backgroundColor: isAutoSync
+                                        ? AppColors.dangerColor
+                                        : AppColors.primaryColor,
+                                    valueColor:
+                                        const AlwaysStoppedAnimation<Color>(
+                                            Colors.white),
+                                    strokeWidth: 3),
+                              ),
+                            ).padding(padding: const EdgeInsets.only(right: 16))
+                          ],
+                        ),
                       );
                     }
 
@@ -241,7 +250,9 @@ class _DashboardPageState extends State<DashboardPage> {
                     groupName: 'Sale',
                     dashboardName: 'Sale Order',
                     actionUrl: 'today_order'),
-                Dashboard(groupName: 'Sale', dashboardName: 'Sale Report'),
+                Dashboard(groupName: 'Sale', dashboardName: 'Sale Report',
+                actionUrl: RouteList.saleOrderPage
+                ),
                 Dashboard(groupName: 'Delivery', dashboardName: 'Loading')
               ];
 

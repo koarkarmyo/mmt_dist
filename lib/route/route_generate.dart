@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/dashboard/dashboard_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/fetch_database/fetch_database_cubit.dart';
+import 'package:mmt_mobile/business%20logic/bloc/product/product_cubit.dart';
 import 'package:mmt_mobile/common_widget/text_widget.dart';
 import 'package:mmt_mobile/route/route_list.dart';
 import 'package:mmt_mobile/sync/bloc/sync_action_bloc/sync_action_bloc_cubit.dart';
@@ -11,7 +13,9 @@ import 'package:mmt_mobile/ui/customer_visit_report_page.dart';
 import 'package:mmt_mobile/ui/dashboard_page.dart';
 import 'package:mmt_mobile/ui/login/admin_login.dart';
 import 'package:mmt_mobile/ui/login/login_page.dart';
-import 'package:mmt_mobile/ui/sale_order_page.dart';
+import 'package:mmt_mobile/ui/sale_order/sale_order_add_extra.dart';
+import 'package:mmt_mobile/ui/sale_order/sale_order_add_product.dart';
+import 'package:mmt_mobile/ui/sale_order/sale_order_page.dart';
 import 'package:mmt_mobile/ui/today_delivery_page.dart';
 
 import '../business logic/bloc/login/login_bloc.dart';
@@ -19,6 +23,7 @@ import '../ui/contact_page.dart';
 import '../ui/product_report_page.dart';
 import '../ui/profile_page.dart';
 import '../ui/route_page.dart';
+import '../ui/sale_order_history_page.dart';
 import '../ui/splash_page.dart';
 
 Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
@@ -52,8 +57,9 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
       return _buildPageRoute(
           routeSettings,
           MultiBlocProvider(
-            providers: [BlocProvider(create: (context) => SyncActionCubit()),
-            BlocProvider(create: (context) => DashboardCubit())
+            providers: [
+              BlocProvider(create: (context) => SyncActionCubit()),
+              BlocProvider(create: (context) => DashboardCubit())
             ],
             child: const DashboardPage(),
           ));
@@ -75,13 +81,36 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
     case RouteList.customerVisitPage:
       return _buildPageRoute(routeSettings, const CustomerVisitReportPage());
     case RouteList.todayOrderPage:
-      return _buildPageRoute(routeSettings, const SaleOrderPage());
+      return _buildPageRoute(routeSettings, const SaleOrderHistoryPage());
+    case RouteList.saleOrderAddProductPage:
+      return _buildPageRoute(
+          routeSettings,
+          MultiBlocProvider(
+            providers: [BlocProvider(create: (context) => ProductCubit())],
+            child: const SaleOrderAddProductPage(),
+          ));
+    case RouteList.saleOrderPage:
+      return _buildPageRoute(
+          routeSettings,
+          MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (context) => ProductCubit()),
+              BlocProvider(
+                create: (context) => CartCubit(),
+              )
+            ],
+            child: const SaleOrderPage(),
+          ));
+    // case RouteList.scannerPage:
+    //   return _buildPageRoute(routeSettings, const ScannerPage());
     case RouteList.todayDeliveryPage:
       return _buildPageRoute(routeSettings, const TodayDeliveryPage());
     case RouteList.customerDashboardPage:
       return _buildPageRoute(routeSettings, const CustomerDashboardPage());
     case RouteList.accountPayment:
       return _buildPageRoute(routeSettings, const AccountPaymentPage());
+    case RouteList.saleOrderAddExtraPage:
+      return _buildPageRoute(routeSettings, const SaleOrderAddExtra());
     default:
       return _buildPageRoute(routeSettings, const NotFoundPage());
   }

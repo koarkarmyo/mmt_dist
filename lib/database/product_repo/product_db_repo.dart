@@ -39,13 +39,17 @@ class ProductDBRepo extends BaseDBRepo {
       product.uomLines = [];
       productUomList.forEach(
         (uomLine) {
-          product.uomLines?.add(UomLine.fromJsonDB(uomLine));
+          if (uomLine[DBConstant.productId] == product.id) {
+            product.uomLines?.add(UomLine.fromJsonDB(uomLine));
+          }
         },
       );
       products.add(product);
     }
 
-    products.forEach((element) => print("Product : ${element.toJson()}"),);
+    products.forEach(
+      (element) => print("Product : ${element.toJson()}"),
+    );
 
     return products;
   }

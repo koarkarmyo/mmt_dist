@@ -4,6 +4,7 @@ import 'package:mmt_mobile/model/stock_location.dart';
 
 import '../../database/database_helper.dart';
 import '../../database/db_constant.dart';
+import '../../model/account_journal.dart';
 import '../../model/base_api_response.dart';
 import '../../model/category.dart';
 import '../../model/currency.dart';
@@ -97,8 +98,8 @@ class SyncUtils {
       //   return await _getCashCollectionProcess(actionName, response);
       // case 'get_account_payment_list':
       //   return await _get_account_payment_list(actionName, response);
-      // case 'get_journal_list':
-      //   return await _get_journal_list(actionName, response);
+      case 'get_journal_list':
+        return await _getJournalList(actionName, response);
       default:
         // MMTApplication.printJob('Save process not found!');
         return SyncProcess.Fail;
@@ -1520,41 +1521,41 @@ class SyncUtils {
 //   return SyncProcess.Fail;
 // }
 //
-// static _get_journal_list(String actionName, Response response) async {
-//   Map<String, dynamic> res = response.data!;
-//
-//   BaseApiResponse<AccountJournal> baseResponse =
-//       BaseApiResponse.fromJson(res);
-//   if (baseResponse.data!.isEmpty) {
-//     return SyncProcess.Finished;
-//   }
-//
-//   await _helper.deleteRows(
-//       tableName: DBConstant.accountJournalTable,
-//       where: 'id',
-//       wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-//   // filter active = true
-//   List<AccountJournal> journalList = baseResponse.data ?? [];
-//   if (journalList.isEmpty) return SyncProcess.Finished;
-//   // change to json to insert database
-//
-//   List<Map<String, dynamic>>? dataList =
-//       journalList.map((e) => e.toJson()).toList();
-//
-//   // insert product list to database
-//   final bool pickingTypeInserted = await _helper.insertDataListBath(
-//       DBConstant.accountJournalTable, dataList);
-//
-//   if (pickingTypeInserted) {
-//     return await _insertOrUpdateLastWriteDate(
-//             actionName: actionName,
-//             lastWriteDate: baseResponse.data!.last.writeDate!)
-//         ? SyncProcess.Finished
-//         : SyncProcess.Fail;
-//   }
-//
-//   return SyncProcess.Finished;
-// }
+static Future<SyncProcess> _getJournalList(String actionName, Response response) async {
+  Map<String, dynamic> res = response.data!;
+
+  BaseApiResponse<AccountJournal> baseResponse =
+      BaseApiResponse.fromJson(res, fromJson: AccountJournal.fromJson);
+  if (baseResponse.data!.isEmpty) {
+    return SyncProcess.Finished;
+  }
+
+  await DatabaseHelper.instance.deleteRows(
+      tableName: DBConstant.accountJournalTable,
+      where: 'id',
+      wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+  // filter active = true
+  List<AccountJournal> journalList = baseResponse.data ?? [];
+  if (journalList.isEmpty) return SyncProcess.Finished;
+  // change to json to insert database
+
+  List<Map<String, dynamic>>? dataList =
+      journalList.map((e) => e.toJson()).toList();
+
+  // insert product list to database
+  final bool pickingTypeInserted = await DatabaseHelper.instance.insertDataListBath(
+      DBConstant.accountJournalTable, dataList);
+
+  if (pickingTypeInserted) {
+    return await _insertOrUpdateLastWriteDate(
+            actionName: actionName,
+            lastWriteDate: baseResponse.data!.last.writeDate!)
+        ? SyncProcess.Finished
+        : SyncProcess.Fail;
+  }
+
+  return SyncProcess.Finished;
+}
 }
 
 // static _getDeliveryOrders(String actionName, Response response) async {

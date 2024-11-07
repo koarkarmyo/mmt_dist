@@ -7,14 +7,14 @@ import 'package:mmt_mobile/ui/widgets/search_box_text_field_widget.dart';
 
 import '../src/enum.dart';
 
-class SaleOrderPage extends StatefulWidget {
-  const SaleOrderPage({super.key});
+class SaleOrderHistoryPage extends StatefulWidget {
+  const SaleOrderHistoryPage({super.key});
 
   @override
-  State<SaleOrderPage> createState() => _SaleOrderPageState();
+  State<SaleOrderHistoryPage> createState() => _SaleOrderHistoryPageState();
 }
 
-class _SaleOrderPageState extends State<SaleOrderPage> {
+class _SaleOrderHistoryPageState extends State<SaleOrderHistoryPage> {
   String formattedDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
   late List<DateTime> dateRange = [];
   List<DateTime> defaultDate = [];

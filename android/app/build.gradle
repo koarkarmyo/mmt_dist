@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.mmt_mobile.mmt_mobile"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
