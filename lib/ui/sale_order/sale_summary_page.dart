@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
 import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
+import 'package:mmt_mobile/business%20logic/bloc/sale_order/sale_order_cubit.dart';
 import 'package:mmt_mobile/model/sale_order/sale_order_line.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/src/mmt_application.dart';
 
+import '../../model/sale_order/sale_order_6/sale_order.dart';
+import '../../src/enum.dart';
 import '../../src/style/app_color.dart';
 
 class SaleSummaryPage extends StatefulWidget {
@@ -18,13 +22,17 @@ class SaleSummaryPage extends StatefulWidget {
 class _SaleSummaryPageState extends State<SaleSummaryPage> {
   final ValueNotifier<DateTime?> _deliveryDate = ValueNotifier(DateTime.now());
   late CartCubit _cartCubit;
+  late SaleOrderCubit _saleOrderCubit;
   double _discountAmount = 0;
+  double _total = 0;
+  final TextEditingController _discController = TextEditingController();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _cartCubit = context.read<CartCubit>();
+    _saleOrderCubit = context.read<SaleOrderCubit>();
   }
 
   @override
@@ -34,19 +42,36 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
         title: Text("Summary Page"),
       ),
       persistentFooterButtons: [
-        Container(
-            padding: 16.allPadding,
-            width: double.infinity,
-            decoration: BoxDecoration(
-                color: AppColors.primaryColor,
-                borderRadius: 12.borderRadius,
-                border: Border.all()),
-            child: const Center(
-              child: Text(
-                "Confirm",
-                style: TextStyle(color: Colors.white),
-              ),
-            ))
+        BlocBuilder<CartCubit, CartState>(
+          builder: (context, state) {
+            return GestureDetector(
+              onTap: () {
+                SaleOrder saleOrder = SaleOrder(
+                    id: 1,
+                    name: 'S0234',
+                    amountTotal: _total - _discountAmount,
+                    createDate: DateTime.now().toString());
+
+                _cartCubit.saveSaleOrder(saleOrder: saleOrder);
+              },
+              child: Container(
+                  padding: 16.allPadding,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                      color: AppColors.primaryColor,
+                      borderRadius: 12.borderRadius,
+                      border: Border.all()),
+                  child: Center(
+                    child: (state.state == BlocCRUDProcessState.creating)
+                        ? CircularProgressIndicator()
+                        : const Text(
+                            "Confirm",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                  )),
+            );
+          },
+        )
       ],
       body: ListView(
         // crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,7 +88,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
             height: 10,
           ),
           const Text(
-            "Delivery Item",
+            "Sale Item",
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ).padding(padding: 16.horizontalPadding),
           _productInCartWidget(),
@@ -180,8 +205,14 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
           children: [
             _discountTypeChoice(),
             TextField(
+              controller: _discController,
+              keyboardType: TextInputType.number,
               onTapOutside: (event) {
                 FocusScope.of(context).unfocus();
+              },
+              onChanged: (value) {
+                //some logic on discount
+                _discountAmount = double.tryParse(value) ?? 0;
               },
               decoration: const InputDecoration(
                   border: InputBorder.none,
@@ -225,7 +256,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
         List<Widget> columnItem = [];
         state.focItemList.forEach(
           (item) {
-            columnItem.add(_itemListTileWidget(item: item));
+            columnItem.add(_notChargeItemWidget(item: item));
           },
         );
         return Column(
@@ -241,7 +272,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
         List<Widget> columnItem = [];
         state.couponList.forEach(
           (item) {
-            columnItem.add(_itemListTileWidget(item: item));
+            columnItem.add(_notChargeItemWidget(item: item));
           },
         );
         return Column(
@@ -281,7 +312,8 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
         List<Widget> columnItem = [];
         state.itemList.forEach(
           (item) {
-            columnItem.add(_itemListTileWidget(item: item));
+            columnItem
+                .add(_itemListTileWidget(item: item, type: SaleItemType.sale));
           },
         );
         return Column(
@@ -291,22 +323,58 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
     );
   }
 
-  Widget _itemListTileWidget({required SaleOrderLine item}) {
+  Widget _notChargeItemWidget({required SaleOrderLine item}) {
+    String pkPcString = ((item.pkQty != null)
+            ? "${item.pkQty} ${item.pkUomLine?.uomName} | "
+            : '') +
+        ((item.pcQty != null)
+            ? "${item.pcQty} ${item.pcUomLine?.uomName} "
+            : '');
+
+    if ((item.productUomQty ?? 0) == 0 &&
+        (item.pkQty ?? 0) == 0 &&
+        (item.pcQty ?? 0) == 0) {
+      return Container();
+    }
+
     return ListTile(
       title: Text(item.productName ?? 'product'),
       subtitle: (MMTApplication.currentUser?.useLooseBox ?? false)
-          ? Text(item.subTotal.toString())
+          ? Text(pkPcString)
+          : Text("${item.productUomQty ?? ''} ${item.uomLine?.uomName ?? ''}"),
+    );
+  }
+
+  Widget _itemListTileWidget(
+      {required SaleOrderLine item, required SaleItemType type}) {
+    String itemPrice = ((item.pkQty != null)
+            ? "${item.pkQty} ${item.pkUomLine?.uomName} x ${item.singlePKPrice} K | "
+            : '') +
+        ((item.pcQty != null)
+            ? "${item.pcQty} ${item.pcUomLine?.uomName} x ${item.singlePCPrice} K"
+            : '');
+
+    if ((item.productUomQty ?? 0) == 0 &&
+        (item.pkQty ?? 0) == 0 &&
+        (item.pcQty ?? 0) == 0) {
+      return Container();
+    }
+
+    return ListTile(
+      title: Text(item.productName ?? 'product'),
+      subtitle: (MMTApplication.currentUser?.useLooseBox ?? false)
+          ? Text(itemPrice)
           : Text(
               "${item.productUomQty.toString()} ${item.uomLine?.uomName}  x ${item.singleItemPrice ?? 0} K"),
       trailing: (MMTApplication.currentUser?.useLooseBox ?? false)
           ? Text(
-              " ${(((item.pkQty ?? 0) * (item.singlePKPrice ?? 0)) + ((item.pcQty ?? 0) * (item.singlePCPrice ?? 0))).toString()} K",
-              style: TextStyle(fontSize: 14),
+              " ${item.subTotal.toString()} K",
+              style: const TextStyle(fontSize: 18),
             )
           : Text(
               "${(item.productUomQty ?? 0) * (item.singleItemPrice ?? 0)} K",
-              style: const TextStyle(fontSize: 14),
-            ),
+              style: const TextStyle(fontSize: 18),
+            ).padding(padding: 8.horizontalPadding),
     );
   }
 }

@@ -312,16 +312,16 @@ class MainSyncProcess {
       );
       return;
     }
-    // catch (e) {
-    //   _syncProcessIsRunning = false;
-    //   _stopAutoSync = false;
-    //   _sendToView(_syncResponse(
-    //       name: actionDescription,
-    //       error: e.toString(),
-    //       message: failMessage,
-    //       isFinished: true));
-    //   return;
-    // }
+    catch (e) {
+      _syncProcessIsRunning = false;
+      _stopAutoSync = false;
+      _sendToView(_syncResponse(
+          name: actionDescription,
+          error: e.toString(),
+          message: failMessage,
+          isFinished: true));
+      return;
+    }
     // assign auto sync is running or not
     _syncProcessIsRunning = actionList.isNotEmpty;
 

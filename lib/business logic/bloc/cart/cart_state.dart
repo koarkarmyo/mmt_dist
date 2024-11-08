@@ -4,9 +4,12 @@ class CartState {
   List<SaleOrderLine> itemList;
   List<SaleOrderLine> focItemList;
   List<SaleOrderLine> couponList;
+  BlocCRUDProcessState state;
 
   CartState(
-      {required this.itemList,
+      {
+        required this.state,
+        required this.itemList,
       required this.focItemList,
       required this.couponList});
 
@@ -14,8 +17,10 @@ class CartState {
     List<SaleOrderLine>? itemList,
     List<SaleOrderLine>? focItemList,
     List<SaleOrderLine>? couponList,
+    BlocCRUDProcessState? state
   }) {
     return CartState(
+      state: state ?? this.state,
         itemList: itemList ?? this.itemList,
         focItemList: focItemList ?? this.focItemList,
         couponList: couponList ?? this.couponList);

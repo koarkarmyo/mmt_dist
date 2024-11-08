@@ -1,3 +1,4 @@
+import '../../database/db_constant.dart';
 import '../../src/mmt_application.dart';
 import '../product/product.dart';
 import '../product/uom_lines.dart';
@@ -64,10 +65,48 @@ class SaleOrderLine {
     data['product_name'] = this.productName;
     data['sale_type'] = this.saleType?.name;
     data['product_uom_qty'] = this.productUomQty;
-    data['pk_qty'] = this.pkQty;
+    data['pk_qty'] = pkQty;
     data['pc_qty'] = pcQty;
+    data['pc_uomline'] = pcUomLine?.toJson();
+    data['pk_uomLine'] = pkUomLine?.toJson();
 
     return data;
+  }
+
+  // '(${DBConstant.productId} INTEGER,'
+  // '${DBConstant.id} INTEGER,'
+  // '${DBConstant.productName} TEXT,'
+  // '${DBConstant.orderNo} TEXT,'
+  // '${DBConstant.orderId} INTEGER,'
+  // '${DBConstant.saleType} TEXT,'
+  // '${DBConstant.productUomQty} DOUBLE,'
+  // '${DBConstant.productTemplateId} INTEGER,'
+  // '${DBConstant.qtyDelivered} DOUBLE,'
+  // '${DBConstant.qtyInvoiced} DOUBLE,'
+  // '${DBConstant.productUom} INTEGER,'
+  // '${DBConstant.productUomName} TEXT,'
+  // '${DBConstant.priceUnit} DOUBLE,'
+  // '${DBConstant.discount} DOUBLE,'
+  // '${DBConstant.priceSubtotal} DOUBLE'
+
+  Map<String,dynamic> toJsonDB(){
+
+    Map<String,dynamic> data = {};
+
+    data['product_id'] = productId;
+    data['product_name'] = productName;
+    data[DBConstant.orderNo] = orderNo;
+    data[DBConstant.saleType] = saleType?.name;
+    data[DBConstant.productUomQty] = productUomQty;
+    data[DBConstant.productUom] = uomLine?.uomId;
+    data[DBConstant.productUomName] = uomLine?.uomId;
+    data[DBConstant.priceUnit] = singleItemPrice;
+    // '${DBConstant.priceUnit} DOUBLE,'
+    // '${DBConstant.discount} DOUBLE,'
+    // '${DBConstant.priceSubtotal} DOUBLE'
+    return data;
+
+
   }
 
   Map<String, dynamic> toJsonForSaleOrderApi({String state = 'draft'}) {

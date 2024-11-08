@@ -157,7 +157,8 @@ class _DashboardPageState extends State<DashboardPage> {
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             duration: const Duration(seconds: 1),
-                            content: const Text("Auto Sync is in progress. Please wait"),
+                            content: const Text(
+                                "Auto Sync is in progress. Please wait"),
                             backgroundColor: AppColors.dangerColor,
                           ));
                         },
@@ -250,10 +251,13 @@ class _DashboardPageState extends State<DashboardPage> {
                     groupName: 'Sale',
                     dashboardName: 'Sale Order',
                     actionUrl: 'today_order'),
-                Dashboard(groupName: 'Sale', dashboardName: 'Sale Report',
-                actionUrl: RouteList.saleOrderPage
-                ),
-                Dashboard(groupName: 'Delivery', dashboardName: 'Loading')
+                Dashboard(
+                    groupName: 'Sale',
+                    dashboardName: 'Sale Report',
+                    actionUrl: RouteList.saleOrderPage),
+                Dashboard(groupName: 'Delivery', dashboardName: 'Loading',
+                actionUrl: RouteList.productReportPage
+                )
               ];
 
               List<Dashboard> dashboardList = state.dashboardList;
@@ -288,11 +292,20 @@ class _DashboardPageState extends State<DashboardPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 ConstantWidgets.SizedBoxHeight,
-                                Text(
-                                  titles[selectedTitleIndex],
-                                  style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600),
+                                Row(
+                                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      titles[selectedTitleIndex],
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    Text(" ( Count : ${_dashboardList.where((element) => element.groupName == groupList[selectedTitleIndex],).toList().length} ) ", style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),)
+                                  ],
                                 ).padding(
                                   padding: 5.allPadding,
                                 ),
@@ -508,7 +521,7 @@ class _DashboardPageState extends State<DashboardPage> {
           print("Sync Complete");
           _dialogKey.currentState?.closeDialog();
           Future.delayed(const Duration(milliseconds: 300)).then((value) {
-            _dialogKey.currentState?.closeDialog();
+            // _dialogKey.currentState?.closeDialog();
             if (data.message == MainSyncProcess.failMessage) {
               Future.delayed(const Duration(milliseconds: 100), () {
                 if (context.mounted) {

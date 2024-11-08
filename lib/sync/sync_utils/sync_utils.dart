@@ -9,6 +9,7 @@ import '../../model/base_api_response.dart';
 import '../../model/category.dart';
 import '../../model/currency.dart';
 import '../../model/dashboard.dart';
+import '../../model/price_list/price_list_item.dart';
 import '../../model/price_list/product_price_list_item.dart';
 import '../../model/product/product.dart';
 import '../../model/route/route_plan.dart';
@@ -617,13 +618,13 @@ class SyncUtils {
     //   return SyncProcess.Finished;
     // }
 
-    BaseApiResponse<ProductPriceListItem> baseResponse =
-        BaseApiResponse.fromJson(res, fromJson: ProductPriceListItem.fromJson);
+    BaseApiResponse<PriceListItem> baseResponse =
+        BaseApiResponse.fromJson(res, fromJson: PriceListItem.fromJson);
     if (baseResponse.data!.isEmpty) {
       return SyncProcess.Finished;
     }
 
-    List<ProductPriceListItem> priceListItemList = baseResponse.data ?? [];
+    List<PriceListItem> priceListItemList = baseResponse.data ?? [];
 
     print("Price List : ${priceListItemList.length}");
 

@@ -21,7 +21,7 @@ import '../partner.dart';
 /// partner_name : "BBB"
 /// batch_name : null
 
-enum SaleType { sale, foc , disc, cupon}
+enum SaleType { sale, foc , disc, coupon}
 
 
 class StockPickingModel {

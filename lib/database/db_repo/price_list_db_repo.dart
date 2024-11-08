@@ -10,10 +10,12 @@ class PriceListDbRepo extends BaseDBRepo {
   PriceListDbRepo._();
 
   Future<List<PriceListItem>> getAllPriceList() async {
+    print("get price list");
     List<Map<String, dynamic>> priceListJsonList =
-        await helper.readAllData(tableName: DBConstant.dashboardTable);
+        await helper.readAllData(tableName: DBConstant.priceListItemTable);
     List<PriceListItem> priceList = [];
     for (Map<String, dynamic> element in priceListJsonList) {
+      print("Price List : $element");
       priceList.add(PriceListItem.fromJson(element));
     }
 

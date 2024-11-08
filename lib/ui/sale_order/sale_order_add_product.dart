@@ -8,6 +8,7 @@ import 'package:mmt_mobile/business%20logic/bloc/product/product_cubit.dart';
 import 'package:mmt_mobile/common_widget/alert_dialog.dart';
 import 'package:mmt_mobile/common_widget/constant_widgets.dart';
 import 'package:mmt_mobile/model/delivery/delivery_item.dart';
+import 'package:mmt_mobile/model/price_list/price_list_item.dart';
 import 'package:mmt_mobile/model/product/uom_lines.dart';
 import 'package:mmt_mobile/src/enum.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
@@ -32,6 +33,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
   List<Product> _productList = [];
   String? _filterProductCategory = 'All';
   List<SaleOrderLine> _saleOrderLineList = [];
+  List<PriceListItem> _priceListItem = [];
   late CartCubit _cartCubit;
 
   @override
@@ -209,14 +211,21 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
         return ListTile(
           contentPadding: 10.horizontalPadding,
           // Adjust padding here
-
           shape: RoundedRectangleBorder(
             side: const BorderSide(color: Colors.black, width: 1),
             borderRadius: BorderRadius.circular(5),
           ),
 
           title: Text(product.name ?? '').boldSize(16),
-          subtitle: Text("K 10000, 23 Kg"),
+          subtitle: Text(
+              (product.priceListItems
+                  ?.toList() // Convert to a list if it's not already
+                ?..sort((a, b) => (a.fixedPrice ?? 0).compareTo(b.productUom ?? 0)) // Sort by productUom
+              )
+                  ?.map((e) => '${e.productUomName} ${e.fixedPrice}') // Map to formatted strings
+                  .join(', ') // Join the list into a single string
+                  ?? '' // Provide an empty string if null
+          ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             // Minimize column height
@@ -253,6 +262,9 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                                       pkQty: (_pkController.text != '')
                                           ? double.tryParse(_pkController.text)
                                           : 0,
+                                      pcUomLine: UomLine(
+                                          uomId: product.looseUomId,
+                                          uomName: product.looseUomName),
                                       pkUomLine: UomLine(
                                           uomId: product.boxUomId,
                                           uomName: product.boxUomName)));
@@ -299,7 +311,10 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                                           : 0,
                                       pcUomLine: UomLine(
                                           uomId: product.looseUomId,
-                                          uomName: product.looseUomName)));
+                                          uomName: product.looseUomName),
+                                      pkUomLine: UomLine(
+                                          uomId: product.boxUomId,
+                                          uomName: product.boxUomName)));
                         },
                         decoration: const InputDecoration(
                             isDense: true,
@@ -355,7 +370,8 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                       decoration: BoxDecoration(
                           border: Border.all(), borderRadius: 4.borderRadius),
                       child: DropdownButton<UomLine>(
-                        value: deliveryItem?.uomLine ?? product.uomLines?.firstOrNull,
+                        value: deliveryItem?.uomLine ??
+                            product.uomLines?.firstOrNull,
                         items: product.uomLines
                             ?.map((UomLine value) => DropdownMenuItem<UomLine>(
                                   value: value,

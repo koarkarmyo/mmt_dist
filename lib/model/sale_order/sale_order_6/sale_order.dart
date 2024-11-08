@@ -1,5 +1,5 @@
-
 import 'package:collection/collection.dart';
+import 'package:mmt_mobile/model/sale_order/sale_order_line.dart';
 
 import '../../../src/enum.dart';
 
@@ -39,6 +39,21 @@ class SaleOrder {
       'delivery_status': this.delivery_status,
     };
   }
+
+  Map<String, dynamic> toJsonDB() {
+    return {
+      'id': id,
+      'name': name,
+      'partner_id': partnerId,
+      'partner_name': partnerName,
+      'sale_person': salePerson,
+      'amount_total': amountTotal,
+      'state': state,
+      'delivery_status': delivery_status,
+    };
+  }
+
+
 
   factory SaleOrder.fromJson(Map<String, dynamic> map) {
     return SaleOrder(

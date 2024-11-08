@@ -96,6 +96,8 @@ class DBConstant {
   static const String countryName = 'country_name';
   static const String syncLimit = 'sync_limit';
   static const String partnerSaleType = "partner_sale_type";
+  static const String productUomMinQty = 'product_uom_min_qty';
+  static const String discountPercent = 'discount_percent';
 
   static const String customerRank = 'customer_rank';
   static const String supplierRank = 'supplier_rank';

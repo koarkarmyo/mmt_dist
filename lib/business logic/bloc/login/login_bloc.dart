@@ -51,39 +51,39 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     print('SESSION::::${MMTApplication.session?.toJson()}');
 
     emit(state.copyWith(status: LoginStatus.loading));
-    // try {
-    Employee? employee = await LoginApiRepo()
-        .employeeLogin(username: event.username, password: event.password);
+    try {
+      Employee? employee = await LoginApiRepo()
+          .employeeLogin(username: event.username, password: event.password);
 
-    print("Login User : ${employee?.toJson()}");
+      print("Login User : ${employee?.toJson()}");
 
-    if (employee == null) {
-      emit(state.copyWith(status: LoginStatus.fail));
-      await Future.delayed(1.second);
-      emit(state.copyWith(status: LoginStatus.initial));
-    } else {
-      MMTApplication.currentUser = employee;
-      MMTApplication.currentUser?.useLooseBox =
-          employee.companyList?.firstOrNull?.useLooseUom == true;
-      SharePrefUtils()
-          .saveString(ShKeys.currentUser, jsonEncode(employee.toJson()));
-      bool _saveSyncActionSuccess =
-          await _saveSyncAction(syncActionList: employee.syncActionList ?? []);
-      print("Save Sync Action : $_saveSyncActionSuccess");
-      if (!_saveSyncActionSuccess) {
-        emit(state.copyWith(
-            status: LoginStatus.fail, error: "Sync Action Save Fail"));
+      if (employee == null) {
+        emit(state.copyWith(status: LoginStatus.fail));
+        await Future.delayed(1.second);
+        emit(state.copyWith(status: LoginStatus.initial));
       } else {
-        emit(state.copyWith(status: LoginStatus.success));
+        MMTApplication.currentUser = employee;
+        MMTApplication.currentUser?.useLooseBox =
+            employee.companyList?.firstOrNull?.useLooseUom == true;
+        SharePrefUtils()
+            .saveString(ShKeys.currentUser, jsonEncode(employee.toJson()));
+        bool _saveSyncActionSuccess = await _saveSyncAction(
+            syncActionList: employee.syncActionList ?? []);
+        print("Save Sync Action : $_saveSyncActionSuccess");
+        if (!_saveSyncActionSuccess) {
+          emit(state.copyWith(
+              status: LoginStatus.fail, error: "Sync Action Save Fail"));
+        } else {
+          emit(state.copyWith(status: LoginStatus.success));
+        }
       }
+    } on DioException {
+      _emitFail();
+    } on OdooException {
+      _emitFail();
+    } on Error {
+      _emitFail();
     }
-    // } on DioException {
-    //   _emitFail();
-    // } on OdooException {
-    //   _emitFail();
-    // } on Error {
-    //   _emitFail();
-    // }
   }
 
   Future<bool> _saveSyncAction(
