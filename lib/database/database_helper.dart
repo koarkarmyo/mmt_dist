@@ -122,6 +122,7 @@ class DatabaseHelper {
 
   _onCreateDatabase(Database db, int version) async {
     await _createProductTable(db);
+    await _createProductTemplateTable(db);
     await _createSyncActionTable(db);
     await _createSyncGroupTable(db);
     await _createSyncActionLinkWithGroupTable(db);
@@ -132,6 +133,7 @@ class DatabaseHelper {
     await _createSaleOrderHeaderTable(db);
     await _createSaleOrderLineTable(db);
     await _createProductUomTable(db);
+    await _createUomTable(db);
     await _createStockLocationTable(db);
     await _createResPartnerTable(db);
     await _createCurrencyTable(db);
@@ -140,6 +142,23 @@ class DatabaseHelper {
     await _createDashboardTable(db);
     await _createCustomerDashboardTable(db);
     await _createPriceListItemTable(db);
+    await _createUomCategoryTable(db);
+  }
+
+  _createUomTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.uomUomTable} '
+        '(${DBConstant.id} INTEGER,'
+        '${DBConstant.name} TEXT,'
+        '${DBConstant.displayName} TEXT,'
+        '${DBConstant.uomCategoryId} INTEGER,'
+        '${DBConstant.uomCategoryName} TEXT,'
+        '${DBConstant.ratio} DOUBLE,'
+        '${DBConstant.rounding} DOUBLE,'
+        '${DBConstant.uomType} TEXT,'
+        '${DBConstant.uomFactor} DOUBLE,'
+        '${DBConstant.active} INTEGER,'
+        '${DBConstant.writeDate} TEXT'
+        ')');
   }
 
   _createSaleOrderHeaderTable(Database db) async {
@@ -227,7 +246,6 @@ class DatabaseHelper {
         '${DBConstant.writeDate} TEXT'
         ')');
   }
-
 
   _createProductUomTable(Database db) async {
     return await db.execute('CREATE TABLE ${DBConstant.productUomTable} '
@@ -359,30 +377,65 @@ class DatabaseHelper {
   }
 
   _createProductTable(Database db) async {
-    return await db.execute('CREATE TABLE ${DBConstant.productTable} '
-        '(${DBConstant.id} INTEGER,'
-        // '${DBConstant.productId} INTEGER,'
+    return await db.execute('CREATE TABLE ${DBConstant.productProductTable} ('
+        '${DBConstant.id} INTEGER,'
         '${DBConstant.name} TEXT,'
         '${DBConstant.categId} INTEGER,'
         '${DBConstant.categName} TEXT,'
-        '${DBConstant.looseUomId} INTEGER,'
-        '${DBConstant.looseUomName} TEXT,'
-        '${DBConstant.uomCategoryId} INTEGER,'
-        '${DBConstant.boxUomId} INTEGER,'
-        '${DBConstant.boxUomName} TEXT,'
+        '${DBConstant.companyId} INTEGER,' // Added company_id
+        '${DBConstant.companyName} TEXT,' // Added company_name
         '${DBConstant.listPrice} DOUBLE,'
         '${DBConstant.defaultCode} TEXT,'
-        '${DBConstant.detialType} TEXT,'
+        '${DBConstant.detialType} TEXT,' // Fixed typo 'detialType' to 'detailedType'
+        '${DBConstant.saleOK} INTEGER,' // Added sale_ok
+        '${DBConstant.purchaseOK} INTEGER,' // Added purchase_ok
+        '${DBConstant.canBeExpensed} INTEGER,' // Added can_be_expensed
         '${DBConstant.barcode} TEXT,'
-        '${DBConstant.image128} TEXT,'
-        '${DBConstant.image512} TEXT,'
-        '${DBConstant.serviceProductType} TEXT,'
+        '${DBConstant.productTmplId} INTEGER,' // Added product_tmpl_id
+        '${DBConstant.productTmplName} TEXT,' // Added product_tmpl_name
         '${DBConstant.active} INTEGER,'
-        '${DBConstant.productGroupId} INTEGER,'
-        '${DBConstant.saleUomId} INTEGER,'
-        '${DBConstant.saleUomName} TEXT,'
-        '${DBConstant.saleOK} TEXT,'
-        '${DBConstant.purchaseOK} TEXT,'
+        '${DBConstant.uomCategoryId} INTEGER,' // Added uom_category_id
+        '${DBConstant.uomCategoryName} TEXT,' // Added uom_category_name
+        '${DBConstant.uomId} INTEGER,' // Added uom_id
+        '${DBConstant.uomName} TEXT,' // Added uom_name
+        '${DBConstant.uomPoId} INTEGER,' // Added uom_po_id
+        '${DBConstant.uomPoName} TEXT,' // Added uom_po_name
+        '${DBConstant.looseUomId} INTEGER,'
+        '${DBConstant.looseUomName} TEXT,'
+        '${DBConstant.boxUomId} INTEGER,'
+        '${DBConstant.boxUomName} TEXT,'
+        '${DBConstant.writeDate} TEXT'
+        ')');
+  }
+
+  _createProductTemplateTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.productTemplateTable} ('
+        '${DBConstant.id} INTEGER,'
+        '${DBConstant.name} TEXT,'
+        '${DBConstant.categId} INTEGER,'
+        '${DBConstant.categName} TEXT,'
+        '${DBConstant.companyId} INTEGER,' // Added company_id
+        '${DBConstant.companyName} TEXT,' // Added company_name
+        '${DBConstant.listPrice} DOUBLE,'
+        '${DBConstant.defaultCode} TEXT,'
+        '${DBConstant.detialType} TEXT,' // Fixed typo 'detialType' to 'detailedType'
+        '${DBConstant.saleOK} INTEGER,' // Added sale_ok
+        '${DBConstant.purchaseOK} INTEGER,' // Added purchase_ok
+        '${DBConstant.canBeExpensed} INTEGER,' // Added can_be_expensed
+        '${DBConstant.barcode} TEXT,'
+        '${DBConstant.productTmplId} INTEGER,' // Added product_tmpl_id
+        '${DBConstant.productTmplName} TEXT,' // Added product_tmpl_name
+        '${DBConstant.active} INTEGER,'
+        '${DBConstant.uomCategoryId} INTEGER,' // Added uom_category_id
+        '${DBConstant.uomCategoryName} TEXT,' // Added uom_category_name
+        '${DBConstant.uomId} INTEGER,' // Added uom_id
+        '${DBConstant.uomName} TEXT,' // Added uom_name
+        '${DBConstant.uomPoId} INTEGER,' // Added uom_po_id
+        '${DBConstant.uomPoName} TEXT,' // Added uom_po_name
+        '${DBConstant.looseUomId} INTEGER,'
+        '${DBConstant.looseUomName} TEXT,'
+        '${DBConstant.boxUomId} INTEGER,'
+        '${DBConstant.boxUomName} TEXT,'
         '${DBConstant.writeDate} TEXT'
         ')');
   }
@@ -443,6 +496,16 @@ class DatabaseHelper {
         ')');
   }
 
+  _createUomCategoryTable(Database db) async {
+    return await db.execute('''
+    CREATE TABLE IF NOT EXISTS ${DBConstant.uomCategoryTable} (
+      ${DBConstant.id} INTEGER PRIMARY KEY,
+      ${DBConstant.name} TEXT,
+      ${DBConstant.writeDate} TEXT
+    )
+  ''');
+  }
+
   _createCategoryTable(Database db) async {
     return await db.execute('CREATE TABLE ${DBConstant.categoryTable} '
         '(${DBConstant.id} INTEGER,'
@@ -476,5 +539,4 @@ class DatabaseHelper {
         '${DBConstant.childId} INTEGER'
         ')');
   }
-
 }

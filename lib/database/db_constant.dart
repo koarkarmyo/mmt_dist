@@ -6,24 +6,26 @@ class DBConstant {
   /*
         Tables
   */
+  static const String uomCategoryTable = 'uom_category';
   static const String stockLocationTable = 'stock_location';
   static const String currencyTable = 'currency_table';
   static const String mscmUserTable = 'mscm_users';
   static const String companyTable = 'company';
   static const String mscmDeviceTable = 'mscm_devices';
   static const String routeTable = 'routes';
+  static const String productTemplateTable = 'product_template';
   static const String routeLineTable = 'mscm_route_lines';
   static const String mscmDeviceRouteTable = 'mscm_device_routes';
   static const String partnerRouteTable = 'partner_routes';
-  static const String productTable = 'products';
+  static const String productProductTable = 'product_product';
   static const String productUomTable = 'product_uom';
-  static const String mscmUomTable = 'mscm_uom';
+  static const String uomUomTable = 'uom_uom';
   static const String warehouseTable = 'warehouses';
   static const String dashboardTable = 'dashboards';
   static const String customerDashboardTable = 'customer_dashboards';
   static const String dashboardTableGroupName = 'dashboard_group_name';
   static const String dashboardTableGroupId = 'dashboard_group_id';
-  static const String categoryTable = 'categories';
+  static const String categoryTable = 'product_category';
   static const String childCategoryTable = 'child_categories';
   static const String syncActionTable = 'mscm_sync_actions';
   static const String syncActionWithGroupTable = 'sync_actions_with_groups';
@@ -103,6 +105,8 @@ class DBConstant {
   static const String supplierRank = 'supplier_rank';
   static const String branchId = 'branch_id';
   static const String branchName = 'branch_name';
+  static const String uomCategoryId = 'uom_category_id';
+  static const String uomCategoryName = 'uom_category_name';
   static const String categoryId = "category_id";
   static const String categoryName = 'category_name';
   static const String rounding = 'rounding';
@@ -246,10 +250,10 @@ class DBConstant {
   static const String uomName = 'uom_name';
   static const String uomType = 'uom_type';
   static const String ratio = 'ratio';
-  static const String uomCategoryId = 'uom_category_id';
-  static const String uomCategoryName = 'uom_category_name';
   static const String productId = 'product_id';
   static const String orderId = 'order_id';
+  static const String trackingId = 'tracking_id';
+  static const String trackingName = 'tracking_name';
 
   static const String categId = 'categ_id';
   static const String listPrice = 'list_price';
@@ -471,6 +475,9 @@ class DBConstant {
   static const String saleUomName = 'sale_uom_name';
   static const String saleOK = 'sale_ok';
   static const String purchaseOK = 'purchase_ok';
+  static const String canBeExpensed = 'can_be_expensed';
+  static const String uomPoId = 'uom_po_id';
+  static const String uomPoName = 'uom_po_name';
 
   static const String saleOrderTypeId = 'sale_order_type_id';
   static const String saleOrderTypeName = 'sale_order_type_name';

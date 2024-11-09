@@ -27,7 +27,7 @@ class ProductDBRepo extends BaseDBRepo {
 
     List<Map<String, dynamic>> productJsonList = await helper
         .readDataByWhereArgs(
-            tableName: DBConstant.productTable,
+            tableName: DBConstant.productProductTable,
             orderBy: DBConstant.name,
             where: '${DBConstant.detialType} =? ',
             whereArgs: [ProductDetailTypes.product.name]);
@@ -60,11 +60,11 @@ class ProductDBRepo extends BaseDBRepo {
 
     if (categoryId != null) {
       jsonList = await helper.readDataByWhereArgs(
-          tableName: DBConstant.productTable,
+          tableName: DBConstant.productProductTable,
           where: '${DBConstant.categId}=?',
           whereArgs: [categoryId]);
     } else {
-      jsonList = await helper.readAllData(tableName: DBConstant.productTable);
+      jsonList = await helper.readAllData(tableName: DBConstant.productProductTable);
     }
 
     for (final json in jsonList) {

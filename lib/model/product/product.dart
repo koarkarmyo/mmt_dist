@@ -52,7 +52,11 @@ class Product extends Equatable {
   int? saleUomId;
   String? saleUomName;
   String? uomPoName;
+  int? trackingId;
+  String? trackingName;
   ServiceProductType? serviceProductType;
+  int? expirationTime;
+  bool? useExpirationDate;
 
   Product(
       {this.id,
@@ -81,7 +85,11 @@ class Product extends Equatable {
       this.saleUomId,
       this.saleUomName,
       this.uomCategoryId,
-      this.uomCategoryName});
+      this.uomCategoryName,
+      this.trackingId,
+      this.trackingName,
+      this.expirationTime,
+      this.useExpirationDate});
 
   Product.fromJson(dynamic json) {
     id = json['product_tmpl_id'];
@@ -118,6 +126,9 @@ class Product extends Equatable {
     serviceProductType = ServiceProductType.values.firstWhereOrNull((e) =>
         e.name.toLowerCase() ==
         json['service_product_type'].toString().toLowerCase());
+    trackingId = json['tracking_id'];
+    trackingName = json['tracking_name'];
+    expirationTime = json['expiration_time'];
   }
 
   Map<String, dynamic> toJson() {

@@ -1,4 +1,3 @@
-
 import 'dart:ui';
 
 import 'package:intl/intl.dart';
@@ -7,12 +6,11 @@ import 'package:mmt_mobile/src/style/app_color.dart';
 import '../utils/date_time_utils.dart';
 import 'mmt_application.dart';
 
-enum UploadBeforeSync { get_sale_order, get_delivery_order}
+enum UploadBeforeSync { get_sale_order, get_delivery_order }
 
-extension SyncExtension on UploadBeforeSync{
-
-  Future<bool> get uploadRequest{
-    switch(this){
+extension SyncExtension on UploadBeforeSync {
+  Future<bool> get uploadRequest {
+    switch (this) {
       // here lies the functions that sends what has stored in db and return bool
       default:
         return Future.value(false);
@@ -20,12 +18,18 @@ extension SyncExtension on UploadBeforeSync{
   }
 }
 
-enum LooseBoxType {pk, pc}
+enum LooseBoxType { pk, pc }
 
-enum SaleItemType{ sale, foc, coupon}
+enum TrackingTypes { serial, lot, none }
+
+enum SaleItemType { sale, foc, coupon }
+
+enum UomType { reference, bigger, smaller }
 
 enum LanguageCode { eng, mm }
+
 enum ViewTypes { list, grid }
+
 enum OrderStates { draft, send, sale, done, cancel }
 
 enum SaleOrderReqTypes { quotation, sale, sale_delivery_and_invoice, wh_sale }
@@ -248,6 +252,7 @@ extension DeliveryStatusToValue on DeliveryStatus {
 }
 
 enum DiscountTypes { K, Percentage }
+
 enum PaymentTypes { cash, bank }
 
 extension PaymentTypesValue on PaymentTypes {
@@ -353,8 +358,8 @@ extension PaymentTransferStatesToValue on PaymentTransferStates {
 extension Iterables<T> on Iterable<T> {
   Map<K, List<T>> groupBy<K>(K Function(T) keyFunction) => fold(
       <K, List<T>>{},
-          (Map<K, List<T>> map, T element) =>
-      map..putIfAbsent(keyFunction(element), () => <T>[]).add(element));
+      (Map<K, List<T>> map, T element) =>
+          map..putIfAbsent(keyFunction(element), () => <T>[]).add(element));
 }
 
 extension DateTimeExtension on DateTime {
