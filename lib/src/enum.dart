@@ -20,7 +20,7 @@ extension SyncExtension on UploadBeforeSync {
 
 enum LooseBoxType { pk, pc }
 
-enum TrackingTypes { serial, lot, none }
+enum TrackingType { serial, lot, none }
 
 enum SaleItemType { sale, foc, coupon }
 

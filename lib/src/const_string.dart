@@ -1,5 +1,5 @@
 class ConstString {
-  static const String appName = 'mmt_distribution';
+  static const String appName = 'MMT Distribution';
   static const String version = '1.0.0';
   static const String welcome = 'Welcome';
   static const String history = 'History';

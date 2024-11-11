@@ -83,7 +83,8 @@ class _LoginPageState extends State<LoginPage> {
     return BlocConsumer<LoginBloc, LoginState>(
       listener: (context, state) {
         if (state.status == LoginStatus.success) {
-          context.pushReplace(route: RouteList.homePage);
+          context.pushReplace(
+              route: RouteList.homePage, args: {'from_login': true});
         }
       },
       builder: (context, state) {
@@ -159,7 +160,7 @@ class _LoginPageState extends State<LoginPage> {
       hintText: "password",
       prefixIcon: const Icon(Icons.key),
       backgroundColor: Colors.white,
-      accentColor:AppColors.primaryColor,
+      accentColor: AppColors.primaryColor,
       borderRadius: 10,
       isShadow: false,
       isPassword: true,

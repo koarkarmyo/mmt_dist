@@ -4,6 +4,7 @@ import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/dashboard/dashboard_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/fetch_database/fetch_database_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/product/product_cubit.dart';
+import 'package:mmt_mobile/business%20logic/bloc/product_category/product_category_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/sale_order/sale_order_cubit.dart';
 import 'package:mmt_mobile/common_widget/text_widget.dart';
 import 'package:mmt_mobile/route/route_list.dart';
@@ -98,6 +99,9 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
               BlocProvider(create: (context) => ProductCubit()),
               BlocProvider(
                 create: (context) => CartCubit(),
+              ),
+              BlocProvider(
+                create: (context) => ProductCategoryCubit(),
               ),
               BlocProvider(
                 create: (context) => SaleOrderCubit(),

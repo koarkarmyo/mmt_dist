@@ -14,7 +14,7 @@ class DashboardDBRepo extends BaseDBRepo {
           await helper.readAllData(tableName: DBConstant.dashboardTable);
       List<Dashboard> dashboardList = [];
       for (Map<String, dynamic> element in dashboardJsonList) {
-        dashboardList.add(Dashboard.fromJson(element));
+        dashboardList.add(Dashboard.fromJsonDB(element));
       }
 
       return dashboardList;

@@ -1,15 +1,13 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
 import 'package:mmt_mobile/common_widget/constant_widgets.dart';
-import 'package:mmt_mobile/database/data_object.dart';
-import 'package:mmt_mobile/database/db_repo/currency_db_repo.dart';
-import 'package:mmt_mobile/database/db_repo/res_partner_repo.dart';
-import 'package:mmt_mobile/database/product_repo/product_db_repo.dart';
-import 'package:mmt_mobile/model/res_partner.dart';
+import 'package:mmt_mobile/model/dashboard_group.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
@@ -26,7 +24,6 @@ import '../sync/bloc/sync_action_bloc/sync_action_bloc_cubit.dart';
 import '../sync/models/sync_response.dart';
 import '../sync/sync_utils/main_sync_process.dart';
 import 'package:collection/collection.dart';
-import 'package:scroll_to_index/scroll_to_index.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -46,39 +43,9 @@ class _DashboardPageState extends State<DashboardPage> {
   late DashboardCubit _dashboardCubit;
   List<Dashboard> _dashboardList = [];
 
-  final List<String> titles = [
-    "Sale",
-    "Delivery",
-    "Finance & Accounting",
-    "Inventory",
-    "WMS",
-    "Report"
-  ];
-
-  final List<List<String>> processLists = [
-    ["Route", "Customer Visit", "Today Order", "Contact"],
-    ["Today Delivery"],
-    ["Account Payments", "Payment Transfer"],
-    ["Loading", "Vehicle Inventory", "Product Report", "Stock Request"],
-    ["Stock Unloading", "Delivery Return", "Purchase", "Purchase Quotation"],
-    [
-      "Loading Report",
-      "Unloading Report",
-      "Vehicle Inventory",
-      "Today Order Report",
-      "Delivery Report",
-      "Delivery Return Report",
-      "Delivery Report(Sale)",
-      "Stock Order",
-      "Delivery Report",
-      "Today Sale Order Report",
-      "Daily Sale Product Report"
-    ]
-  ];
-
   void _onScroll() {
     double offset = _scrollController.offset;
-    int newIndex = (offset / 250).round();
+    int newIndex = (offset / 100).round();
 
     if (newIndex != selectedTitleIndexNotifier.value &&
         newIndex < _dashboardList.length) {
@@ -94,7 +61,23 @@ class _DashboardPageState extends State<DashboardPage> {
     manualSyncStreamListener();
     _syncActionCubit = context.read<SyncActionCubit>()
       ..getSyncAction(isManualSync: true);
-    _dashboardCubit = context.read<DashboardCubit>()..getDashboard();
+    _dashboardCubit = context.read<DashboardCubit>();
+  }
+
+  @override
+  void didChangeDependencies() {
+    RouteSettings? routeSettings = ModalRoute.of(context)?.settings;
+    if (routeSettings?.arguments != null) {
+      final json = routeSettings?.arguments as Map<String, dynamic>;
+      bool fromLoginPage = json['from_login'] ?? false;
+      if (fromLoginPage) {
+        _dashboardCubit.fetchDashboardFromApi();
+      }
+    } else {
+      _dashboardCubit.getDashboard();
+    }
+
+    super.didChangeDependencies();
   }
 
   Future<void> _scrollToIndex(int index) async {
@@ -150,6 +133,10 @@ class _DashboardPageState extends State<DashboardPage> {
               return StreamBuilder(
                   stream: MainSyncProcess.instance.syncStream,
                   builder: (context, snapshot) {
+                    if (snapshot.data?.isFinished == true) {
+                      print("Sync success");
+                      _dashboardCubit.getDashboard();
+                    }
                     if (MainSyncProcess.instance.syncProcessIsRunning) {
                       bool isAutoSync = snapshot.data?.isAutoSync ?? false;
 
@@ -220,8 +207,9 @@ class _DashboardPageState extends State<DashboardPage> {
         children: [
           GestureDetector(
             onTap: () {
-              MainSyncProcess.instance
-                  .setAutoSyncActions('MASTER', isImmediate: false);
+              // MainSyncProcess.instance
+              //     .setAutoSyncActions('MASTER', isImmediate: false);
+              _dashboardCubit.fetchDashboardFromApi();
             },
             child: const Text(
               "Dashboard",
@@ -240,30 +228,30 @@ class _DashboardPageState extends State<DashboardPage> {
       builder: (context, state) {
         print("Dashboard State : ${state.state}");
         if (state.state == BlocCRUDProcessState.fetching) {
-          return const CircularProgressIndicator();
+          return const Center(child: CircularProgressIndicator()).expanded();
         } else if (state.state == BlocCRUDProcessState.fetchSuccess) {
+          _dashboardList = state.dashboardList;
+          if (state.dashboardList.isEmpty) {
+            return const Center(
+                child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.numbers),
+                SizedBox(
+                  height: 20,
+                ),
+                Text("Dashboard is empty"),
+              ],
+            )).expanded();
+          }
           return ValueListenableBuilder<int>(
             valueListenable: selectedTitleIndexNotifier,
             builder: (context, selectedTitleIndex, _) {
-              // List<String> processes = processLists[selectedTitleIndex];
-              _dashboardList = [
-                Dashboard(
-                    groupName: 'Sale',
-                    dashboardName: 'Sale Order',
-                    actionUrl: 'today_order'),
-                Dashboard(
-                    groupName: 'Sale',
-                    dashboardName: 'Sale Report',
-                    actionUrl: RouteList.saleOrderPage),
-                Dashboard(groupName: 'Delivery', dashboardName: 'Loading',
-                actionUrl: RouteList.productReportPage
-                )
-              ];
-
-              List<Dashboard> dashboardList = state.dashboardList;
-              List<String> groupList = _dashboardList
+              _dashboardList = state.dashboardList;
+              List<DashboardGroup> groupList = _dashboardList
                   .map(
-                    (e) => e.groupName ?? '',
+                    (e) => DashboardGroup(
+                        id: e.dashboardGroupId, name: e.dashboardGroupName),
                   )
                   .toSet()
                   .toList();
@@ -296,15 +284,22 @@ class _DashboardPageState extends State<DashboardPage> {
                                   // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      titles[selectedTitleIndex],
+                                      groupList[selectedTitleIndex].name ?? '',
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w600),
                                     ),
-                                    Text(" ( Count : ${_dashboardList.where((element) => element.groupName == groupList[selectedTitleIndex],).toList().length} ) ", style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),)
+                                    Text(
+                                      " ( Count : ${_dashboardList.where(
+                                            (element) =>
+                                                element.dashboardGroupName ==
+                                                groupList[selectedTitleIndex],
+                                          ).toList().length} ) ",
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
                                   ],
                                 ).padding(
                                   padding: 5.allPadding,
@@ -313,8 +308,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                 buildProcessList(_dashboardList
                                     .where(
                                       (element) =>
-                                          element.groupName ==
-                                          groupList[selectedTitleIndex],
+                                          element.dashboardGroupId ==
+                                          groupList[selectedTitleIndex].id,
                                     )
                                     .toList())
                               ],
@@ -338,60 +333,89 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget buildTitleList(
-      {required List<String> dashboardGroupList,
+      {required List<DashboardGroup> dashboardGroupList,
       required int selectedTitleIndex}) {
-    return SingleChildScrollView(
-      controller: _scrollController,
-      scrollDirection: Axis.horizontal,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Row(
-          children: List.generate(dashboardGroupList.length, (index) {
-            return AutoScrollTag(
-              index: index,
-              controller: _scrollController,
-              key: ValueKey(index),
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: GestureDetector(
-                  onTap: () {
-                    _scrollToIndex(index);
-                    // selectedTitleIndexNotifier.value = index;
-                  },
-                  child: Container(
-                    width: 250,
-                    height: selectedTitleIndex == index ? 80 : 70,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: selectedTitleIndex == index
-                          ? Colors.blueAccent
-                          : Colors.black12,
-                    ),
-                    alignment: Alignment.center,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5),
-                      child: Text(
-                        titles[index],
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: selectedTitleIndex == index ? 16 : 14,
-                          fontWeight: selectedTitleIndex == index
-                              ? FontWeight.bold
-                              : null,
-                          color: selectedTitleIndex == index
-                              ? Colors.white
-                              : Colors.black,
+    return SizedBox(
+      height: 100,
+      child: ListView.builder(
+        controller: _scrollController,
+        itemCount: dashboardGroupList.length,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) {
+          return AutoScrollTag(
+            index: index,
+            controller: _scrollController,
+            key: ValueKey(index),
+            child: Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: GestureDetector(
+                onTap: () {
+                  _scrollToIndex(index);
+                  // selectedTitleIndexNotifier.value = index;
+                },
+                child: Container(
+                  width: 250,
+                  height: selectedTitleIndex == index ? 80 : 70,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: selectedTitleIndex == index
+                        ? Colors.blueAccent
+                        : Colors.black12,
+                  ),
+                  alignment: Alignment.center,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          height: 30,
+                          width: 30,
+                          child: StatefulBuilder(
+                            builder: (context, innerState) {
+                              return CachedNetworkImage(
+                                useOldImageOnUrlChange: true,
+                                imageUrl:
+                                    "${MMTApplication.serverUrl}/web/image?model=dashboard.group&id=${dashboardGroupList[index].id}&field=icon&unique=${List.generate(14, (_) => Random().nextInt(10).toString()).join()}",
+                                httpHeaders: {
+                                  "Cookie":
+                                      "session_id=${MMTApplication.session?.sessionId}"
+                                },
+                                // placeholder: (context, url) => SizedBox(
+                                //   height: 10,
+                                //   width: 10,
+                                //   child: CircularProgressIndicator(
+                                //     color: AppColors.primaryColor,
+                                //   ),
+                                // ),
+                                errorWidget: (context, url, error) =>
+                                    const Icon(Icons.error),
+                              );
+                            },
+                          ),
+                        ).padding(padding: 16.horizontalPadding),
+                        Text(
+                          dashboardGroupList[index].name ?? '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: selectedTitleIndex == index ? 16 : 14,
+                            fontWeight: selectedTitleIndex == index
+                                ? FontWeight.bold
+                                : null,
+                            color: selectedTitleIndex == index
+                                ? Colors.white
+                                : Colors.black,
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 ),
               ),
-            );
-          }),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -445,10 +469,31 @@ class _DashboardPageState extends State<DashboardPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Icon(Icons.business_center, size: 25),
+                        SizedBox(
+                          height: 25,
+                          width: 25,
+                          child: CachedNetworkImage(
+                            useOldImageOnUrlChange: true,
+                            imageUrl:
+                                "${MMTApplication.serverUrl}/web/image?model=dashboard.setting&id=${process.id}&field=icon&unique=${List.generate(14, (_) => Random().nextInt(10).toString()).join()}",
+                            httpHeaders: {
+                              "Cookie":
+                                  "session_id=${MMTApplication.session?.sessionId}"
+                            },
+                            placeholder: (context, url) => SizedBox(
+                              height: 10,
+                              width: 10,
+                              child: CircularProgressIndicator(
+                                color: AppColors.primaryColor,
+                              ),
+                            ),
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.error),
+                          ),
+                        )
                       ],
                     ),
                     const SizedBox(width: 8),
@@ -542,40 +587,4 @@ class _DashboardPageState extends State<DashboardPage> {
       }
     });
   }
-
-// Widget buildQuickActions() {
-//   int itemCount = 1; // Update with the number of items you want in the row
-//   double containerWidth = MediaQuery.of(context).size.width / itemCount - 20; // Adjusts width based on screen size
-//
-//   return Row(
-//     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//     children: [
-//       buildQuickAction("Delivery Sync", Icons.sync, width: containerWidth),
-//     ],
-//   );
-// }
-//
-//
-// Widget buildQuickAction(String title, IconData icon, {double? width}) {
-//   return Container(
-//     decoration: BoxDecoration(
-//         color: Colors.blueAccent,
-//         borderRadius: BorderRadius.circular(5)),
-//     height: 70,
-//     width: width,
-//     child: Column(
-//       mainAxisAlignment: MainAxisAlignment.center,
-//       children: [
-//         Text(
-//           title,
-//           style: const TextStyle(color: Colors.white),
-//         ),
-//         Icon(
-//           icon,
-//           color: Colors.white,
-//         ),
-//       ],
-//     ),
-//   );
-// }
 }

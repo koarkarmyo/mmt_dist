@@ -5,6 +5,7 @@ import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/fetch_database/fetch_database_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/login/login_bloc.dart';
 import 'package:mmt_mobile/business%20logic/bloc/product/product_cubit.dart';
+import 'package:mmt_mobile/business%20logic/bloc/product_category/product_category_cubit.dart';
 import 'package:mmt_mobile/common_widget/alert_dialog.dart';
 import 'package:mmt_mobile/common_widget/constant_widgets.dart';
 import 'package:mmt_mobile/model/delivery/delivery_item.dart';
@@ -41,6 +42,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
     // TODO: implement initState
     super.initState();
     _productCubit = context.read<ProductCubit>()..getAllProduct();
+    context.read<ProductCategoryCubit>().getProductCategory();
 
     _cartCubit = context.read<CartCubit>();
   }
@@ -143,40 +145,50 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
   }
 
   Widget _filterWidget() {
-    return PopupMenuButton<String>(
-      elevation: 0.5,
-      color: Colors.white,
-      onSelected: (String value) {
-        // Handle the selected value
-        _filterProductCategory = value;
-        _productCubit.searchProduct(categoryName: value);
-      },
-      itemBuilder: (BuildContext context) => _productList
-          .fold<Set<String>>({}, (set, e) => set..add(e.categName ?? ''))
-          .map((item) => PopupMenuItem(value: item, child: Text(item ?? '')))
-          .toList(),
-      icon: Container(
-        padding: 8.allPadding,
-        decoration: BoxDecoration(
-          borderRadius: 8.borderRadius,
-          color: AppColors.primaryColor,
-        ),
-        child: const Row(
-          children: [
-            Text(
-              "Product Type",
-              style: TextStyle(fontSize: 12, color: Colors.white),
+    return BlocBuilder<ProductCategoryCubit, ProductCategoryState>(
+      builder: (context, state) {
+        return PopupMenuButton<String>(
+          elevation: 0.5,
+          color: Colors.white,
+          onSelected: (String value) {
+            // Handle the selected value
+            _filterProductCategory = value;
+            _productCubit.searchProduct(categoryName: value);
+          },
+          // itemBuilder: (BuildContext context) => _productList
+          //     .fold<Set<String>>({}, (set, e) => set..add(e.categName ?? ''))
+          //     .map((item) => PopupMenuItem(value: item, child: Text(item ?? '')))
+          //     .toList(),
+          itemBuilder: (BuildContext context) => state.productCategoryList
+              .map(
+                (item) => PopupMenuItem(
+                    value: item.name, child: Text(item.name ?? '')),
+              )
+              .toList(),
+          icon: Container(
+            padding: 8.allPadding,
+            decoration: BoxDecoration(
+              borderRadius: 8.borderRadius,
+              color: AppColors.primaryColor,
             ),
-            Icon(
-              Icons.filter_list_alt,
-              color: Colors.white,
-              size: 16,
+            child: const Row(
+              children: [
+                Text(
+                  "Product Type",
+                  style: TextStyle(fontSize: 12, color: Colors.white),
+                ),
+                Icon(
+                  Icons.filter_list_alt,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
 
-      // This is the IconButton
+          // This is the IconButton
+        );
+      },
     );
   }
 
@@ -217,15 +229,17 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
           ),
 
           title: Text(product.name ?? '').boldSize(16),
-          subtitle: Text(
-              (product.priceListItems
-                  ?.toList() // Convert to a list if it's not already
-                ?..sort((a, b) => (a.fixedPrice ?? 0).compareTo(b.productUom ?? 0)) // Sort by productUom
-              )
-                  ?.map((e) => '${e.productUomName} ${e.fixedPrice}') // Map to formatted strings
-                  .join(', ') // Join the list into a single string
-                  ?? '' // Provide an empty string if null
-          ),
+          subtitle: Text((product.priceListItems
+                          ?.toList() // Convert to a list if it's not already
+                        ?..sort((a, b) => (a.fixedPrice ?? 0)
+                            .compareTo(b.productUom ?? 0)) // Sort by productUom
+                      )
+                      ?.map((e) =>
+                          '${e.productUomName} ${e.fixedPrice}') // Map to formatted strings
+                      .join(', ') // Join the list into a single string
+                  ??
+                  '' // Provide an empty string if null
+              ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             // Minimize column height

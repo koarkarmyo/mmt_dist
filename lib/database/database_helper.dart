@@ -300,24 +300,24 @@ class DatabaseHelper {
   }
 
   _createDashboardTable(Database db) async {
-    return await db.execute('CREATE TABLE ${DBConstant.dashboardTable} '
-        '(${DBConstant.id} INTEGER,'
+    return await db.execute('CREATE TABLE ${DBConstant.dashboardTable} ('
+        '${DBConstant.id} INTEGER PRIMARY KEY,'
+        '${DBConstant.dashboardGroupId} INTEGER,'
+        '${DBConstant.dashboardGroupName} TEXT,'
         '${DBConstant.dashboardId} INTEGER,'
-        '${DBConstant.icon} TEXT,'
+        '${DBConstant.dashboardName} TEXT,'
         '${DBConstant.isFolder} INTEGER,'
+        '${DBConstant.companyId} INTEGER,'
+        '${DBConstant.companyName} TEXT,'
+        '${DBConstant.solutionId} TEXT,'
         '${DBConstant.actionUrl} TEXT,'
         '${DBConstant.parentId} INTEGER,'
+        '${DBConstant.parentDescription} TEXT,'
         '${DBConstant.priority} INTEGER,'
-        '${DBConstant.solutionId} TEXT,'
-        '${DBConstant.parentUrl} TEXT,'
-        '${DBConstant.dashboardName} TEXT,'
-        '${DBConstant.writeDate} TEXT,'
-        '${DBConstant.staffRoleId} INTEGER,'
         '${DBConstant.description} TEXT,'
-        '${DBConstant.staffRoleName} TEXT,'
-        '${DBConstant.dashboardTableGroupId} INTEGER,'
-        '${DBConstant.dashboardTableGroupName} TEXT'
+        '${DBConstant.writeDate} TEXT'
         ')');
+
   }
 
   _createCompanyTable(Database db) async {
@@ -351,8 +351,8 @@ class DatabaseHelper {
         '${DBConstant.staffRoleId} INTEGER,'
         '${DBConstant.description} TEXT,'
         '${DBConstant.staffRoleName} TEXT,'
-        '${DBConstant.dashboardTableGroupId} INTEGER,'
-        '${DBConstant.dashboardTableGroupName} TEXT'
+        '${DBConstant.dashboardGroupId} INTEGER,'
+        '${DBConstant.dashboardGroupName} TEXT'
         ')');
   }
 
@@ -436,6 +436,7 @@ class DatabaseHelper {
         '${DBConstant.looseUomName} TEXT,'
         '${DBConstant.boxUomId} INTEGER,'
         '${DBConstant.boxUomName} TEXT,'
+        '${DBConstant.trackingType} TEXT,'
         '${DBConstant.writeDate} TEXT'
         ')');
   }

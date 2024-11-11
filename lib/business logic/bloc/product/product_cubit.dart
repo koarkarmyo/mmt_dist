@@ -32,7 +32,7 @@ class ProductCubit extends Cubit<ProductState> {
           productList[index].priceListItems = priceListItems
               .where(
                 (e) {
-                  print("product temp : ${e.productTmplId}");
+                  // print("product temp : ${e.productTmplId}");
                   return e.productTmplId == product.id;}
               )
               .toList();

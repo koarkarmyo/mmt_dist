@@ -1,5 +1,7 @@
 import 'package:mmt_mobile/model/product/uom_lines.dart';
 
+import '../src/enum.dart';
+
 class ProductTemplate {
   int? id;
   String? name;
@@ -27,6 +29,7 @@ class ProductTemplate {
   String? boxUomName;
   List<UomLine>? uomLines;
   String? writeDate;
+  TrackingType? trackingType;
 
   ProductTemplate(
       {this.id,
@@ -54,6 +57,7 @@ class ProductTemplate {
       this.boxUomId,
       this.boxUomName,
       this.uomLines,
+      this.trackingType,
       this.writeDate});
 
   ProductTemplate.fromJson(Map<String, dynamic> json) {
@@ -88,6 +92,14 @@ class ProductTemplate {
       });
     }
     writeDate = json['write_date'];
+    TrackingType.values.forEach(
+      (element) {
+        if (element.name == json['tracking']) {
+          print("tracking type : ${element.name}");
+          trackingType = element;
+        }
+      },
+    );
   }
 
   Map<String, dynamic> toJson() {
@@ -120,6 +132,7 @@ class ProductTemplate {
       data['uom_lines'] = this.uomLines!.map((v) => v.toJson()).toList();
     }
     data['write_date'] = this.writeDate;
+    data['tracking'] = trackingType?.name;
     return data;
   }
 
@@ -138,7 +151,7 @@ class ProductTemplate {
     data['purchase_ok'] = this.purchaseOk ?? false ? 1 : 0;
     data['can_be_expensed'] = this.canBeExpensed ?? false ? 1 : 0;
     data['barcode'] = this.barcode;
-    data['active'] = this.active  ?? false ? 1 : 0;
+    data['active'] = this.active ?? false ? 1 : 0;
     data['uom_category_id'] = this.uomCategoryId;
     data['uom_category_name'] = this.uomCategoryName;
     data['uom_id'] = this.uomId;
@@ -150,6 +163,48 @@ class ProductTemplate {
     data['box_uom_id'] = this.boxUomId;
     data['box_uom_name'] = this.boxUomName;
     data['write_date'] = this.writeDate;
+    data['tracking'] = trackingType?.name;
     return data;
+  }
+
+  ProductTemplate.fromJsonDB({required Map<String, dynamic> json}) {
+    id = json['id'];
+    name = json['name'];
+    categId = json['categ_id'];
+    categName = json['categ_name'];
+    companyId = json['company_id'];
+    companyName = json['company_name'];
+    listPrice = json['list_price'];
+    defaultCode = json['default_code'];
+    detailedType = json['detailed_type'];
+    saleOk = json['sale_ok'];
+    purchaseOk = json['purchase_ok'];
+    canBeExpensed = json['can_be_expensed'];
+    barcode = json['barcode'];
+    active = json['active'];
+    uomCategoryId = json['uom_category_id'];
+    uomCategoryName = json['uom_category_name'];
+    uomId = json['uom_id'];
+    uomName = json['uom_name'];
+    uomPoId = json['uom_po_id'];
+    uomPoName = json['uom_po_name'];
+    looseUomId = json['loose_uom_id'];
+    looseUomName = json['loose_uom_name'];
+    boxUomId = json['box_uom_id'];
+    boxUomName = json['box_uom_name'];
+    if (json['uom_lines'] != null) {
+      uomLines = <UomLine>[];
+      json['uom_lines'].forEach((v) {
+        uomLines!.add(UomLine.fromJson(v));
+      });
+    }
+    writeDate = json['write_date'];
+    TrackingType.values.forEach(
+      (element) {
+        if (element.name == json['tracking']) {
+          trackingType = element;
+        }
+      },
+    );
   }
 }

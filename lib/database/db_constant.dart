@@ -23,8 +23,9 @@ class DBConstant {
   static const String warehouseTable = 'warehouses';
   static const String dashboardTable = 'dashboards';
   static const String customerDashboardTable = 'customer_dashboards';
-  static const String dashboardTableGroupName = 'dashboard_group_name';
-  static const String dashboardTableGroupId = 'dashboard_group_id';
+  static const String dashboardGroupName = 'dashboard_group_name';
+  static const String dashboardGroupId = 'dashboard_group_id';
+  static const String parentDescription = 'parent_description';
   static const String categoryTable = 'product_category';
   static const String childCategoryTable = 'child_categories';
   static const String syncActionTable = 'mscm_sync_actions';
@@ -100,6 +101,8 @@ class DBConstant {
   static const String partnerSaleType = "partner_sale_type";
   static const String productUomMinQty = 'product_uom_min_qty';
   static const String discountPercent = 'discount_percent';
+  static const String trackingType = 'tracking';
+
 
   static const String customerRank = 'customer_rank';
   static const String supplierRank = 'supplier_rank';

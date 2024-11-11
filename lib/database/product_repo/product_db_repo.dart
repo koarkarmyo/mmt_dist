@@ -31,19 +31,23 @@ class ProductDBRepo extends BaseDBRepo {
             orderBy: DBConstant.name,
             where: '${DBConstant.detialType} =? ',
             whereArgs: [ProductDetailTypes.product.name]);
-    List<Map<String, dynamic>> productUomList =
-        await helper.readAllData(tableName: DBConstant.productUomTable);
+    // List<Map<String, dynamic>> productUomList =
+    //     await helper.readAllData(tableName: DBConstant.productUomTable);
+    List<Map<String, dynamic>> uomMapList =
+        await helper.readAllData(tableName: DBConstant.uomUomTable);
+
+    List<UomLine> uomList = [];
+
+    uomMapList.forEach(
+      (element) => uomList.add(UomLine.fromJson(element)),
+    );
 
     for (Map<String, dynamic> element in productJsonList) {
       Product product = Product.fromJsonDB(element);
       product.uomLines = [];
-      productUomList.forEach(
-        (uomLine) {
-          if (uomLine[DBConstant.productId] == product.id) {
-            product.uomLines?.add(UomLine.fromJsonDB(uomLine));
-          }
-        },
-      );
+      product.uomLines?.addAll(uomList.where(
+        (element) => element.uomCategoryId == product.uomCategoryId,
+      ));
       products.add(product);
     }
 
@@ -64,7 +68,8 @@ class ProductDBRepo extends BaseDBRepo {
           where: '${DBConstant.categId}=?',
           whereArgs: [categoryId]);
     } else {
-      jsonList = await helper.readAllData(tableName: DBConstant.productProductTable);
+      jsonList =
+          await helper.readAllData(tableName: DBConstant.productProductTable);
     }
 
     for (final json in jsonList) {

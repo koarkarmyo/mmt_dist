@@ -615,12 +615,12 @@ class SyncUtils {
     }
 
     // delete process
-    await DatabaseHelper.instance
-        .deleteAllRow(tableName: DBConstant.dashboardTable);
-    // await _helper.deleteRows(
-    //     tableName: DBConstant.dashboardTable,
-    //     where: DBConstant.id,
-    //     wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+    // await DatabaseHelper.instance
+    //     .deleteAllRow(tableName: DBConstant.dashboardTable);
+    await DatabaseHelper.instance.deleteRows(
+        tableName: DBConstant.dashboardTable,
+        where: DBConstant.id,
+        wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
 
     // change to json to insert database
     List<Map<String, dynamic>>? dataList =

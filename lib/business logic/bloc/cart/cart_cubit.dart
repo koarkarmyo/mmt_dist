@@ -143,7 +143,7 @@ class CartCubit extends Cubit<CartState> {
           )
           .firstOrNull;
 
-      orderLine.singlePKPrice = price?.fixedPrice ?? 10;
+      orderLine.singlePKPrice = price?.fixedPrice ?? 0;
       // orderLine.subTotal =
       //     (orderLine.pkQty ?? 0) * (orderLine.singlePKPrice ?? 0);
     } else if (looseBoxType == LooseBoxType.pc) {
@@ -155,14 +155,14 @@ class CartCubit extends Cubit<CartState> {
 
       print("Single PC Price : ${orderLine.singlePCPrice}");
 
-      orderLine.singlePCPrice = price?.fixedPrice ?? 5;
+      orderLine.singlePCPrice = price?.fixedPrice ?? 0;
     } else {
       PriceListItem? price = _priceListItems
           .where(
-            (element) => element.productUom == orderLine.pcUomLine?.uomId  && element.productId == orderLine.productId,
+            (element) => element.productUom == orderLine.uomLine?.uomId  && element.productId == orderLine.productId,
           )
           .firstOrNull;
-      orderLine.singleItemPrice = price?.fixedPrice ?? 5;
+      orderLine.singleItemPrice = price?.fixedPrice ?? 0;
       // orderLine.subTotal =
       //     (orderLine.productUomQty ?? 0) * (orderLine.singleItemPrice ?? 0);
     }

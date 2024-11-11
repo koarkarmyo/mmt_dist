@@ -239,8 +239,8 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
             }
           },
           title: Text(product.name ?? ''),
-          subtitle: Text(
-              "Available Qty: ${((product.refQty ?? 0).toString())} ${product.uomName}"),
+          subtitle:
+              Text("Available Qty: ${((0).toString())} ${product.uomName}"),
           trailing: (index >= 0)
               ? Icon(
                   Icons.check_circle,
