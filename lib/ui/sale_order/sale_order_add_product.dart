@@ -16,8 +16,10 @@ import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/src/mmt_application.dart';
 
+import '../../common_widget/text_widget.dart';
 import '../../model/product/product.dart';
 import '../../model/sale_order/sale_order_line.dart';
+import '../../src/const_string.dart';
 import '../../src/style/app_color.dart';
 
 class SaleOrderAddProductPage extends StatefulWidget {
@@ -55,24 +57,27 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        // appBar: AppBar(
-        //   title: const Text(
-        //     "Customer Name",
-        //     style: TextStyle(fontSize: 16),
-        //   ),
-        // ),
         appBar: AppBar(
-          // leading: IconButton(
-          //   icon: const Icon(Icons.arrow_back),
-          //   onPressed: () {
-          //     Navigator.of(context).pop(); // Pops back to the previous screen.
-          //   },
-          // ),
-          title: Text(
+          title: const Text(
             "Customer Name",
             style: TextStyle(fontSize: 16),
           ),
         ),
+        persistentFooterButtons: [
+          BlocBuilder<ProductCubit, ProductState>(
+            builder: (context, state) {
+              return TextWidget(
+                '',
+                dataList: [
+                  ConstString.total,
+                  ':',
+                  state.productList.length.toString()
+                ],
+                style: const TextStyle(fontSize: 16),
+              );
+            },
+          )
+        ],
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mmt_mobile/business%20logic/bloc/batch/batch_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/dashboard/dashboard_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/fetch_database/fetch_database_cubit.dart';
@@ -13,6 +14,8 @@ import 'package:mmt_mobile/ui/account_payment_page.dart';
 import 'package:mmt_mobile/ui/customer_dashboard_page.dart';
 import 'package:mmt_mobile/ui/customer_visit_report_page.dart';
 import 'package:mmt_mobile/ui/dashboard_page.dart';
+import 'package:mmt_mobile/ui/loading/stock_loading_add_page.dart';
+import 'package:mmt_mobile/ui/loading/stock_loading_history.dart';
 import 'package:mmt_mobile/ui/login/admin_login.dart';
 import 'package:mmt_mobile/ui/login/login_page.dart';
 import 'package:mmt_mobile/ui/sale_order/sale_order_add_extra.dart';
@@ -119,6 +122,15 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
       return _buildPageRoute(routeSettings, const AccountPaymentPage());
     case RouteList.saleOrderAddExtraPage:
       return _buildPageRoute(routeSettings, const SaleOrderAddExtra());
+    case RouteList.stockLoadingAddPage:
+      return _buildPageRoute(
+          routeSettings,
+          MultiBlocProvider(
+            providers: [BlocProvider(create: (context) => BatchCubit())],
+            child: const StockLoadingAddPage(),
+          ));
+    case RouteList.stockLoadingHistory:
+      return _buildPageRoute(routeSettings, const StockLoadingHistory());
     default:
       return _buildPageRoute(routeSettings, const NotFoundPage());
   }

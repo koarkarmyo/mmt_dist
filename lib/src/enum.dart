@@ -18,6 +18,16 @@ extension SyncExtension on UploadBeforeSync {
   }
 }
 
+enum LocationTypes {
+  supplier,
+  view,
+  internal,
+  customer,
+  inventory,
+  production,
+  transit
+}
+
 enum LooseBoxType { pk, pc }
 
 enum TrackingType { serial, lot, none }

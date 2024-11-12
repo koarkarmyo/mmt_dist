@@ -10,19 +10,19 @@ class TextWidget extends StatefulWidget {
   final TextOverflow? overflow;
   final int? maxLines;
   final Color? selectionColor;
+  final List<String?>? dataList;
 
   // Please feel free to add the parameters of the text to the widget.
   // I was too lazy to write that day. Sorry :3
 
-  const TextWidget(
-    this.data, {
-    super.key,
-    this.style,
-    this.textAlign,
-    this.overflow,
-    this.maxLines,
-    this.selectionColor,
-  });
+  const TextWidget(this.data,
+      {super.key,
+      this.style,
+      this.textAlign,
+      this.overflow,
+      this.maxLines,
+      this.selectionColor,
+      this.dataList});
 
   @override
   State<TextWidget> createState() => _TextWidgetState();
@@ -35,7 +35,9 @@ class _TextWidgetState extends State<TextWidget> {
       valueListenable: MMTApplication.languageNotifier,
       builder: (context, value, child) {
         return Text(
-          widget.data.preferredLanguage(),
+          (widget.dataList ?? []).isNotEmpty
+              ? _listToString()
+              : widget.data.preferredLanguage(),
           style: widget.style,
           maxLines: widget.maxLines,
           overflow: widget.overflow,
@@ -44,6 +46,16 @@ class _TextWidgetState extends State<TextWidget> {
         );
       },
     );
+  }
+
+  String _listToString() {
+    String text = '';
+    widget.dataList?.forEach(
+      (element) {
+        text = "$text ${(element?.preferredLanguage() ?? '')}";
+      },
+    );
+    return text;
   }
 }
 

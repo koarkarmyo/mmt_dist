@@ -45,7 +45,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   void _onScroll() {
     double offset = _scrollController.offset;
-    int newIndex = (offset / 100).round();
+    int newIndex = (offset / 180).round();
 
     if (newIndex != selectedTitleIndexNotifier.value &&
         newIndex < _dashboardList.length) {
@@ -244,17 +244,34 @@ class _DashboardPageState extends State<DashboardPage> {
               ],
             )).expanded();
           }
+          if (state.dashboardList.isEmpty) {
+            return Container();
+          }
           return ValueListenableBuilder<int>(
             valueListenable: selectedTitleIndexNotifier,
             builder: (context, selectedTitleIndex, _) {
               _dashboardList = state.dashboardList;
-              List<DashboardGroup> groupList = _dashboardList
-                  .map(
-                    (e) => DashboardGroup(
-                        id: e.dashboardGroupId, name: e.dashboardGroupName),
-                  )
-                  .toSet()
-                  .toList();
+              List<DashboardGroup> groupList = [];
+
+              _dashboardList.forEach(
+                (element) {
+                  if (!groupList
+                      .map(
+                        (e) => e.id,
+                      )
+                      .toList()
+                      .contains(element.dashboardGroupId)) {
+                    groupList.add(DashboardGroup(
+                        id: element.dashboardGroupId,
+                        name: element.dashboardGroupName));
+                  }
+                },
+              );
+              DashboardGroup? dashboardGroup = (groupList.isEmpty)
+                  ? null
+                  : DashboardGroup(
+                      id: groupList[selectedTitleIndex].id,
+                      name: groupList[selectedTitleIndex].name);
 
               return Expanded(
                 child: Column(
@@ -283,17 +300,19 @@ class _DashboardPageState extends State<DashboardPage> {
                                 Row(
                                   // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      groupList[selectedTitleIndex].name ?? '',
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600),
-                                    ),
+                                    (groupList.isNotEmpty)
+                                        ? Text(
+                                            dashboardGroup?.name ?? '',
+                                            style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600),
+                                          )
+                                        : Container(),
                                     Text(
                                       " ( Count : ${_dashboardList.where(
                                             (element) =>
                                                 element.dashboardGroupName ==
-                                                groupList[selectedTitleIndex],
+                                                dashboardGroup?.name,
                                           ).toList().length} ) ",
                                       style: const TextStyle(
                                         fontSize: 14,
@@ -309,7 +328,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                     .where(
                                       (element) =>
                                           element.dashboardGroupId ==
-                                          groupList[selectedTitleIndex].id,
+                                          dashboardGroup?.id,
                                     )
                                     .toList())
                               ],
@@ -335,6 +354,9 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget buildTitleList(
       {required List<DashboardGroup> dashboardGroupList,
       required int selectedTitleIndex}) {
+    if (dashboardGroupList.isEmpty) {
+      return Container();
+    }
     return SizedBox(
       height: 100,
       child: ListView.builder(
@@ -483,13 +505,13 @@ class _DashboardPageState extends State<DashboardPage> {
                               "Cookie":
                                   "session_id=${MMTApplication.session?.sessionId}"
                             },
-                            placeholder: (context, url) => SizedBox(
-                              height: 10,
-                              width: 10,
-                              child: CircularProgressIndicator(
-                                color: AppColors.primaryColor,
-                              ),
-                            ),
+                            // placeholder: (context, url) => SizedBox(
+                            //   height: 10,
+                            //   width: 10,
+                            //   child: CircularProgressIndicator(
+                            //     color: AppColors.primaryColor,
+                            //   ),
+                            // ),
                             errorWidget: (context, url, error) =>
                                 const Icon(Icons.error),
                           ),

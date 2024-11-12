@@ -17,4 +17,6 @@ class RouteList {
   static const String accountPayment = '/account_payment';
   static const String saleOrderAddExtraPage = "/sale_order_add_extra";
   static const String scannerPage = "/scanner_page";
+  static const String stockLoadingAddPage = '/stock_loading_add';
+  static const String stockLoadingHistory = '/stock_loading_history';
 }

@@ -12,6 +12,7 @@ class ConstString {
   static const String pkgNo = "ပစ္စည်းထုတ်အရေအတွက်";
   static const String barcode = "Barcode";
   static const String retry = "ထပ်မံကြိုးစားပါ";
+  static const String fail = 'Fail';
   static const String marker = "Marker အမည်";
   static const String noItem = "မရှိပါ";
   static const String unfinishedToken = 'Ongoing Token';
@@ -38,6 +39,8 @@ class ConstString {
   static const String pickUpAddress = "ကုန်သွားယူမည့် လိပ်စာ";
   static const String deliveryAddress = "ပို့ရမည့် လိပ်စာ";
   static const String confirm = "အတည်ပြုမည်";
+  static const String loading = "Loading";
+  static const String stockLoadingHistory = "Stock Loading History";
   static const String customerNameOrPhoneNo =
       "ဖောက်သည်နာမည် သို့မဟုတ် ဖုန်းနံပါတ်";
   static const String phone = "ဖုန်းနံပါတ်";
@@ -52,7 +55,7 @@ class ConstString {
   static const String cbm = "cbm";
   static const String confirmText = "ပြုလုပ်မည်ဆိုလား သေချာပြီလား";
   static const String refute = "မလုပ်ပါ";
-  static const String total = "စုစုပေါင်း";
+  static const String total = "Total";
   static const String individualAmount = "တစ်ခုချင်း အလေးချိန်/ထုထည်";
   static const String productQuantity = "ပစ္စည်းအရေအတွက်";
   static const String deliver = "ပေးပို့မည်";
