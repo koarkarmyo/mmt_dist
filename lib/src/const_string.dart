@@ -6,6 +6,7 @@ class ConstString {
   static const String saleOrderMM = 'အ‌ရောင်းအော်ဒါများ';
   static const String voucherNo = 'အော်ဒါနံပါတ်';
   static const String createSaleOrder = 'အ‌ရောင်းအော်ဒါတင်ခြင်း';
+  static const String coupon = 'Coupon';
   static const String name = "နာမည်";
   static const String urlRequired = 'ဆာဗာလင့်ထည့်‌ပေးပါ';
   static const String employeeName = "ဝန်ထမ်းနာမည်";
@@ -34,6 +35,10 @@ class ConstString {
   static const String pickUp = "Pick Up";
   static const String transfer = "Transfer";
   static const String delivery = "Delivery";
+  static const String deliveryReturn = "Delivery Return";
+  static const String focItem = 'FOC Item';
+  static const String deliveryItem = 'Delivery Item';
+  static const String deliverySummaryPage = "Delivery Summary Page";
   static const String customerName = "ဖောက်သည်နာမည်";
   static const String shopAddress = "စျေးဆိုင်လိပ်စာ";
   static const String pickUpAddress = "ကုန်သွားယူမည့် လိပ်စာ";
@@ -56,6 +61,8 @@ class ConstString {
   static const String confirmText = "ပြုလုပ်မည်ဆိုလား သေချာပြီလား";
   static const String refute = "မလုပ်ပါ";
   static const String total = "Total";
+  static const String subtotal = 'SubTotal';
+  static const String discountTotal = 'Discount Total';
   static const String individualAmount = "တစ်ခုချင်း အလေးချိန်/ထုထည်";
   static const String productQuantity = "ပစ္စည်းအရေအတွက်";
   static const String deliver = "ပေးပို့မည်";
@@ -86,5 +93,6 @@ class ConstString {
 
   static const String custVisitReport = "Customer Visit Report";
   static const String saleOrder = "Sale Order";
+  static const String saleOrderNo = 'Sale Order Number';
   static const String customerDashboard = "Customer Dashboard";
 }

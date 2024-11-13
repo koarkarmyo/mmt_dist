@@ -1,7 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
-import 'package:mmt_mobile/business%20logic/bloc/customer/customer_bloc.dart';
 import 'package:mmt_mobile/database/db_repo/price_list_db_repo.dart';
 import 'package:mmt_mobile/database/product_repo/product_db_repo.dart';
 import 'package:mmt_mobile/model/price_list/price_list_item.dart';

@@ -1,32 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
-import 'package:mmt_mobile/business%20logic/bloc/product/product_cubit.dart';
-import 'package:mmt_mobile/common_widget/alert_dialog.dart';
-import 'package:mmt_mobile/src/enum.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
-import 'package:collection/collection.dart';
 
-import '../../model/delivery/delivery_item.dart';
+import '../../business logic/bloc/cart/cart_cubit.dart';
+import '../../business logic/bloc/product/product_cubit.dart';
+import '../../common_widget/text_widget.dart';
 import '../../model/product/product.dart';
 import '../../model/product/uom_lines.dart';
 import '../../model/sale_order/sale_order_line.dart';
 import '../../route/route_list.dart';
+import '../../src/const_string.dart';
+import '../../src/enum.dart';
 import '../../src/mmt_application.dart';
 import '../../src/style/app_color.dart';
 
-class FocItemPage extends StatefulWidget {
-  const FocItemPage({super.key});
+class DeliveryFocItemPage extends StatefulWidget {
+  const DeliveryFocItemPage({super.key});
 
   @override
-  State<FocItemPage> createState() => _FocItemPageState();
+  State<DeliveryFocItemPage> createState() => _DeliveryFocItemPageState();
 }
 
-class _FocItemPageState extends State<FocItemPage> {
-  late CartCubit _cartCubit;
+class _DeliveryFocItemPageState extends State<DeliveryFocItemPage> {
+  // late CartCubit _cartCubit;
   late ProductCubit _productCubit;
   List<SaleOrderLine> focList = [];
 
@@ -34,7 +33,7 @@ class _FocItemPageState extends State<FocItemPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _cartCubit = context.read<CartCubit>();
+    // _cartCubit = context.read<CartCubit>();
     _productCubit = context.read<ProductCubit>();
   }
 
@@ -44,13 +43,13 @@ class _FocItemPageState extends State<FocItemPage> {
       appBar: AppBar(
         title: Text("FOC Items"),
         actions: [
-          IconButton(
-              onPressed: () {
-                context.pushTo(
-                    route: RouteList.saleOrderAddExtraPage,
-                    args: {'extra_type': 'foc'});
-              },
-              icon: const Icon(Icons.add))
+          // IconButton(
+          //     onPressed: () {
+          //       context.pushTo(
+          //           route: RouteList.saleOrderAddExtraPage,
+          //           args: {'extra_type': 'foc'});
+          //     },
+          //     icon: const Icon(Icons.add))
         ],
       ),
       body: Column(
@@ -115,7 +114,7 @@ class _FocItemPageState extends State<FocItemPage> {
                 SlidableAction(
                     backgroundColor: AppColors.dangerColor,
                     onPressed: (context) {
-                      _cartCubit.removeFocItem(productId: product.id ?? 0);
+                      // _cartCubit.removeFocItem(productId: product.id ?? 0);
                     },
                     label: "Delete",
                     icon: Icons.delete)
@@ -141,6 +140,7 @@ class _FocItemPageState extends State<FocItemPage> {
                           SizedBox(
                             width: 80, // Set a fixed width for the TextField
                             child: TextField(
+                              enabled: false,
                               keyboardType: TextInputType.number,
                               onTap: () {
                                 _pkController.selection = TextSelection(
@@ -154,19 +154,19 @@ class _FocItemPageState extends State<FocItemPage> {
                               autofocus: false,
                               controller: _pkController,
                               onChanged: (value) {
-                                _cartCubit.addCartFocItem(
-                                    looseBoxType: LooseBoxType.pk,
-                                    focItem: deliveryItem.copyWith(
-                                      pcUomLine: UomLine(
-                                          uomId: product.looseUomId,
-                                          uomName: product.looseUomName),
-                                      pkUomLine: UomLine(
-                                          uomId: product.boxUomId,
-                                          uomName: product.boxUomName),
-                                      pkQty: (_pkController.text != '')
-                                          ? double.tryParse(_pkController.text)
-                                          : 0,
-                                    ));
+                                // _cartCubit.addCartFocItem(
+                                //     looseBoxType: LooseBoxType.pk,
+                                //     focItem: deliveryItem.copyWith(
+                                //       pcUomLine: UomLine(
+                                //           uomId: product.looseUomId,
+                                //           uomName: product.looseUomName),
+                                //       pkUomLine: UomLine(
+                                //           uomId: product.boxUomId,
+                                //           uomName: product.boxUomName),
+                                //       pkQty: (_pkController.text != '')
+                                //           ? double.tryParse(_pkController.text)
+                                //           : 0,
+                                //     ));
                               },
                               decoration: const InputDecoration(
                                   isDense: true,
@@ -182,6 +182,7 @@ class _FocItemPageState extends State<FocItemPage> {
                           SizedBox(
                             width: 80, // Set a fixed width for the TextField
                             child: TextField(
+                              enabled: false,
                               keyboardType: TextInputType.number,
                               onTap: () {
                                 _pcController.selection = TextSelection(
@@ -195,19 +196,19 @@ class _FocItemPageState extends State<FocItemPage> {
                               autofocus: false,
                               controller: _pcController,
                               onChanged: (value) {
-                                _cartCubit.addCartFocItem(
-                                    looseBoxType: LooseBoxType.pc,
-                                    focItem: deliveryItem.copyWith(
-                                      pkUomLine: UomLine(
-                                          uomId: product.boxUomId,
-                                          uomName: product.boxUomName),
-                                      pcUomLine: UomLine(
-                                          uomId: product.looseUomId,
-                                          uomName: product.looseUomName),
-                                      pcQty: (_pcController.text != '')
-                                          ? double.tryParse(_pcController.text)
-                                          : 0,
-                                    ));
+                                // _cartCubit.addCartFocItem(
+                                //     looseBoxType: LooseBoxType.pc,
+                                //     focItem: deliveryItem.copyWith(
+                                //       pkUomLine: UomLine(
+                                //           uomId: product.boxUomId,
+                                //           uomName: product.boxUomName),
+                                //       pcUomLine: UomLine(
+                                //           uomId: product.looseUomId,
+                                //           uomName: product.looseUomName),
+                                //       pcQty: (_pcController.text != '')
+                                //           ? double.tryParse(_pcController.text)
+                                //           : 0,
+                                //     ));
                               },
                               decoration: const InputDecoration(
                                   isDense: true,
@@ -224,6 +225,7 @@ class _FocItemPageState extends State<FocItemPage> {
                           SizedBox(
                             width: 80, // Set a fixed width for the TextField
                             child: TextField(
+                              enabled: false,
                               keyboardType: TextInputType.number,
                               onTap: () {
                                 _qtyController.selection = TextSelection(
@@ -237,16 +239,16 @@ class _FocItemPageState extends State<FocItemPage> {
                               autofocus: false,
                               controller: _qtyController,
                               onChanged: (value) {
-                                _cartCubit.addCartFocItem(
-                                    focItem: SaleOrderLine(
-                                        productId: product.id,
-                                        productName: product.name,
-                                        productUomQty:
-                                            (_qtyController.text != '')
-                                                ? double.tryParse(
-                                                    _qtyController.text)
-                                                : 0,
-                                        uomLine: product.uomLines?.first));
+                                // _cartCubit.addCartFocItem(
+                                //     focItem: SaleOrderLine(
+                                //         productId: product.id,
+                                //         productName: product.name,
+                                //         productUomQty:
+                                //         (_qtyController.text != '')
+                                //             ? double.tryParse(
+                                //             _qtyController.text)
+                                //             : 0,
+                                //         uomLine: product.uomLines?.first));
                               },
                               textAlign: TextAlign.right,
                               decoration: const InputDecoration(
@@ -267,7 +269,7 @@ class _FocItemPageState extends State<FocItemPage> {
                                 border: Border.all(),
                                 borderRadius: 4.borderRadius),
                             child: DropdownButton<UomLine>(
-                              value: deliveryItem?.uomLine ??
+                              value: deliveryItem.uomLine ??
                                   product.uomLines?.first,
                               items: product.uomLines
                                   ?.map((UomLine value) =>
@@ -278,16 +280,16 @@ class _FocItemPageState extends State<FocItemPage> {
                                   .toList(),
                               onChanged: (UomLine? newValue) {
                                 // Handle selection change
-                                _cartCubit.addCartFocItem(
-                                    focItem: SaleOrderLine(
-                                        productId: product.id,
-                                        productName: product.name,
-                                        productUomQty:
-                                            (_qtyController.text != '')
-                                                ? double.tryParse(
-                                                    _qtyController.text)
-                                                : 0,
-                                        uomLine: newValue));
+                                // _cartCubit.addCartFocItem(
+                                //     focItem: SaleOrderLine(
+                                //         productId: product.id,
+                                //         productName: product.name,
+                                //         productUomQty:
+                                //         (_qtyController.text != '')
+                                //             ? double.tryParse(
+                                //             _qtyController.text)
+                                //             : 0,
+                                //         uomLine: newValue));
                               },
                               hint: const Text('uom'),
                               isDense: true,

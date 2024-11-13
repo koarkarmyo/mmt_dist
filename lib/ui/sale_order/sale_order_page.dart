@@ -33,7 +33,7 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
       const SaleOrderAddProductPage(),
       const SaleOrderSaleItemPage(),
       const FocItemPage(),
-      const CouponItemPage(),
+      // const CouponItemPage(),
       const SaleSummaryPage()
     ];
   }
@@ -63,6 +63,7 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
           stateManagement: true,
           // Default is true.
           hideNavigationBarWhenKeyboardAppears: true,
+          handleAndroidBackButtonPress: false,
           // popBehaviorOnSelectedNavBarItemPress: PopActionScreensType.all,
           padding: const EdgeInsets.only(top: 8),
           backgroundColor: Colors.grey.shade900,
@@ -114,14 +115,14 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
           inactiveColorPrimary: CupertinoColors.systemGrey,
           routeAndNavigatorSettings:
               const RouteAndNavigatorSettings(onGenerateRoute: generateRoute)),
-      PersistentBottomNavBarItem(
-        icon: const Icon(CupertinoIcons.tag_circle),
-        title: ("Coupon"),
-        activeColorPrimary: CupertinoColors.activeBlue,
-        inactiveColorPrimary: CupertinoColors.systemGrey,
-          routeAndNavigatorSettings:
-          const RouteAndNavigatorSettings(onGenerateRoute: generateRoute)
-      ),
+      // PersistentBottomNavBarItem(
+      //   icon: const Icon(CupertinoIcons.tag_circle),
+      //   title: ("Coupon"),
+      //   activeColorPrimary: CupertinoColors.activeBlue,
+      //   inactiveColorPrimary: CupertinoColors.systemGrey,
+      //     routeAndNavigatorSettings:
+      //     const RouteAndNavigatorSettings(onGenerateRoute: generateRoute)
+      // ),
       PersistentBottomNavBarItem(
         icon: const Icon(CupertinoIcons.sum),
         title: ("Summary"),

@@ -15,13 +15,24 @@ class BatchCubit extends Cubit<BatchState> {
   fetchBatchByBarcode({required String barcode}) async {
     emit(state.copyWith(state: BlocCRUDProcessState.fetching));
     try {
-      List<StockMove> stockMoveList =
+      List<StockMoveLine> stockMoveList =
           await BatchApiRepo.instance.fetchBatchFromApi(name: barcode);
       emit(state.copyWith(
           state: BlocCRUDProcessState.fetchSuccess,
           stockMoveList: stockMoveList));
     } on Exception {
       emit(state.copyWith(state: BlocCRUDProcessState.fetchFail));
+    } on Error {
+      emit(state.copyWith(state: BlocCRUDProcessState.fetchFail));
+    }
+  }
+
+  uploadDoneQty({required List<StockMoveLine> stockMoveList}) {
+    emit(state.copyWith(state: BlocCRUDProcessState.updating));
+    try {
+      emit(state.copyWith(state: BlocCRUDProcessState.updateSuccess));
+    } on Exception {
+      emit(state.copyWith(state: BlocCRUDProcessState.updateFail));
     }
   }
 }

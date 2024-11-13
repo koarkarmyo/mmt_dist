@@ -19,4 +19,6 @@ class RouteList {
   static const String scannerPage = "/scanner_page";
   static const String stockLoadingAddPage = '/stock_loading_add';
   static const String stockLoadingHistory = '/stock_loading_history';
+  static const String deliveryPage = '/delivery_page';
+  static const String deliveryListPage = '/delivery_list_page';
 }

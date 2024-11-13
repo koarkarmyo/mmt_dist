@@ -1,27 +1,16 @@
-part of 'customer_bloc.dart';
+part of 'customer_cubit.dart';
 
-class CustomerState extends Equatable {
-  final List<Partner> customers;
-  final BlocCRUDProcessState state;
-  final Map<String, String> errors;
+class CustomerState {
+  List<ResPartner> customerList;
 
-  CustomerState(
-      {required this.customers, required this.state, required this.errors});
+  BlocCRUDProcessState state;
 
-  CustomerState copyWith({
-    BlocCRUDProcessState? state,
-    List<Partner>? customers,
-    String? currentRouteId,
-    String? currentRouteName,
-    Map<String, String>? errors,
-  }) {
+  CustomerState({required this.customerList, required this.state});
+
+  CustomerState copyWith(
+      {List<ResPartner>? customerList, BlocCRUDProcessState? state}) {
     return CustomerState(
-      state: state ?? this.state,
-      customers: customers ?? this.customers,
-      errors: errors ?? this.errors,
-    );
+        customerList: customerList ?? this.customerList,
+        state: state ?? this.state);
   }
-
-  @override
-  List<Object?> get props => [this.customers, this.state];
 }

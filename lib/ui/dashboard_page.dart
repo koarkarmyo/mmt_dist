@@ -125,6 +125,12 @@ class _DashboardPageState extends State<DashboardPage> {
           // IconButton(onPressed: () {
           //
           // }, icon: Icon(Icons.sync,size: 30,))
+          IconButton(
+              onPressed: () async {
+                String? barcode =
+                    await MMTApplication.scanBarcode(context: context);
+              },
+              icon: Icon(Icons.qr_code)),
           BlocBuilder<SyncActionCubit, SyncActionState>(
             builder: (context, state) {
               state.actionGroupList.forEach(

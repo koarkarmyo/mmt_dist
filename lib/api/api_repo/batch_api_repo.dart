@@ -9,13 +9,13 @@ class BatchApiRepo extends BaseApiRepo {
 
   BatchApiRepo._();
 
-  Future<List<StockMove>> fetchBatchFromApi({required String name}) async {
+  Future<List<StockMoveLine>> fetchBatchFromApi({required String name}) async {
     Response response = await postMethodCall(
-        additionalPath: '/api/sync/', bodyData: {"name": name});
+        additionalPath: '/batch/', bodyData: {"name": name});
 
-    BaseApiResponse<StockMove> baseApiResponse =
-        BaseApiResponse<StockMove>.fromJson(response.data,
-            fromJson: StockMove.fromJson);
+    BaseApiResponse<StockMoveLine> baseApiResponse =
+        BaseApiResponse<StockMoveLine>.fromJson(response.data,
+            fromJson: StockMoveLine.fromJson);
 
     return baseApiResponse.data ?? [];
   }
