@@ -27,14 +27,12 @@ class ProductCubit extends Cubit<ProductState> {
 
       productList.forEachIndexed(
         (index, product) {
-          print("product : ${product.id} | product_temp_id : ${priceListItems.length}");
-          productList[index].priceListItems = priceListItems
-              .where(
-                (e) {
-                  // print("product temp : ${e.productTmplId}");
-                  return e.productTmplId == product.id;}
-              )
-              .toList();
+          print(
+              "product : ${product.id} | product_temp_id : ${priceListItems.length}");
+          productList[index].priceListItems = priceListItems.where((e) {
+            // print("product temp : ${e.productTmplId}");
+            return e.productTmplId == product.id;
+          }).toList();
         },
       );
 
@@ -47,6 +45,19 @@ class ProductCubit extends Cubit<ProductState> {
           state: BlocCRUDProcessState.fetchSuccess,
           productList: productList,
           filterProductList: productList));
+    } on Exception {
+      emit(state.copyWith(state: BlocCRUDProcessState.fetchFail));
+    }
+  }
+
+  Future<void> getProductById({required int productId}) async {
+    emit(state.copyWith(state: BlocCRUDProcessState.fetching));
+    try {
+      Product? product =
+          await ProductDBRepo.instance.getProductById(productId: productId);
+      print("Product Cubit : ${product?.toJson()}");
+      emit(state.copyWith(
+          state: BlocCRUDProcessState.fetchSuccess, product: product));
     } on Exception {
       emit(state.copyWith(state: BlocCRUDProcessState.fetchFail));
     }

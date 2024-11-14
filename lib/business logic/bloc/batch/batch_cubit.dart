@@ -22,9 +22,10 @@ class BatchCubit extends Cubit<BatchState> {
           stockMoveList: stockMoveList));
     } on Exception {
       emit(state.copyWith(state: BlocCRUDProcessState.fetchFail));
-    } on Error {
-      emit(state.copyWith(state: BlocCRUDProcessState.fetchFail));
     }
+    // on Error {
+    //   emit(state.copyWith(state: BlocCRUDProcessState.fetchFail));
+    // }
   }
 
   uploadDoneQty({required List<StockMoveLine> stockMoveList}) {

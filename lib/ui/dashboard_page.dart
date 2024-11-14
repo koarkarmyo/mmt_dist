@@ -408,13 +408,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                   "Cookie":
                                       "session_id=${MMTApplication.session?.sessionId}"
                                 },
-                                // placeholder: (context, url) => SizedBox(
-                                //   height: 10,
-                                //   width: 10,
-                                //   child: CircularProgressIndicator(
-                                //     color: AppColors.primaryColor,
-                                //   ),
-                                // ),
+
                                 errorWidget: (context, url, error) =>
                                     const Icon(Icons.error),
                               );

@@ -7,8 +7,10 @@ class ConstString {
   static const String voucherNo = 'အော်ဒါနံပါတ်';
   static const String createSaleOrder = 'အ‌ရောင်းအော်ဒါတင်ခြင်း';
   static const String coupon = 'Coupon';
-  static const String name = "နာမည်";
+  static const String name = "Name";
   static const String urlRequired = 'ဆာဗာလင့်ထည့်‌ပေးပါ';
+  static const String lot = 'Lot';
+  static const String uom = 'Uom';
   static const String employeeName = "ဝန်ထမ်းနာမည်";
   static const String pkgNo = "ပစ္စည်းထုတ်အရေအတွက်";
   static const String barcode = "Barcode";
@@ -16,6 +18,8 @@ class ConstString {
   static const String fail = 'Fail';
   static const String marker = "Marker အမည်";
   static const String noItem = "မရှိပါ";
+  static const String date = "Date";
+  static const String qty = 'Qty';
   static const String unfinishedToken = 'Ongoing Token';
   static const String addNewToken = "Add New Token";
   static const String createNewToken = "Create New Token";
@@ -26,7 +30,7 @@ class ConstString {
   static const String search = "Search";
   static const String searchMM = "ရှာမည်";
   static const String create = "ဖန်တီးမည်";
-  static const String add = "ထည့်မည်";
+  static const String add = "add";
   static const String addNew = "အသစ်ထည့်မည်";
   static const String welcomeText = "ဟိန်းတေဇမိသားစုမှ ကြိုဆိုပါသည်";
   static const String pickUpMM = "ကုန်ကောက်";
@@ -65,6 +69,7 @@ class ConstString {
   static const String discountTotal = 'Discount Total';
   static const String individualAmount = "တစ်ခုချင်း အလေးချိန်/ထုထည်";
   static const String productQuantity = "ပစ္စည်းအရေအတွက်";
+  static const String products = "Products";
   static const String deliver = "ပေးပို့မည်";
   static const String isVehicle = "ကား";
   static const String qtyRequired = "အရေအတွက်ထည့်ပါ";
@@ -72,7 +77,7 @@ class ConstString {
   static const String needSignNotiString = "လက်မှတ်ထိုးပါ";
   static const String clear = "ရှင်းမည်";
   static const String cancel = "ပယ်ဖျတ်ရန်";
-  static const String save = "သိမ်းမည်";
+  static const String save = "Save";
   static const String locationCreate = "နေရာအသစ်ဖန်တီးခြင်း";
   static const String locationNotIdentical = "ရွေးထားသောပစ္စည်းများ နေရာမတူပါ";
   static const String product = "ပစ္စည်း";

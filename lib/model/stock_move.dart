@@ -1,3 +1,5 @@
+import 'lot.dart';
+
 class StockMoveLine {
   String? batchNo;
   String? scheduledDate;
@@ -14,9 +16,13 @@ class StockMoveLine {
   String? productName;
   int? productUomId;
   String? productUomName;
-  int? productQty;
+  double? productQty;
   double? productUomQty;
   double? qtyDone;
+  int? lotId;
+  String? lotName;
+  bool? isChecked;
+  List<Lot>? lotList;
 
   StockMoveLine(
       {this.batchNo,
@@ -36,7 +42,12 @@ class StockMoveLine {
       this.productUomName,
       this.productQty,
       this.productUomQty,
-      this.qtyDone});
+      this.qtyDone,
+      this.lotId,
+      this.lotName,
+      this.isChecked,
+        this.lotList
+      });
 
   StockMoveLine.fromJson(Map<String, dynamic> json) {
     batchNo = json['batch_no'];
@@ -57,6 +68,8 @@ class StockMoveLine {
     productQty = json['product_qty'];
     productUomQty = json['product_uom_qty'];
     qtyDone = json['qty_done'];
+    lotId = json['lot_id'];
+    lotName = json['lot_number'];
   }
 
   Map<String, dynamic> toJson() {
@@ -79,6 +92,8 @@ class StockMoveLine {
     data['product_qty'] = productQty;
     data['product_uom_qty'] = productUomQty;
     data['qty_done'] = qtyDone;
+    data['lot_id'] = lotId;
+    data['lot_number'] = lotName;
     return data;
   }
 }

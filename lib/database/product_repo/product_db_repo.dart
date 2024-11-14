@@ -22,6 +22,37 @@ class ProductDBRepo extends BaseDBRepo {
     return priceList;
   }
 
+  Future<Product?> getProductById({required int productId}) async {
+    List<Map<String, dynamic>> productJsonList = await helper
+        .readDataByWhereArgs(
+            tableName: DBConstant.productProductTable,
+            orderBy: DBConstant.name,
+            where: '${DBConstant.id} =? ',
+            whereArgs: [productId]);
+
+    Product? product;
+
+    for (Map<String, dynamic> jsonData in productJsonList) {
+      product = Product.fromJsonDB(jsonData);
+      print("Fetch Product : ${product.toJson()}");
+    }
+
+    if (product != null) {
+      List<Map<String, dynamic>> uomJsonList = await helper.readDataByWhereArgs(
+          tableName: DBConstant.uomUomTable,
+          where: '${DBConstant.uomCategoryId} =? ',
+          whereArgs: [product.uomCategoryId]);
+
+      product.uomLines = [];
+
+      for (Map<String, dynamic> json in uomJsonList) {
+        product.uomLines?.add(UomLine.fromJson(json));
+      }
+    }
+
+    return product;
+  }
+
   Future<List<Product>> getProductList() async {
     List<Product> products = [];
 
