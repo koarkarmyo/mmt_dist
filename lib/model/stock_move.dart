@@ -23,6 +23,8 @@ class StockMoveLine {
   String? lotName;
   bool? isChecked;
   List<Lot>? lotList;
+  bool? isLot;
+  List<StockMoveData>? data;
 
   StockMoveLine(
       {this.batchNo,
@@ -46,8 +48,8 @@ class StockMoveLine {
       this.lotId,
       this.lotName,
       this.isChecked,
-        this.lotList
-      });
+      this.lotList,
+      this.isLot});
 
   StockMoveLine.fromJson(Map<String, dynamic> json) {
     batchNo = json['batch_no'];
@@ -96,4 +98,64 @@ class StockMoveLine {
     data['lot_number'] = lotName;
     return data;
   }
+
+  StockMoveLine copyWith({
+    String? batchNo,
+    String? scheduledDate,
+    int? pickingId,
+    String? pickingName,
+    double? productsAvailability,
+    int? partnerId,
+    String? partnerName,
+    String? origin,
+    int? locationId,
+    int? moveId,
+    int? saleLineId,
+    int? productId,
+    String? productName,
+    int? productUomId,
+    String? productUomName,
+    double? productQty,
+    double? productUomQty,
+    double? qtyDone,
+    int? lotId,
+    String? lotName,
+    bool? isChecked,
+    List<Lot>? lotList,
+    bool? isLot,
+  }) {
+    return StockMoveLine(
+      batchNo: batchNo ?? this.batchNo,
+      scheduledDate: scheduledDate ?? this.scheduledDate,
+      pickingId: pickingId ?? this.pickingId,
+      pickingName: pickingName ?? this.pickingName,
+      productsAvailability: productsAvailability ?? this.productsAvailability,
+      partnerId: partnerId ?? this.partnerId,
+      partnerName: partnerName ?? this.partnerName,
+      origin: origin ?? this.origin,
+      locationId: locationId ?? this.locationId,
+      moveId: moveId ?? this.moveId,
+      saleLineId: saleLineId ?? this.saleLineId,
+      productId: productId ?? this.productId,
+      productName: productName ?? this.productName,
+      productUomId: productUomId ?? this.productUomId,
+      productUomName: productUomName ?? this.productUomName,
+      productQty: productQty ?? this.productQty,
+      productUomQty: productUomQty ?? this.productUomQty,
+      qtyDone: qtyDone ?? this.qtyDone,
+      lotId: lotId ?? this.lotId,
+      lotName: lotName ?? this.lotName,
+      isChecked: isChecked ?? this.isChecked,
+      lotList: lotList ?? this.lotList,
+      isLot: isLot ?? this.isLot,
+    );
+  }
+}
+
+class StockMoveData{
+  double? qty;
+  int? productUomId;
+  String? productUomName;
+
+  StockMoveData({this.qty, this.productUomId, this.productUomName});
 }

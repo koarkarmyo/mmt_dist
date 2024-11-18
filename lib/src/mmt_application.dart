@@ -75,6 +75,29 @@ class MMTApplication {
     return stringBuffer.toString();
   }
 
+  static List<Map<String, dynamic>> uomLongFormChanger(
+      {required double refTotal, required List<UomLine> uomList}) {
+    List<Map<String, dynamic>> qtyUomList = [];
+    uomList.sort(
+      (a, b) => (b.ratio ?? 0).compareTo(a.ratio ?? 0),
+    );
+    uomList.forEach(
+      (element) {
+        int qty = refTotal ~/ (element.ratio ?? 1);
+        refTotal = refTotal % (element.ratio ?? 1);
+
+        if (qty > 0) {
+          qtyUomList.add({
+            'qty': qty.toDouble(),
+            'product_uom_id': element.uomId,
+            'product_uom_name': element.uomName
+          });
+        }
+      },
+    );
+    return qtyUomList;
+  }
+
   static double uomQtyToRefTotal(UomLine uomLine, double quantity) {
     double totalQty = 0;
     if (uomLine.uomType == 'bigger') {

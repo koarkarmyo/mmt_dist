@@ -1,4 +1,3 @@
-
 import 'package:intl/intl.dart';
 
 class Session {
@@ -26,8 +25,10 @@ class Session {
       String expiresString = match.group(2)!;
       String maxAgeString = match.group(3)!;
 
-      DateFormat format = DateFormat("E, dd MMM yyyy HH:mm:ss 'GMT'");
-      DateTime expires = format.parse(expiresString);
+      DateFormat format =
+          DateFormat("EEE, dd-MMM-yyyy HH:mm:ss 'GMT'", "en_US");
+      DateTime expires = format.parseUtc(expiresString);
+
       int maxAge = int.parse(maxAgeString);
 
       return Session(

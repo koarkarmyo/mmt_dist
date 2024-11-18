@@ -19,4 +19,21 @@ class BatchApiRepo extends BaseApiRepo {
 
     return baseApiResponse.data ?? [];
   }
+
+  Future<bool> loadBatch(
+      {required List<StockMoveLine> stockMoveLineList}) async {
+    List<Map<String, dynamic>> data = [];
+
+    stockMoveLineList.forEach(
+      (element) {
+        data.add(element.toJson());
+      },
+    );
+
+    Response response = await postApiMethodCall(
+        additionalPath: '/save_loading/',
+        params: {"name": "move_line_ids", "args": data});
+
+    return response.statusCode == 200;
+  }
 }

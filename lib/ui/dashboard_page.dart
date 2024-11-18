@@ -215,7 +215,8 @@ class _DashboardPageState extends State<DashboardPage> {
             onTap: () {
               // MainSyncProcess.instance
               //     .setAutoSyncActions('MASTER', isImmediate: false);
-              _dashboardCubit.fetchDashboardFromApi();
+              // _dashboardCubit.fetchDashboardFromApi();
+              context.pushTo(route: RouteList.stockLoadingAddPage);
             },
             child: const Text(
               "Dashboard",

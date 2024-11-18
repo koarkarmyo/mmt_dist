@@ -97,6 +97,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       List<Map<String, dynamic>> actionWithGroupJsonList = [];
       syncActionList.forEach((element) {
         actionJson.add(element.toJson());
+        print("Sync Action : ${element.toJson()}");
 
         for (SyncActionGroup actionGroup in element.actionGroup ?? []) {
           Map<String, dynamic> actionJson = {};

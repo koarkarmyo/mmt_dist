@@ -1,6 +1,8 @@
 import 'package:mmt_mobile/model/price_list/price_list_item.dart';
 import 'package:mmt_mobile/model/product/uom_lines.dart';
 
+import '../../src/enum.dart';
+
 class Product {
   int? id;
   String? name;
@@ -29,6 +31,7 @@ class Product {
   List<UomLine>? uomLines;
   String? writeDate;
   List<PriceListItem>? priceListItems;
+  TrackingType? trackingType;
 
   Product(
       {this.id,
@@ -89,6 +92,11 @@ class Product {
         uomLines!.add(UomLine.fromJson(v));
       });
     }
+    TrackingType.values.forEach((element) {
+      if(element.name == json['tracking']){
+        trackingType = element;
+      }
+    },);
     writeDate = json['write_date'];
   }
 
@@ -118,6 +126,7 @@ class Product {
     data['loose_uom_name'] = this.looseUomName;
     data['box_uom_id'] = this.boxUomId;
     data['box_uom_name'] = this.boxUomName;
+    data['tracking'] = trackingType?.name;
     if (this.uomLines != null) {
       data['uom_lines'] = this.uomLines!.map((v) => v.toJson()).toList();
     }
@@ -156,6 +165,11 @@ class Product {
         uomLines!.add(UomLine.fromJson(v));
       });
     }
+    TrackingType.values.forEach((element) {
+      if(element.name == json['tracking']){
+        trackingType = element;
+      }
+    },);
     writeDate = json['write_date'];
   }
 
@@ -186,6 +200,7 @@ class Product {
     data['box_uom_id'] = this.boxUomId;
     data['box_uom_name'] = this.boxUomName;
     data['write_date'] = this.writeDate;
+    data['tracking'] = trackingType?.name;
     return data;
   }
 }

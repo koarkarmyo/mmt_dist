@@ -18,9 +18,10 @@ import '../../src/style/app_color.dart';
 import '../widgets/textfield_custom_widget.dart';
 
 class StockLoadingAddLot extends StatefulWidget {
-  const StockLoadingAddLot({super.key, required this.stockMoveLine});
+  const StockLoadingAddLot({super.key, required this.stockMoveLine, required this.lotList});
 
   final StockMoveLine stockMoveLine;
+  final List<Lot> lotList;
 
   @override
   State<StockLoadingAddLot> createState() => _StockLoadingAddLotState();
@@ -34,13 +35,7 @@ class _StockLoadingAddLotState extends State<StockLoadingAddLot> {
   TextEditingController _uomController = TextEditingController();
   late ProductCubit _productCubit;
 
-  List<Lot> lotList = [
-    Lot(id: 1, name: "LOT00001"),
-    Lot(id: 2, name: "LOT00002"),
-    Lot(id: 3, name: "LOT00003"),
-    Lot(id: 4, name: "LOT00004"),
-    Lot(id: 5, name: "LOT00005")
-  ];
+ late List<Lot> lotList ;
 
   @override
   void initState() {
@@ -56,6 +51,7 @@ class _StockLoadingAddLotState extends State<StockLoadingAddLot> {
     _productCubit.getProductById(
         productId: widget.stockMoveLine.productId ?? 0);
     _lotListNotifier.value = widget.stockMoveLine.lotList ?? [];
+    lotList  = widget.lotList;
   }
 
   @override

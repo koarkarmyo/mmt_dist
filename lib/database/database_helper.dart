@@ -317,7 +317,6 @@ class DatabaseHelper {
         '${DBConstant.description} TEXT,'
         '${DBConstant.writeDate} TEXT'
         ')');
-
   }
 
   _createCompanyTable(Database db) async {
@@ -403,6 +402,7 @@ class DatabaseHelper {
         '${DBConstant.looseUomId} INTEGER,'
         '${DBConstant.looseUomName} TEXT,'
         '${DBConstant.boxUomId} INTEGER,'
+        '${DBConstant.trackingType} TEXT,'
         '${DBConstant.boxUomName} TEXT,'
         '${DBConstant.writeDate} TEXT'
         ')');
