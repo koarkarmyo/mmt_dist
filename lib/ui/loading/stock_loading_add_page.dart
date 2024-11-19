@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/business%20logic/bloc/batch/batch_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
 import 'package:mmt_mobile/business%20logic/bloc/lot/lot_cubit.dart';
-import 'package:mmt_mobile/common_widget/bottom_choice_sheet_widget.dart';
 import 'package:mmt_mobile/common_widget/retry_widget.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
@@ -37,6 +36,7 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
   final TextEditingController _searchBatchController = TextEditingController();
   final ValueNotifier<List<StockMoveLine>> _stockMoveLineListNotifier =
       ValueNotifier([]);
+  List<Product> _productList = [];
 
   @override
   void initState() {
@@ -61,30 +61,47 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
               return IconButton(
                   onPressed: () {
                     bool isAllCheck = true;
+                    bool lotCheck = true;
                     for (StockMoveLine moveLine
                         in _stockMoveLineListNotifier.value) {
                       isAllCheck = moveLine.isChecked ?? false;
                       if (!isAllCheck) {
-                        break;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text(ConstString.pleaseCheckAllItem),
+                            backgroundColor: AppColors.dangerColor,
+                          ),
+                        );
                       }
                     }
 
-                    List<Lot> lotList = [];
-                    _stockMoveLineListNotifier.value.forEach(
-                      (element) {
-                        lotList.addAll(element.lotList ?? []);
-                      },
-                    );
+                    if (isAllCheck) {
+                      List<Lot> lotList = [];
+                      _stockMoveLineListNotifier.value.forEach(
+                        (element) {
+                          if (element.isLot ?? false) {
+                            if ((element.lotList ?? []).isEmpty) {
+                              lotCheck = false;
+                            }
+                          }
+                          lotList.addAll(element.lotList ?? []);
+                        },
+                      );
 
-                    lotList.forEach(
-                      (element) {
-                        print(element.toJson());
-                      },
-                    );
-
-                    _batchCubit.uploadDoneQty(
-                        stockMoveList: _stockMoveLineListNotifier.value,
-                        lotList: lotList);
+                      if (!lotCheck) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const TextWidget(ConstString.lotRequired),
+                            backgroundColor: AppColors.dangerColor,
+                          ),
+                        );
+                      } else {
+                        _batchCubit.uploadDoneQty(
+                            stockMoveList: _stockMoveLineListNotifier.value,
+                            lotList: lotList,
+                            productList: _productList);
+                      }
+                    }
                   },
                   icon: const Icon(Icons.cloud_upload_rounded));
             },
@@ -148,7 +165,7 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
             builder: (context, productState) {
               return BlocBuilder<BatchCubit, BatchState>(
                 builder: (context, state) {
-                  if (state.state == BlocCRUDProcessState.fetching ||
+                  if (productState.state == BlocCRUDProcessState.fetching ||
                       state.state == BlocCRUDProcessState.fetching) {
                     return const Center(
                       child: CircularProgressIndicator(),
@@ -164,6 +181,7 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
                     );
                   }
                   _stockMoveLineListNotifier.value = state.stockMoveList;
+                  _productList = productState.productList;
 
                   state.stockMoveList.forEachIndexed(
                     (stockMoveIndex, stockMoveLine) {
@@ -242,7 +260,13 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
                               create: (context) => ProductCubit(),
                               child: StockLoadingAddLot(
                                 stockMoveLine: stockMoveLine,
-                                lotList: state.lotList.where((element) => element.productId == stockMoveLine.productId,).toList(),
+                                lotList: state.lotList
+                                    .where(
+                                      (element) =>
+                                          element.productId ==
+                                          stockMoveLine.productId,
+                                    )
+                                    .toList(),
                               ),
                             );
                           },

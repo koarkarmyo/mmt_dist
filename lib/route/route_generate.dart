@@ -19,7 +19,6 @@ import 'package:mmt_mobile/ui/dashboard_page.dart';
 import 'package:mmt_mobile/ui/delivery/delivery_list_page.dart';
 import 'package:mmt_mobile/ui/delivery/delivery_page.dart';
 import 'package:mmt_mobile/ui/loading/stock_loading_add_page.dart';
-import 'package:mmt_mobile/ui/loading/stock_loading_history.dart';
 import 'package:mmt_mobile/ui/login/admin_login.dart';
 import 'package:mmt_mobile/ui/login/login_page.dart';
 import 'package:mmt_mobile/ui/sale_order/sale_order_add_extra.dart';
@@ -29,6 +28,7 @@ import 'package:mmt_mobile/ui/today_delivery_page.dart';
 
 import '../business logic/bloc/login/login_bloc.dart';
 import '../ui/contact_page.dart';
+import '../ui/loading/stock_loading_history_page.dart';
 import '../ui/product_report_page.dart';
 import '../ui/profile_page.dart';
 import '../ui/route_page.dart';
@@ -163,8 +163,9 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
             ],
             child: const StockLoadingAddPage(),
           ));
-    case RouteList.stockLoadingHistory:
-      return _buildPageRoute(routeSettings, const StockLoadingHistory());
+    case RouteList.loadingHistoryPage:
+      return _buildPageRoute(routeSettings, const StockLoadingHistoryPage());
+
     default:
       return _buildPageRoute(routeSettings, const NotFoundPage());
   }

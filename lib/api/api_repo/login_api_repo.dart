@@ -29,10 +29,9 @@ class LoginApiRepo extends BaseApiRepo {
 
     // MMTApplication.odooSession = CustomOdooSession.fromJson(response.data);
     // MMTApplication.odooSession?.session =
-    // MMTApplication.session =
-    //     Session.fromCookieString(response.headers['set-cookie']?.first ?? '');
-    MMTApplication.session = Session.fromCookieString(
-        "session_id=3517b7e33e17b445b925d74681d25e2c1430501e; Expires=Mon, 25-Nov-2024 04:13:27 GMT; Max-Age=604800; HttpOnly; Path=/");
+    MMTApplication.session =
+        Session.fromCookieString(response.headers['set-cookie']?.first ?? '');
+
     // DioProvider().dio.options.headers['Cookie'] =
     //     'session_id=${MMTApplication.session?.sessionId}';
     Map<String, dynamic>? data = MMTApplication.session?.toJson();

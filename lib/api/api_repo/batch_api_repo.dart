@@ -26,6 +26,7 @@ class BatchApiRepo extends BaseApiRepo {
 
     stockMoveLineList.forEach(
       (element) {
+        // print("Stock Move : ${element.toJson()}");
         data.add(element.toJson());
       },
     );

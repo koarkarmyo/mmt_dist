@@ -20,7 +20,7 @@ class MMTApplication {
   // Server
   // static const String serverUrl = 'http://217.15.166.234:8069';
 
-  static String serverUrl = '';
+  static String serverUrl = '161.97.187.243:8090';
   static Employee? currentUser;
   static Company? selectedCompany;
 
@@ -83,15 +83,17 @@ class MMTApplication {
     );
     uomList.forEach(
       (element) {
-        int qty = refTotal ~/ (element.ratio ?? 1);
-        refTotal = refTotal % (element.ratio ?? 1);
+        if (element.uomType != UomType.smaller.name) {
+          int qty = refTotal ~/ (element.ratio ?? 1);
+          refTotal = refTotal % (element.ratio ?? 1);
 
-        if (qty > 0) {
-          qtyUomList.add({
-            'qty': qty.toDouble(),
-            'product_uom_id': element.uomId,
-            'product_uom_name': element.uomName
-          });
+          if (qty > 0) {
+            qtyUomList.add({
+              'qty': qty.toDouble(),
+              'product_uom_id': element.uomId,
+              'product_uom_name': element.uomName
+            });
+          }
         }
       },
     );

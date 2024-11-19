@@ -90,6 +90,10 @@ class ConstString {
   static const String lotNotFoundInThisSo = "ယခု‌ဘောက်ချာတွင် ဘားကုဒ်မရှိပါ";
   static const String productRequired = "ပစ္စည်းစားရင်းမရှိပါ";
   static const String barcodeNotFound = "ဘားကုဒ်မရှိပါ";
+  static const String pleaseCheckAllItem = 'Please check all items';
+  static const String totalQtyNotMatch = "Total Quantity does not match";
+  static const String lotRequired = "Lot is required in some items";
+  static const String loadingHistory = "Loading History";
 
   static const String meterCube = "m\u00B3";
 

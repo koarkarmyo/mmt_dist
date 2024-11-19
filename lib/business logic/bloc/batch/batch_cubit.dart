@@ -9,7 +9,9 @@ import 'package:mmt_mobile/src/mmt_application.dart';
 
 import '../../../model/lot.dart';
 import '../../../model/product/product.dart';
+import '../../../model/product/uom_lines.dart';
 import '../../../model/stock_move.dart';
+import '../../../src/enum.dart';
 
 part 'batch_state.dart';
 
@@ -73,21 +75,28 @@ class BatchCubit extends Cubit<BatchState> {
           stockMoveWithTotalList: stockMoveWithTotalQty));
     } on Exception {
       emit(state.copyWith(state: BlocCRUDProcessState.fetchFail));
+    } on Error {
+      emit(state.copyWith(state: BlocCRUDProcessState.fetchFail));
     }
-    // on Error {
-    //   emit(state.copyWith(state: BlocCRUDProcessState.fetchFail));
-    // }
   }
 
   uploadDoneQty(
       {required List<StockMoveLine> stockMoveList,
-      required List<Lot> lotList}) async {
+      required List<Lot> lotList,
+      required List<Product> productList}) async {
     emit(state.copyWith(state: BlocCRUDProcessState.updating));
     try {
       List<StockMoveLine> stockMoveList = [];
 
       state.stockMoveList.forEach(
         (stockMove) {
+          // print("stock move : ${stockMove.toJson()}");
+          List<UomLine> uomList = productList
+                  .firstWhereOrNull(
+                    (element) => element.id == stockMove.productId,
+                  )
+                  ?.uomLines ??
+              [];
           List<Lot> productLotList = lotList
               .where(
                 (e) => e.productId == stockMove.productId,
@@ -99,13 +108,31 @@ class BatchCubit extends Cubit<BatchState> {
           } else {
             productLotList.forEach(
               (element) {
-                if (element != productLotList.first) {
-                 stockMove.moveId = null;
+                StockMoveLine stockMoveLine = stockMove.copyWith();
+                UomLine? uomLine = uomList.firstWhereOrNull(
+                  (uom) => uom.uomId == element.productUomId,
+                );
+                if (element.id != productLotList.first.id) {
+                  stockMoveLine.moveId = null;
+                  print("not first item : assign null");
                 }
-                stockMove.lotId = element.id;
-                stockMove.lotName = element.name;
-                stockMove.qtyDone = element.productQty;
-                stockMoveList.add(stockMove);
+                stockMoveLine.lotId = element.id;
+                stockMoveLine.lotName = element.name;
+                double qty = 0;
+                if (uomLine?.uomType == UomType.bigger.name) {
+                  qty = (element.productQty ?? 0) * (uomLine?.ratio ?? 0);
+                } else {
+                  qty = (element.productQty ?? 0) / (uomLine?.ratio ?? 0);
+                }
+
+                stockMoveLine.qtyDone = qty;
+                stockMoveList.add(stockMoveLine);
+                stockMoveList.forEach(
+                  (element) {
+                    print(
+                        "stock move list ${stockMoveList.length} : ${element.toJson()}");
+                  },
+                );
               },
             );
           }
