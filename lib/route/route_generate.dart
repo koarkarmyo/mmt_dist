@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mmt_mobile/business%20logic/bloc/batch/batch_cubit.dart';
+import 'package:mmt_mobile/business%20logic/bloc/batch/stock_loading_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/customer/customer_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/dashboard/dashboard_cubit.dart';
@@ -18,7 +18,9 @@ import 'package:mmt_mobile/ui/customer_visit_report_page.dart';
 import 'package:mmt_mobile/ui/dashboard_page.dart';
 import 'package:mmt_mobile/ui/delivery/delivery_list_page.dart';
 import 'package:mmt_mobile/ui/delivery/delivery_page.dart';
+import 'package:mmt_mobile/ui/delivery_return/delivery_return_page.dart';
 import 'package:mmt_mobile/ui/loading/stock_loading_add_page.dart';
+import 'package:mmt_mobile/ui/loading/stock_loading_detail.dart';
 import 'package:mmt_mobile/ui/login/admin_login.dart';
 import 'package:mmt_mobile/ui/login/login_page.dart';
 import 'package:mmt_mobile/ui/sale_order/sale_order_add_extra.dart';
@@ -139,6 +141,8 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
     //   return _buildPageRoute(routeSettings, const ScannerPage());
     case RouteList.todayDeliveryPage:
       return _buildPageRoute(routeSettings, const TodayDeliveryPage());
+    case RouteList.deliveryReturnPage:
+      return _buildPageRoute(routeSettings, const DeliveryReturnPage());
     case RouteList.customerDashboardPage:
       return _buildPageRoute(routeSettings, const CustomerDashboardPage());
     case RouteList.accountPayment:
@@ -157,7 +161,7 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
           routeSettings,
           MultiBlocProvider(
             providers: [
-              BlocProvider(create: (context) => BatchCubit()),
+              BlocProvider(create: (context) => StockLoadingCubit()),
               BlocProvider(create: (context) => ProductCubit()),
               BlocProvider(create: (context) => LotCubit()),
             ],
@@ -165,6 +169,14 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
           ));
     case RouteList.loadingHistoryPage:
       return _buildPageRoute(routeSettings, const StockLoadingHistoryPage());
+    case RouteList.stockLoadingDetailPage:
+      return _buildPageRoute(
+          routeSettings,
+          MultiBlocProvider(providers: [
+            BlocProvider(
+              create: (context) => StockLoadingCubit(),
+            )
+          ], child: const StockLoadingDetailPage()));
 
     default:
       return _buildPageRoute(routeSettings, const NotFoundPage());

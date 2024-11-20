@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mmt_mobile/model/language_model.dart';
 import 'package:mmt_mobile/model/login_response.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
+import 'package:mmt_mobile/ui/widgets/confirm_dialog_widget.dart';
 import 'package:odoo_rpc/odoo_rpc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
@@ -20,7 +21,7 @@ class MMTApplication {
   // Server
   // static const String serverUrl = 'http://217.15.166.234:8069';
 
-  static String serverUrl = '161.97.187.243:8090';
+  static String serverUrl = 'http://161.97.187.243:8090';
   static Employee? currentUser;
   static Company? selectedCompany;
 
@@ -40,6 +41,12 @@ class MMTApplication {
   static UomLine? getReferenceUomLine(List<UomLine> uomLines) {
     return uomLines
         .firstWhereOrNull((uomLine) => uomLine.uomType == 'reference');
+  }
+
+  static Future<bool?> showConfirmDialog({required String confirmQuestion, required BuildContext context}) async{
+    return await showDialog(context: context, builder: (context) {
+      return ConfirmDialogWidget(confirmQuestion: confirmQuestion);
+    },);
   }
 
   static String nestedUomChanger(double refTotalQty, List<UomLine> uomLines,

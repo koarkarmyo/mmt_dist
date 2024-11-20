@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mmt_mobile/business%20logic/bloc/batch/batch_cubit.dart';
+import 'package:mmt_mobile/business%20logic/bloc/batch/stock_loading_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
 import 'package:mmt_mobile/business%20logic/bloc/lot/lot_cubit.dart';
 import 'package:mmt_mobile/common_widget/retry_widget.dart';
@@ -28,7 +28,7 @@ class StockLoadingAddPage extends StatefulWidget {
 }
 
 class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
-  late BatchCubit _batchCubit;
+  late StockLoadingCubit _batchCubit;
   late ProductCubit _productCubit;
   String? _batchName;
   late LotCubit _lotCubit;
@@ -42,7 +42,7 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _batchCubit = context.read<BatchCubit>();
+    _batchCubit = context.read<StockLoadingCubit>();
     _productCubit = context.read<ProductCubit>()..getAllProduct();
     _lotCubit = context.read<LotCubit>()..fetchLot();
   }
@@ -53,13 +53,13 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
       appBar: AppBar(
         title: const TextWidget(ConstString.loading),
         actions: [
-          BlocBuilder<BatchCubit, BatchState>(
+          BlocBuilder<StockLoadingCubit, StockLoadingState>(
             builder: (context, state) {
               if (state.state == BlocCRUDProcessState.updating) {
                 return const CircularProgressIndicator();
               }
               return IconButton(
-                  onPressed: () {
+                  onPressed: () async {
                     bool isAllCheck = true;
                     bool lotCheck = true;
                     for (StockMoveLine moveLine
@@ -73,6 +73,10 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
                           ),
                         );
                       }
+                    }
+
+                    if(_stockMoveLineListNotifier.value.isEmpty){
+                      isAllCheck = false;
                     }
 
                     if (isAllCheck) {
@@ -96,10 +100,18 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
                           ),
                         );
                       } else {
-                        _batchCubit.uploadDoneQty(
-                            stockMoveList: _stockMoveLineListNotifier.value,
-                            lotList: lotList,
-                            productList: _productList);
+                        bool confirm = await MMTApplication.showConfirmDialog(
+                                confirmQuestion:
+                                    ConstString.loadingConfirmDialog,
+                                context: context) ??
+                            false;
+
+                        if (confirm) {
+                          _batchCubit.uploadDoneQty(
+                              stockMoveList: _stockMoveLineListNotifier.value,
+                              lotList: lotList,
+                              productList: _productList);
+                        }
                       }
                     }
                   },
@@ -109,7 +121,7 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
         ],
       ),
       persistentFooterButtons: [
-        BlocBuilder<BatchCubit, BatchState>(
+        BlocBuilder<StockLoadingCubit, StockLoadingState>(
           builder: (context, state) {
             return TextWidget(
               '',
@@ -163,7 +175,7 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
           // _pickingListWidget()
           BlocBuilder<ProductCubit, ProductState>(
             builder: (context, productState) {
-              return BlocBuilder<BatchCubit, BatchState>(
+              return BlocBuilder<StockLoadingCubit, StockLoadingState>(
                 builder: (context, state) {
                   if (productState.state == BlocCRUDProcessState.fetching ||
                       state.state == BlocCRUDProcessState.fetching) {
@@ -212,10 +224,10 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
       TableRow(
         decoration: BoxDecoration(color: Colors.grey[200]),
         children: [
-          _tableItem(''),
           _tableItem(ConstString.name, align: Alignment.centerLeft),
           _tableItem(ConstString.qty),
           _tableItem(ConstString.uom),
+          _tableItem(''),
           _tableItem(''),
         ],
       )
@@ -230,11 +242,11 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
     return Table(
       border: TableBorder.all(),
       columnWidths: const {
-        0: FlexColumnWidth(1),
-        1: FlexColumnWidth(5),
-        2: FlexColumnWidth(2),
-        3: FlexColumnWidth(3),
-        4: FlexColumnWidth(1)
+        0: FlexColumnWidth(5),
+        1: FlexColumnWidth(2),
+        2: FlexColumnWidth(3),
+        3: FlexColumnWidth(1),
+        4: FlexColumnWidth(1),
       },
       children: tableRows,
     );
@@ -244,6 +256,18 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
     required StockMoveLine stockMoveLine,
   }) {
     return TableRow(children: [
+      _tableItem(stockMoveLine.productName ?? '', align: Alignment.centerLeft),
+      // _tableItem((stockMoveLine.productUomQty ?? 0).toString()),
+      _tableItemList((stockMoveLine.data ?? [])
+          .map(
+            (e) => e.qty.toString(),
+          )
+          .toList()),
+      _tableItemList((stockMoveLine.data ?? [])
+          .map(
+            (e) => e.productUomName ?? '',
+          )
+          .toList()),
       (stockMoveLine.isLot ?? false)
           ? Align(
               alignment: Alignment.centerLeft,
@@ -285,18 +309,6 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
               ),
             )
           : Container(),
-      _tableItem(stockMoveLine.productName ?? '', align: Alignment.centerLeft),
-      // _tableItem((stockMoveLine.productUomQty ?? 0).toString()),
-      _tableItemList((stockMoveLine.data ?? [])
-          .map(
-            (e) => e.qty.toString(),
-          )
-          .toList()),
-      _tableItemList((stockMoveLine.data ?? [])
-          .map(
-            (e) => e.productUomName ?? '',
-          )
-          .toList()),
 
       ValueListenableBuilder(
         valueListenable: _stockMoveLineListNotifier,

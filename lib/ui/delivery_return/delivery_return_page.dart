@@ -13,6 +13,8 @@ class DeliveryReturnPage extends StatefulWidget {
 }
 
 class _DeliveryReturnPageState extends State<DeliveryReturnPage> {
+  final ValueNotifier<String?> _vehicleNameNotifier = ValueNotifier(null);
+
   List<String> locationList = [
     "7R/3818",
     "4R/3818",
@@ -47,26 +49,29 @@ class _DeliveryReturnPageState extends State<DeliveryReturnPage> {
               padding: 8.horizontalPadding,
               decoration: BoxDecoration(
                   border: Border.all(), borderRadius: 8.borderRadius),
-              child: TextField(
-                decoration: InputDecoration(border: InputBorder.none),
+              child: ValueListenableBuilder(
+                valueListenable: _vehicleNameNotifier,
+                builder: (context, value, child) => Text(value ?? ''),
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 16,
           ),
           _returnListWidget()
         ],
-      ).padding(padding: 8.allPadding),
+      ).padding(padding: 16.allPadding),
     );
   }
 
   Widget _returnListWidget() {
     return ListView.builder(
+      itemCount: 6,
       itemBuilder: (context, index) {
-        return ListTile(
+        return const ListTile(
           dense: true,
           title: Text("Product Name"),
+          subtitle: Text("12 Kg"),
         );
       },
     ).expanded();

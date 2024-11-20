@@ -351,8 +351,16 @@ class _DashboardPageState extends State<DashboardPage> {
           );
         } else {
           return const Center(
-            child: Text("Dashboard Not Found"),
-          );
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.numbers),
+              SizedBox(
+                height: 20,
+              ),
+              Text("Dashboard is empty"),
+            ],
+          )).expanded();
         }
       },
     );

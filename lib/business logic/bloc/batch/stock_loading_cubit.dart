@@ -13,12 +13,12 @@ import '../../../model/product/uom_lines.dart';
 import '../../../model/stock_move.dart';
 import '../../../src/enum.dart';
 
-part 'batch_state.dart';
+part 'stock_loading_state.dart';
 
-class BatchCubit extends Cubit<BatchState> {
-  BatchCubit()
+class StockLoadingCubit extends Cubit<StockLoadingState> {
+  StockLoadingCubit()
       : super(
-            BatchState(state: BlocCRUDProcessState.initial, stockMoveList: []));
+            StockLoadingState(state: BlocCRUDProcessState.initial, stockMoveList: []));
 
   fetchBatchByBarcode({required String barcode}) async {
     emit(state.copyWith(state: BlocCRUDProcessState.fetching));

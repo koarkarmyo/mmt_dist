@@ -1,20 +1,20 @@
-part of 'batch_cubit.dart';
+part of 'stock_loading_cubit.dart';
 
-class BatchState {
+class StockLoadingState {
   BlocCRUDProcessState state;
   List<StockMoveLine> stockMoveList;
   List<StockMoveLine>? stockMoveWithTotalList;
 
-  BatchState(
+  StockLoadingState(
       {required this.state,
       required this.stockMoveList,
       this.stockMoveWithTotalList});
 
-  BatchState copyWith(
+  StockLoadingState copyWith(
       {BlocCRUDProcessState? state,
       List<StockMoveLine>? stockMoveList,
       List<StockMoveLine>? stockMoveWithTotalList}) {
-    return BatchState(
+    return StockLoadingState(
         state: state ?? this.state,
         stockMoveList: stockMoveList ?? this.stockMoveList,
         stockMoveWithTotalList:
