@@ -183,9 +183,9 @@ class _StockLoadingAddLotState extends State<StockLoadingAddLot> {
               ),
               ValueListenableBuilder(
                 valueListenable: _remainingQtyNotifier,
-                builder: (context, value, child) =>
-                    Text("Remaining Qty : $value ${widget.stockMoveLine.productUomName}")
-                        .padding(padding: 8.verticalPadding),
+                builder: (context, value, child) => Text(
+                        "Remaining Qty : $value ${widget.stockMoveLine.productUomName}")
+                    .padding(padding: 8.verticalPadding),
               ),
               _lotListWidget()
             ],
@@ -228,10 +228,13 @@ class _StockLoadingAddLotState extends State<StockLoadingAddLot> {
     return GestureDetector(
       onTap: () {
         double refQty = _calculateRefLotTotalQty();
-        print("Difference : ${((widget.stockMoveLine.productUomQty ?? 0) - refQty).abs()}");
-        if ( ((widget.stockMoveLine.productUomQty ?? 0) - refQty).abs() > 1  ) {
-          _warningNotifier.value = ConstString.totalQtyNotMatch;
-        } else if (_uomNotifier.value == null) {
+        print(
+            "Difference : ${((widget.stockMoveLine.productUomQty ?? 0) - refQty).abs()}");
+        // if ( ((widget.stockMoveLine.productUomQty ?? 0) - refQty).abs() > 1  ) {
+        //   _warningNotifier.value = ConstString.totalQtyNotMatch;
+        // } else
+
+        if (_uomNotifier.value == null) {
           _warningNotifier.value = "Uom is empty";
         } else {
           context.pop(_lotListNotifier.value);
@@ -256,7 +259,7 @@ class _StockLoadingAddLotState extends State<StockLoadingAddLot> {
         if (_lotNotifier.value != null &&
             double.tryParse(_qtyController.text) != null &&
             _uomNotifier.value != null) {
-          Lot lot = Lot.fromJson(_lotNotifier.value!.toJson()) ;
+          Lot lot = Lot.fromJson(_lotNotifier.value!.toJson());
           double qty = double.tryParse(_qtyController.text) ?? 0;
           UomLine uom = _uomNotifier.value!;
           lot.productQty = qty;
@@ -265,7 +268,8 @@ class _StockLoadingAddLotState extends State<StockLoadingAddLot> {
           _lotListNotifier.value.add(lot);
           _lotListNotifier.value = List.of(_lotListNotifier.value);
           _remainingQtyNotifier.value =
-              (widget.stockMoveLine.productUomQty ?? 0) - _calculateRefLotTotalQty();
+              (widget.stockMoveLine.productUomQty ?? 0) -
+                  _calculateRefLotTotalQty();
           _resetValue();
         }
       },

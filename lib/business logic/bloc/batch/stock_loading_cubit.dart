@@ -17,8 +17,8 @@ part 'stock_loading_state.dart';
 
 class StockLoadingCubit extends Cubit<StockLoadingState> {
   StockLoadingCubit()
-      : super(
-            StockLoadingState(state: BlocCRUDProcessState.initial, stockMoveList: []));
+      : super(StockLoadingState(
+            state: BlocCRUDProcessState.initial, stockMoveList: []));
 
   fetchBatchByBarcode({required String barcode}) async {
     emit(state.copyWith(state: BlocCRUDProcessState.fetching));
@@ -50,21 +50,37 @@ class StockLoadingCubit extends Cubit<StockLoadingState> {
         },
       );
 
+      List<StockMoveLine> stockMoveWithEachUomQty = [];
+
       stockMoveWithTotalQty.forEachIndexed(
         (index, stockMove) {
           Product? product = productList
               .firstWhereOrNull((element) => element.id == stockMove.productId);
           if (product != null) {
-            stockMoveWithTotalQty[index].data = [];
             MMTApplication.uomLongFormChanger(
                     refTotal: stockMove.productUomQty ?? 0,
                     uomList: product.uomLines ?? [])
-                .forEach((qtyUom) => stockMoveWithTotalQty[index].data?.add(
-                      StockMoveData(
-                          qty: qtyUom['qty'],
-                          productUomId: qtyUom['product_uom_id'],
-                          productUomName: qtyUom['product_uom_name']),
-                    ));
+                .forEach(
+              (element) {
+                stockMoveWithEachUomQty.add(stockMove.copyWith(
+                    productUomId: element['product_uom_id'],
+                    productUomName: element['product_uom_name'],
+                    productUomQty: element['qty']));
+              },
+            );
+
+            // stockMoveWithTotalQty[index].data = [];
+            // MMTApplication.uomLongFormChanger(
+            //         refTotal: stockMove.productUomQty ?? 0,
+            //         uomList: product.uomLines ?? [])
+            //     .forEach((qtyUom) =>
+            //
+            //     stockMoveWithTotalQty[index].data?.add(
+            //           StockMoveData(
+            //               qty: qtyUom['qty'],
+            //               productUomId: qtyUom['product_uom_id'],
+            //               productUomName: qtyUom['product_uom_name']),
+            //         ));
           }
         },
       );
@@ -72,7 +88,7 @@ class StockLoadingCubit extends Cubit<StockLoadingState> {
       emit(state.copyWith(
           state: BlocCRUDProcessState.fetchSuccess,
           stockMoveList: stockMoveList,
-          stockMoveWithTotalList: stockMoveWithTotalQty));
+          stockMoveWithTotalList: stockMoveWithEachUomQty));
     } on Exception {
       emit(state.copyWith(state: BlocCRUDProcessState.fetchFail));
     } on Error {
@@ -113,11 +129,12 @@ class StockLoadingCubit extends Cubit<StockLoadingState> {
                   (uom) => uom.uomId == element.productUomId,
                 );
                 if (element.id != productLotList.first.id) {
-                  stockMoveLine.moveId = null;
+                  stockMoveLine.id = null;
                   print("not first item : assign null");
                 }
                 stockMoveLine.lotId = element.id;
                 stockMoveLine.lotName = element.name;
+
                 double qty = 0;
                 if (uomLine?.uomType == UomType.bigger.name) {
                   qty = (element.productQty ?? 0) * (uomLine?.ratio ?? 0);
@@ -125,6 +142,7 @@ class StockLoadingCubit extends Cubit<StockLoadingState> {
                   qty = (element.productQty ?? 0) / (uomLine?.ratio ?? 0);
                 }
 
+                stockMoveLine.productUomQty = qty;
                 stockMoveLine.qtyDone = qty;
                 stockMoveList.add(stockMoveLine);
                 stockMoveList.forEach(

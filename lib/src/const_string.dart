@@ -20,6 +20,7 @@ class ConstString {
   static const String noItem = "မရှိပါ";
   static const String date = "Date";
   static const String qty = 'Qty';
+  static const String doneQty = 'DoneQty';
   static const String unfinishedToken = 'Ongoing Token';
   static const String addNewToken = "Add New Token";
   static const String createNewToken = "Create New Token";

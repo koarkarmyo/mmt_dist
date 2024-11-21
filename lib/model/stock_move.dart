@@ -1,6 +1,9 @@
+import 'package:flutter/cupertino.dart';
+
 import 'lot.dart';
 
 class StockMoveLine {
+  int? id;
   String? batchNo;
   String? scheduledDate;
   int? pickingId;
@@ -25,9 +28,11 @@ class StockMoveLine {
   List<Lot>? lotList;
   bool? isLot;
   List<StockMoveData>? data;
+  TextEditingController? controller;
 
   StockMoveLine(
-      {this.batchNo,
+      {this.id,
+      this.batchNo,
       this.scheduledDate,
       this.pickingId,
       this.pickingName,
@@ -52,6 +57,7 @@ class StockMoveLine {
       this.isLot});
 
   StockMoveLine.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
     batchNo = json['batch_no'];
     scheduledDate = json['scheduled_date'];
     pickingId = json['picking_id'];
@@ -76,6 +82,7 @@ class StockMoveLine {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
+    data['id'] = id;
     data['batch_no'] = batchNo;
     data['scheduled_date'] = scheduledDate;
     data['picking_id'] = pickingId;
@@ -100,6 +107,7 @@ class StockMoveLine {
   }
 
   StockMoveLine copyWith({
+    int? id,
     String? batchNo,
     String? scheduledDate,
     int? pickingId,
@@ -125,6 +133,7 @@ class StockMoveLine {
     bool? isLot,
   }) {
     return StockMoveLine(
+      id: id ?? this.id,
       batchNo: batchNo ?? this.batchNo,
       scheduledDate: scheduledDate ?? this.scheduledDate,
       pickingId: pickingId ?? this.pickingId,
@@ -152,7 +161,7 @@ class StockMoveLine {
   }
 }
 
-class StockMoveData{
+class StockMoveData {
   double? qty;
   int? productUomId;
   String? productUomName;
