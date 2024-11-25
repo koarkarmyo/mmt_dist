@@ -13,6 +13,7 @@ class StockMoveLine {
   String? partnerName;
   String? origin;
   int? locationId;
+  int? locationDestId;
   int? moveId;
   int? saleLineId;
   int? productId;
@@ -41,6 +42,7 @@ class StockMoveLine {
       this.partnerName,
       this.origin,
       this.locationId,
+      this.locationDestId,
       this.moveId,
       this.saleLineId,
       this.productId,
@@ -67,6 +69,7 @@ class StockMoveLine {
     partnerName = json['partner_name'];
     origin = json['origin'];
     locationId = json['location_id'];
+    locationDestId = json['location_dest_id'];
     moveId = json['move_id'];
     saleLineId = json['sale_line_id'];
     productId = json['product_id'];
@@ -92,6 +95,7 @@ class StockMoveLine {
     data['partner_name'] = partnerName;
     data['origin'] = origin;
     data['location_id'] = locationId;
+    data['location_dest_id'] = locationDestId;
     data['move_id'] = moveId;
     data['sale_line_id'] = saleLineId;
     data['product_id'] = productId;
@@ -117,6 +121,7 @@ class StockMoveLine {
     String? partnerName,
     String? origin,
     int? locationId,
+    int? locationDestId,
     int? moveId,
     int? saleLineId,
     int? productId,
@@ -143,6 +148,7 @@ class StockMoveLine {
       partnerName: partnerName ?? this.partnerName,
       origin: origin ?? this.origin,
       locationId: locationId ?? this.locationId,
+      locationDestId: locationDestId ?? this.locationDestId,
       moveId: moveId ?? this.moveId,
       saleLineId: saleLineId ?? this.saleLineId,
       productId: productId ?? this.productId,

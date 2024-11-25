@@ -3,12 +3,12 @@ part of 'stock_loading_cubit.dart';
 class StockLoadingState {
   BlocCRUDProcessState state;
   List<StockMoveLine> stockMoveList;
-  List<StockMoveLine>? stockMoveWithTotalList;
+  List<StockMoveLine> stockMoveWithTotalList;
 
   StockLoadingState(
       {required this.state,
       required this.stockMoveList,
-      this.stockMoveWithTotalList});
+     required this.stockMoveWithTotalList});
 
   StockLoadingState copyWith(
       {BlocCRUDProcessState? state,

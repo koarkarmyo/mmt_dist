@@ -21,6 +21,12 @@ extension DurationExtension on num {
   SizedBox get squareSized => SizedBox(height: toDouble(), width: toDouble());
 }
 
+extension DoubleExtension on double {
+  double roundTo({required int position}) {
+    return double.parse(toStringAsFixed(position));
+  }
+}
+
 extension PaddingExtension on (num, num) {
   EdgeInsets get padding =>
       EdgeInsets.symmetric(vertical: $1.toDouble(), horizontal: $2.toDouble());

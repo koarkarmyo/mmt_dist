@@ -20,6 +20,7 @@ import '../../src/const_string.dart';
 import '../../src/enum.dart';
 import '../../src/style/app_color.dart';
 import '../widgets/textfield_custom_widget.dart';
+import 'package:collection/collection.dart';
 
 class StockLoadingAddLot extends StatefulWidget {
   const StockLoadingAddLot(
@@ -123,7 +124,11 @@ class _StockLoadingAddLotState extends State<StockLoadingAddLot> {
                     builder: (context, state) {
                       if (state.state == BlocCRUDProcessState.fetchSuccess) {
                         _uomNotifier.value =
-                            state.product?.uomLines?.firstOrNull;
+                            state.product?.uomLines?.firstWhereOrNull(
+                          (element) =>
+                              element.uomId ==
+                              widget.stockMoveLine.productUomId,
+                        );
                         _uomList = state.product?.uomLines ?? [];
                       }
                       return GestureDetector(
@@ -184,7 +189,7 @@ class _StockLoadingAddLotState extends State<StockLoadingAddLot> {
               ValueListenableBuilder(
                 valueListenable: _remainingQtyNotifier,
                 builder: (context, value, child) => Text(
-                        "Remaining Qty : $value ${widget.stockMoveLine.productUomName}")
+                        "Demand Qty : $value ${widget.stockMoveLine.productUomName}")
                     .padding(padding: 8.verticalPadding),
               ),
               _lotListWidget()
@@ -196,7 +201,9 @@ class _StockLoadingAddLotState extends State<StockLoadingAddLot> {
   }
 
   void _resetValue() {
-    _uomNotifier.value = _uomList.firstOrNull;
+    _uomNotifier.value = _uomList.firstWhereOrNull(
+      (element) => element.uomId == widget.stockMoveLine.productUomId,
+    );
     _lotNotifier.value = null;
     _qtyController.text = '';
   }
@@ -237,6 +244,19 @@ class _StockLoadingAddLotState extends State<StockLoadingAddLot> {
         if (_uomNotifier.value == null) {
           _warningNotifier.value = "Uom is empty";
         } else {
+          if (_lotNotifier.value != null &&
+              double.tryParse(_qtyController.text) != null &&
+              _uomNotifier.value != null) {
+            Lot lot = Lot.fromJson(_lotNotifier.value!.toJson());
+            double qty = double.tryParse(_qtyController.text) ?? 0;
+            UomLine uom = _uomNotifier.value!;
+            lot.productQty = qty;
+            lot.productUomName = uom.uomName;
+            lot.productUomId = uom.uomId;
+            _lotListNotifier.value.add(lot);
+
+
+          }
           context.pop(_lotListNotifier.value);
         }
       },
@@ -267,9 +287,6 @@ class _StockLoadingAddLotState extends State<StockLoadingAddLot> {
           lot.productUomId = uom.uomId;
           _lotListNotifier.value.add(lot);
           _lotListNotifier.value = List.of(_lotListNotifier.value);
-          _remainingQtyNotifier.value =
-              (widget.stockMoveLine.productUomQty ?? 0) -
-                  _calculateRefLotTotalQty();
           _resetValue();
         }
       },
@@ -324,13 +341,16 @@ class _StockLoadingAddLotState extends State<StockLoadingAddLot> {
             return element.uomId == lot.productUomId;
           },
         );
-
-        if (uomLine.uomType == UomType.reference.name) {
+        if (uomLine.uomId == widget.stockMoveLine.productUomId) {
           refQty += lot.productQty ?? 0;
-        } else if (uomLine.uomType == UomType.smaller.name) {
-          refQty += (lot.productQty ?? 0) / (uomLine.ratio ?? 1);
         } else {
-          refQty += (lot.productQty ?? 0) * (uomLine.ratio ?? 1);
+          UomLine? refUom = _uomList.firstWhereOrNull(
+            (element) => element.uomType == UomType.reference.name,
+          );
+          if (refUom != null) {
+            refQty += MMTApplication.refToUom(uomLine,
+                MMTApplication.uomQtyToRefTotal(refUom, lot.productQty ?? 0));
+          }
         }
       },
     );

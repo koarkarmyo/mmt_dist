@@ -18,7 +18,14 @@ part 'stock_loading_state.dart';
 class StockLoadingCubit extends Cubit<StockLoadingState> {
   StockLoadingCubit()
       : super(StockLoadingState(
-            state: BlocCRUDProcessState.initial, stockMoveList: []));
+            state: BlocCRUDProcessState.initial,
+            stockMoveList: [],
+            stockMoveWithTotalList: []));
+
+  editStockMoveLineList(
+      {required List<StockMoveLine> stockMoveLineList}) async {
+    emit(state.copyWith(stockMoveWithTotalList: stockMoveLineList));
+  }
 
   fetchBatchByBarcode({required String barcode}) async {
     emit(state.copyWith(state: BlocCRUDProcessState.fetching));
@@ -101,6 +108,7 @@ class StockLoadingCubit extends Cubit<StockLoadingState> {
       required List<Lot> lotList,
       required List<Product> productList}) async {
     emit(state.copyWith(state: BlocCRUDProcessState.updating));
+    // stockMoveList.forEach((element) => print("Cubit Stock Move : ${element.toJson()}"),);
     try {
       List<StockMoveLine> stockMoveList = [];
 
@@ -119,38 +127,83 @@ class StockLoadingCubit extends Cubit<StockLoadingState> {
               )
               .toList();
           if (productLotList.isEmpty) {
-            stockMove.qtyDone = stockMove.productUomQty;
+            // // stockMove.qtyDone = stockMove.qtyDone;
+            // int index = stockMoveList.indexWhere(
+            //   (element) => element.id == stockMove.id,
+            // );
+            // if (index != -1) {
+            //   stockMoveList[index].qtyDone =
+            //       (stockMoveList[index].qtyDone ?? 0) +
+            //           (stockMove.qtyDone ?? 0);
+            // } else {
+            //   stockMoveList.add(stockMove);
+            // }
+            Product? product = productList.firstWhereOrNull(
+              (element) => element.id == stockMove.productId,
+            );
+            List<StockMoveLine> stockMoveLineListWithDifUom =
+                state.stockMoveWithTotalList
+                    .where(
+                      (element) => element.moveId == stockMove.moveId && element.productId == stockMove.productId,
+                    )
+                    .toList();
+            stockMoveLineListWithDifUom.forEach(
+              (element) {
+                print("stock move with");
+                UomLine? uomLine = product?.uomLines?.firstWhereOrNull(
+                  (uom) => uom.uomId == element.productUomId,
+                );
+                if (uomLine != null) {
+                  stockMove.qtyDone = (stockMove.qtyDone ?? 0) +  MMTApplication.uomQtyToRefTotal(
+                      uomLine, element.qtyDone ?? 0);
+                }
+              },
+            );
             stockMoveList.add(stockMove);
+
+            print("Without Lot : ${stockMove.toJson()}");
           } else {
+            int index = 0;
             productLotList.forEach(
               (element) {
-                StockMoveLine stockMoveLine = stockMove.copyWith();
+                int lotIndex = stockMoveList.indexWhere(
+                  (stockMove) =>
+                      stockMove.lotId == element.id &&
+                      stockMove.productId == element.productId,
+                );
                 UomLine? uomLine = uomList.firstWhereOrNull(
                   (uom) => uom.uomId == element.productUomId,
                 );
-                if (element.id != productLotList.first.id) {
-                  stockMoveLine.id = null;
-                  print("not first item : assign null");
-                }
-                stockMoveLine.lotId = element.id;
-                stockMoveLine.lotName = element.name;
-
-                double qty = 0;
-                if (uomLine?.uomType == UomType.bigger.name) {
-                  qty = (element.productQty ?? 0) * (uomLine?.ratio ?? 0);
+                if (lotIndex != -1 && uomLine != null) {
+                  double doneQty = MMTApplication.uomQtyToRefTotal(
+                      uomLine, element.productQty ?? 0);
+                  stockMoveList[lotIndex].productUomQty =
+                      (stockMoveList[lotIndex].productUomQty ?? 0) + doneQty;
+                  stockMoveList[lotIndex].qtyDone =
+                      (stockMoveList[lotIndex].qtyDone ?? 0) + doneQty;
                 } else {
-                  qty = (element.productQty ?? 0) / (uomLine?.ratio ?? 0);
-                }
+                  StockMoveLine stockMoveLine = stockMove.copyWith();
 
-                stockMoveLine.productUomQty = qty;
-                stockMoveLine.qtyDone = qty;
-                stockMoveList.add(stockMoveLine);
-                stockMoveList.forEach(
-                  (element) {
-                    print(
-                        "stock move list ${stockMoveList.length} : ${element.toJson()}");
-                  },
-                );
+                  if (index != 0) {
+                    stockMoveLine.id = null;
+                    print("not first item : assign null");
+                  } else {
+                    print("first item !!!");
+                  }
+                  stockMoveLine.lotId = element.id;
+                  stockMoveLine.lotName = element.name;
+
+                  double qty = 0;
+                  if (uomLine != null) {
+                    qty = MMTApplication.uomQtyToRefTotal(
+                        uomLine, element.productQty ?? 0);
+                  }
+
+                  stockMoveLine.productUomQty = qty;
+                  stockMoveLine.qtyDone = qty;
+                  stockMoveList.add(stockMoveLine);
+                }
+                index = index + 1;
               },
             );
           }
