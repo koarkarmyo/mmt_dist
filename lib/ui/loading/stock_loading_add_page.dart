@@ -280,12 +280,12 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
       TableRow(
         decoration: BoxDecoration(color: Colors.grey[200]),
         children: [
+          _tableItem(''),
           _tableItem(ConstString.name, align: Alignment.centerLeft),
-          _tableItem(ConstString.qty),
-          _tableItem(ConstString.doneQty),
           _tableItem(ConstString.uom),
+          _tableItem(ConstString.qty),
           _tableItem(''),
-          _tableItem(''),
+          _tableItem(ConstString.doneQty),
         ],
       )
     ];
@@ -315,12 +315,12 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
     return Table(
       border: TableBorder.all(),
       columnWidths: const {
-        0: FlexColumnWidth(4),
-        1: FlexColumnWidth(2),
-        2: FlexColumnWidth(2),
-        3: FlexColumnWidth(3),
+        0: FlexColumnWidth(1),
+        1: FlexColumnWidth(4),
+        2: FlexColumnWidth(3),
+        3: FlexColumnWidth(2),
         4: FlexColumnWidth(1),
-        5: FlexColumnWidth(1),
+        5: FlexColumnWidth(2),
       },
       children: tableRows,
     );
@@ -329,55 +329,33 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
   TableRow _tableRow(
       {required StockMoveLine stockMoveLine, required int index}) {
     return TableRow(children: [
+      BlocBuilder<StockLoadingCubit, StockLoadingState>(
+        builder: (context, state) {
+          return Checkbox(
+            value: stockMoveLine.isChecked ?? false,
+            onChanged: (value) {
+              int index = state.stockMoveWithTotalList.indexWhere(
+                (element) =>
+                    element.moveId == stockMoveLine.moveId &&
+                    element.productUomId == stockMoveLine.productUomId,
+              );
+              if (index > -1) {
+                stockMoveLine.isChecked = value;
+                state.stockMoveWithTotalList[index] = stockMoveLine;
+
+                _stockLoadingCubit.editStockMoveLineList(
+                    stockMoveLineList: state.stockMoveWithTotalList ?? []);
+              }
+            },
+          );
+        },
+      ),
       _tableItem(stockMoveLine.productName ?? '', align: Alignment.centerLeft),
+      _tableItem(stockMoveLine.productUomName ?? ''),
       // _tableItem((stockMoveLine.productUomQty ?? 0).toString()),
 
       _tableItem((stockMoveLine.productUomQty ?? 0).toString()),
 
-      (stockMoveLine.isLot ?? false)
-          ? _tableItem(
-              (_calculateQtyDoneFromLot(stockMoveLine: stockMoveLine) ?? 0)
-                  .toString())
-          : BlocBuilder<StockLoadingCubit, StockLoadingState>(
-              builder: (context, state) {
-                return TextField(
-                  style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.bold),
-                  onChanged: (value) {
-                    int index = state.stockMoveWithTotalList.indexWhere(
-                        (element) =>
-                            element.id == stockMoveLine.id &&
-                            element.productUomId == stockMoveLine.productUomId);
-                    if (index > -1) {
-                      state.stockMoveWithTotalList[index].qtyDone =
-                          _changeToRefQty(
-                              qty: double.tryParse(value) ?? 0,
-                              uomId: stockMoveLine.productUomId ?? 0,
-                              productId: stockMoveLine.productId ?? 0);
-                      _stockLoadingCubit.editStockMoveLineList(
-                          stockMoveLineList: state.stockMoveWithTotalList);
-                    }
-                  },
-                  onTap: () {
-                    stockMoveLine.controller?.selection = TextSelection(
-                        baseOffset: 0,
-                        extentOffset:
-                            stockMoveLine.controller?.text.length ?? 0);
-                  },
-                  controller: stockMoveLine.controller,
-                  keyboardType: TextInputType.number,
-                  onTapOutside: (event) {
-                    FocusScope.of(context).unfocus();
-                  },
-                  textAlign: TextAlign.right,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                  ),
-                );
-              },
-            ).padding(padding: 8.horizontalPadding),
-
-      _tableItem(stockMoveLine.productUomName ?? ''),
       (stockMoveLine.isLot ?? false)
           ? Align(
               alignment: Alignment.centerLeft,
@@ -426,7 +404,7 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
                               //     "Lot List : after dialog : ${lotList.length} : ${_stockMoveLineListNotifier.value[index].lotList?.length}");
                             }
                           },
-                          icon: Icon(Icons.more_vert));
+                          icon: const Icon(Icons.more_vert));
                     },
                   );
                 },
@@ -434,27 +412,48 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
             )
           : Container(),
 
-      BlocBuilder<StockLoadingCubit, StockLoadingState>(
-        builder: (context, state) {
-          return Checkbox(
-            value: stockMoveLine.isChecked ?? false,
-            onChanged: (value) {
-              int index = state.stockMoveWithTotalList.indexWhere(
-                (element) =>
-                    element.moveId == stockMoveLine.moveId &&
-                    element.productUomId == stockMoveLine.productUomId,
-              );
-              if (index > -1) {
-                stockMoveLine.isChecked = value;
-                state.stockMoveWithTotalList[index] = stockMoveLine;
-
-                _stockLoadingCubit.editStockMoveLineList(
-                    stockMoveLineList: state.stockMoveWithTotalList ?? []);
-              }
-            },
-          );
-        },
-      ),
+      (stockMoveLine.isLot ?? false)
+          ? _tableItem(
+              (_calculateQtyDoneFromLot(stockMoveLine: stockMoveLine) ?? 0)
+                  .toString())
+          : BlocBuilder<StockLoadingCubit, StockLoadingState>(
+              builder: (context, state) {
+                return TextField(
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.bold),
+                  onChanged: (value) {
+                    int index = state.stockMoveWithTotalList.indexWhere(
+                        (element) =>
+                            element.id == stockMoveLine.id &&
+                            element.productUomId == stockMoveLine.productUomId);
+                    if (index > -1) {
+                      state.stockMoveWithTotalList[index].qtyDone =
+                          _changeToRefQty(
+                              qty: double.tryParse(value) ?? 0,
+                              uomId: stockMoveLine.productUomId ?? 0,
+                              productId: stockMoveLine.productId ?? 0);
+                      _stockLoadingCubit.editStockMoveLineList(
+                          stockMoveLineList: state.stockMoveWithTotalList);
+                    }
+                  },
+                  onTap: () {
+                    stockMoveLine.controller?.selection = TextSelection(
+                        baseOffset: 0,
+                        extentOffset:
+                            stockMoveLine.controller?.text.length ?? 0);
+                  },
+                  controller: stockMoveLine.controller,
+                  keyboardType: TextInputType.number,
+                  onTapOutside: (event) {
+                    FocusScope.of(context).unfocus();
+                  },
+                  textAlign: TextAlign.right,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                  ),
+                );
+              },
+            ).padding(padding: 8.horizontalPadding),
     ]);
   }
 

@@ -22,6 +22,8 @@ class SaleOrderLine {
   double? subTotal;
   double? singlePKPrice;
   double? singlePCPrice;
+  double? discountPercent;
+
 
   SaleOrderLine({
     this.productId,
@@ -39,7 +41,8 @@ class SaleOrderLine {
     this.singleItemPrice,
     this.subTotal,
     this.singlePCPrice,
-    this.singlePKPrice
+    this.singlePKPrice,
+    this.discountPercent
   });
 
   SaleOrderLine.fromJson(Map<String, dynamic> json) {
@@ -140,7 +143,8 @@ class SaleOrderLine {
     double? singleItemPrice,
     double? subTotal,
     double? singlePKPrice,
-    double? singlePCPrice
+    double? singlePCPrice,
+    double? discountPercent
   }) {
     return SaleOrderLine(id: id ?? this.id,
         orderNo: orderNo ?? this.orderNo,
@@ -155,7 +159,8 @@ class SaleOrderLine {
       singleItemPrice: singleItemPrice ?? this.singlePCPrice,
       singlePCPrice:  singlePCPrice ?? this.singlePCPrice,
       singlePKPrice: singlePKPrice ?? this.singlePKPrice,
-      subTotal: subTotal ?? this.subTotal
+      subTotal: subTotal ?? this.subTotal,
+      discountPercent: discountPercent ?? this.discountPercent
     );
   }
 

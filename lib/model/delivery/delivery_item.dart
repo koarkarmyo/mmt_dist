@@ -19,6 +19,7 @@ class DeliveryItem {
   double? refPrice = 0;
   UomLine? uomLine;
   double? balanceQty;
+  double? discountPercent;
 
   DeliveryItem({
     this.productId,
@@ -36,6 +37,7 @@ class DeliveryItem {
     this.refPrice,
     this.uomLine,
     this.balanceQty,
+    this.discountPercent
   }) {
     calculateSubtotal();
   }

@@ -5,9 +5,13 @@ class ConstString {
   static const String history = 'History';
   static const String saleOrderMM = 'အ‌ရောင်းအော်ဒါများ';
   static const String voucherNo = 'အော်ဒါနံပါတ်';
+  static const String pc = 'PC';
+  static const String pk = 'PK';
+  static const String delete = 'Delete';
   static const String createSaleOrder = 'အ‌ရောင်းအော်ဒါတင်ခြင်း';
   static const String coupon = 'Coupon';
   static const String name = "Name";
+  static const String saleItem = "Sale Item";
   static const String urlRequired = 'ဆာဗာလင့်ထည့်‌ပေးပါ';
   static const String lot = 'Lot';
   static const String uom = 'Uom';
@@ -21,6 +25,7 @@ class ConstString {
   static const String date = "Date";
   static const String qty = 'Qty';
   static const String doneQty = 'DoneQty';
+  static const String stock = 'Stock';
   static const String unfinishedToken = 'Ongoing Token';
   static const String addNewToken = "Add New Token";
   static const String createNewToken = "Create New Token";
@@ -48,7 +53,7 @@ class ConstString {
   static const String shopAddress = "စျေးဆိုင်လိပ်စာ";
   static const String pickUpAddress = "ကုန်သွားယူမည့် လိပ်စာ";
   static const String deliveryAddress = "ပို့ရမည့် လိပ်စာ";
-  static const String confirm = "အတည်ပြုမည်";
+  static const String confirm = "confirm";
   static const String loading = "Loading";
   static const String stockLoadingHistory = "Stock Loading History";
   static const String customerNameOrPhoneNo =
@@ -77,7 +82,7 @@ class ConstString {
   static const String amountRequired = "ငွေအမောင့်ထည့်ပါ";
   static const String needSignNotiString = "လက်မှတ်ထိုးပါ";
   static const String clear = "ရှင်းမည်";
-  static const String cancel = "ပယ်ဖျတ်ရန်";
+  static const String cancel = "cancel";
   static const String save = "Save";
   static const String locationCreate = "နေရာအသစ်ဖန်တီးခြင်း";
   static const String locationNotIdentical = "ရွေးထားသောပစ္စည်းများ နေရာမတူပါ";
@@ -95,7 +100,8 @@ class ConstString {
   static const String totalQtyNotMatch = "Total Quantity does not match";
   static const String lotRequired = "Lot is required in some items";
   static const String loadingHistory = "Loading History";
-  static const String loadingConfirmDialog = "Do you want to confirm the loading?";
+  static const String loadingConfirmDialog =
+      "Do you want to confirm the loading?";
 
   static const String meterCube = "m\u00B3";
 

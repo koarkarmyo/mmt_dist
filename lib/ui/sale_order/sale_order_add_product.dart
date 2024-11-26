@@ -33,10 +33,7 @@ class SaleOrderAddProductPage extends StatefulWidget {
 class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
   late ProductCubit _productCubit;
   TextEditingController _searchProduct = TextEditingController();
-  List<Product> _productList = [];
   String? _filterProductCategory = 'All';
-  List<SaleOrderLine> _saleOrderLineList = [];
-  List<PriceListItem> _priceListItem = [];
   late CartCubit _cartCubit;
 
   @override
@@ -98,9 +95,275 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                 _filterWidget()
               ],
             ),
-            _showProductList()
+            // _showProductList()
+            _productTableHeaderWidget(),
+            _productTableRows()
           ],
         ).padding(padding: 16.horizontalPadding),
+      ),
+    );
+  }
+
+  Widget _productTableHeaderWidget() {
+    List<TableRow> tableRows = [
+      TableRow(
+        decoration: BoxDecoration(color: Colors.grey[200]),
+        children: (MMTApplication.currentUser?.useLooseBox ?? false)
+            ? [
+                _tableItem(ConstString.name, align: Alignment.centerLeft),
+                _tableItem(ConstString.pk),
+                _tableItem(ConstString.pc),
+              ]
+            : [
+                _tableItem(ConstString.name, align: Alignment.centerLeft),
+                _tableItem(ConstString.uom),
+                _tableItem(ConstString.qty),
+              ],
+      )
+    ];
+
+    return Table(
+      border: TableBorder.all(),
+      columnWidths: (MMTApplication.currentUser?.useLooseBox ?? false)
+          ? const {
+              0: FlexColumnWidth(6),
+              1: FlexColumnWidth(3),
+              2: FlexColumnWidth(3),
+            }
+          : const {
+              0: FlexColumnWidth(6),
+              1: FlexColumnWidth(4),
+              2: FlexColumnWidth(3),
+            },
+      children: tableRows,
+    );
+  }
+
+  Widget _productTableRows() {
+    return BlocBuilder<ProductCubit, ProductState>(
+      builder: (context, state) {
+        return ListView.builder(
+          itemCount: state.productList.length,
+          itemBuilder: (context, index) {
+            return (MMTApplication.currentUser?.useLooseBox ?? false)
+                ? _productRowWithPKPC(product: state.productList[index])
+                : _productRow(product: state.productList[index]);
+          },
+        ).expanded();
+      },
+    );
+  }
+
+  Widget _productRowWithPKPC({required Product product}) {
+    TextEditingController pkController = TextEditingController();
+    TextEditingController pcController = TextEditingController();
+
+    return BlocBuilder<CartCubit, CartState>(builder: (context, state) {
+      SaleOrderLine? deliveryItem = state.itemList
+          .where(
+            (element) => element.productId == product.id,
+          )
+          .firstOrNull;
+
+      print("Delivery Item : ${deliveryItem?.toJson()}");
+
+      return Container(
+        padding: 8.allPadding,
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: Colors.grey.shade300),
+          ),
+        ),
+        child: Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(product.name ?? '').bold(),
+                const SizedBox(
+                  height: 8,
+                ),
+                const Text(
+                  "10000K",
+                  style: TextStyle(fontSize: 14),
+                ),
+                const Text("10 PK 5 PC", style: TextStyle(fontSize: 14))
+              ],
+            ).expanded(flex: 6),
+            TextField(
+              onTap: () {
+                pkController.selection = TextSelection(
+                    baseOffset: 0, extentOffset: pkController.text.length);
+              },
+              onTapOutside: (event) {
+                FocusScope.of(context).unfocus();
+              },
+              onChanged: (value) {
+                _cartCubit.addCartSaleItem(
+                    looseBoxType: LooseBoxType.pk,
+                    saleItem: deliveryItem?.copyWith(
+                          pkQty: (pkController.text != '')
+                              ? double.tryParse(pkController.text)
+                              : 0,
+                        ) ??
+                        SaleOrderLine(
+                            productId: product.id,
+                            productName: product.name,
+                            pkQty: (pkController.text != '')
+                                ? double.tryParse(pkController.text)
+                                : 0,
+                            pcUomLine: UomLine(
+                                uomId: product.looseUomId,
+                                uomName: product.looseUomName),
+                            pkUomLine: UomLine(
+                                uomId: product.boxUomId,
+                                uomName: product.boxUomName)));
+              },
+              keyboardType: TextInputType.number,
+              controller: pkController,
+              textAlign: TextAlign.right,
+              decoration: InputDecoration(
+                  border: InputBorder.none, hintText: ConstString.qty),
+            ).padding(padding: 8.horizontalPadding).expanded(flex: 3),
+            TextField(
+              onTap: () {
+                pcController.selection = TextSelection(
+                    baseOffset: 0, extentOffset: pcController.text.length);
+              },
+              onTapOutside: (event) {
+                FocusScope.of(context).unfocus();
+              },
+              onChanged: (value) {
+                _cartCubit.addCartSaleItem(
+                    looseBoxType: LooseBoxType.pc,
+                    saleItem: deliveryItem?.copyWith(
+                          pcQty: (pcController.text != '')
+                              ? double.tryParse(pcController.text)
+                              : 0,
+                        ) ??
+                        SaleOrderLine(
+                            productId: product.id,
+                            productName: product.name,
+                            pcQty: (pcController.text != '')
+                                ? double.tryParse(pcController.text)
+                                : 0,
+                            pcUomLine: UomLine(
+                                uomId: product.looseUomId,
+                                uomName: product.looseUomName),
+                            pkUomLine: UomLine(
+                                uomId: product.boxUomId,
+                                uomName: product.boxUomName)));
+              },
+              keyboardType: TextInputType.number,
+              controller: pcController,
+              textAlign: TextAlign.right,
+              decoration: const InputDecoration(
+                  border: InputBorder.none, hintText: ConstString.qty),
+            ).padding(padding: 8.horizontalPadding).expanded(flex: 3),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _productRow({required Product product}) {
+    TextEditingController controller = TextEditingController();
+
+    return BlocBuilder<CartCubit, CartState>(builder: (context, state) {
+      SaleOrderLine? deliveryItem = state.itemList
+          .where(
+            (element) => element.productId == product.id,
+          )
+          .firstOrNull;
+
+      print("Delivery Item : ${deliveryItem?.toJson()}");
+
+      return Container(
+        padding: 8.allPadding,
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: Colors.grey.shade300),
+          ),
+        ),
+        child: Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(product.name ?? '').bold(),
+                const SizedBox(
+                  height: 8,
+                ),
+                const Text(
+                  "10000K",
+                  style: TextStyle(fontSize: 14),
+                ),
+                const Text("10 PK 5 PC", style: TextStyle(fontSize: 14))
+              ],
+            ).expanded(flex: 6),
+            Container(
+              margin: 8.horizontalPadding,
+              width: 200,
+              child: DropdownButton<UomLine>(
+                isExpanded: true,
+                value: deliveryItem?.uomLine ?? product.uomLines?.firstOrNull,
+                items: product.uomLines
+                    ?.map((UomLine value) => DropdownMenuItem<UomLine>(
+                          value: value,
+                          child: Text(value.uomName ?? ''),
+                        ))
+                    .toList(),
+                onChanged: (UomLine? newValue) {
+                  // Handle selection change
+                  _cartCubit.addCartSaleItem(
+                      saleItem: SaleOrderLine(
+                          productId: product.id,
+                          productName: product.name,
+                          productUomQty: (controller.text != '')
+                              ? double.tryParse(controller.text)
+                              : 0,
+                          uomLine: newValue));
+                },
+                hint: const Text('uom'),
+                isDense: true,
+              ),
+            ).expanded(flex: 4),
+            TextField(
+              onTap: () {
+                controller.selection = TextSelection(
+                    baseOffset: 0, extentOffset: controller.text.length);
+              },
+              onTapOutside: (event) {
+                FocusScope.of(context).unfocus();
+              },
+              onChanged: (value) {
+                _cartCubit.addCartSaleItem(
+                    saleItem: SaleOrderLine(
+                        productId: product.id,
+                        productName: product.name,
+                        productUomQty: (controller.text != '')
+                            ? double.tryParse(controller.text)
+                            : 0,
+                        uomLine: product.uomLines?.firstOrNull));
+              },
+              keyboardType: TextInputType.number,
+              controller: controller,
+              textAlign: TextAlign.right,
+              decoration: InputDecoration(
+                  border: InputBorder.none, hintText: ConstString.qty),
+            ).padding(padding: 8.horizontalPadding).expanded(flex: 3),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _tableItem(String text, {Alignment align = Alignment.centerRight}) {
+    return Padding(
+      padding: EdgeInsets.all(8.0),
+      child: Align(
+        alignment: align,
+        child: Text(text, style: TextStyle(fontWeight: FontWeight.bold)),
       ),
     );
   }
@@ -199,7 +462,6 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
 
   Widget _showProductList() {
     return BlocBuilder<ProductCubit, ProductState>(builder: (context, state) {
-      _productList = state.productList;
       return ListView.builder(
         itemCount: state.filterProductList.length,
         itemBuilder: (context, index) {
