@@ -84,9 +84,9 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
               }
               return BlocBuilder<StockLoadingCubit, StockLoadingState>(
                 builder: (context, state) {
-                  // if (state.state == BlocCRUDProcessState.updateSuccess) {
-                  //   return Container();
-                  // }
+                  if (state.state == BlocCRUDProcessState.updateSuccess) {
+                    return Container();
+                  }
                   return IconButton(
                       onPressed: () async {
                         bool isAllCheck = true;
@@ -95,14 +95,7 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
                             in state.stockMoveWithTotalList) {
                           isAllCheck = moveLine.isChecked ?? false;
                           if (!isAllCheck) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content:
-                                    const Text(ConstString.pleaseCheckAllItem),
-                                duration: const Duration(milliseconds: 500),
-                                backgroundColor: AppColors.dangerColor,
-                              ),
-                            );
+                            break;
                           }
                         }
 
@@ -152,6 +145,15 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
                                   productList: _productList);
                             }
                           }
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  const Text(ConstString.pleaseCheckAllItem),
+                              duration: const Duration(milliseconds: 500),
+                              backgroundColor: AppColors.dangerColor,
+                            ),
+                          );
                         }
                       },
                       icon: const Icon(Icons.cloud_upload_rounded));
@@ -355,6 +357,12 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
                       _stockLoadingCubit.editStockMoveLineList(
                           stockMoveLineList: state.stockMoveWithTotalList);
                     }
+                  },
+                  onTap: () {
+                    stockMoveLine.controller?.selection = TextSelection(
+                        baseOffset: 0,
+                        extentOffset:
+                            stockMoveLine.controller?.text.length ?? 0);
                   },
                   controller: stockMoveLine.controller,
                   keyboardType: TextInputType.number,

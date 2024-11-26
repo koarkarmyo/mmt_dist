@@ -43,6 +43,7 @@ class StockLoadingCubit extends Cubit<StockLoadingState> {
                 (e) => e.productId,
               )
               .contains(element.productId)) {
+            element.qtyDone = 0;
             stockMoveWithTotalQty.add(element);
           } else {
             int index = stockMoveWithTotalQty.indexWhere(
@@ -69,6 +70,7 @@ class StockLoadingCubit extends Cubit<StockLoadingState> {
                     uomList: product.uomLines ?? [])
                 .forEach(
               (element) {
+                print("Long Form : $element ${stockMove.productUomQty}");
                 stockMoveWithEachUomQty.add(stockMove.copyWith(
                     productUomId: element['product_uom_id'],
                     productUomName: element['product_uom_name'],
@@ -115,6 +117,7 @@ class StockLoadingCubit extends Cubit<StockLoadingState> {
       state.stockMoveList.forEach(
         (stockMove) {
           // print("stock move : ${stockMove.toJson()}");
+          stockMove.qtyDone = 0;
           List<UomLine> uomList = productList
                   .firstWhereOrNull(
                     (element) => element.id == stockMove.productId,
@@ -144,18 +147,23 @@ class StockLoadingCubit extends Cubit<StockLoadingState> {
             List<StockMoveLine> stockMoveLineListWithDifUom =
                 state.stockMoveWithTotalList
                     .where(
-                      (element) => element.moveId == stockMove.moveId && element.productId == stockMove.productId,
+                      (element) =>
+                          element.moveId == stockMove.moveId &&
+                          element.productId == stockMove.productId,
                     )
                     .toList();
             stockMoveLineListWithDifUom.forEach(
               (element) {
                 print("stock move with");
                 UomLine? uomLine = product?.uomLines?.firstWhereOrNull(
-                  (uom) => uom.uomId == element.productUomId,
+                  (uom) => uom.uomId == stockMove.productUomId,
                 );
                 if (uomLine != null) {
-                  stockMove.qtyDone = (stockMove.qtyDone ?? 0) +  MMTApplication.uomQtyToRefTotal(
-                      uomLine, element.qtyDone ?? 0);
+                  stockMove.qtyDone = (stockMove.qtyDone ?? 0) +
+                      MMTApplication.uomQtyToRefTotal(
+                          uomLine, element.qtyDone ?? 0);
+                  print(
+                      "This is qty done : each ${element.qtyDone} ${element.productUomName} : ${MMTApplication.uomQtyToRefTotal(uomLine, element.qtyDone ?? 0)}");
                 }
               },
             );
