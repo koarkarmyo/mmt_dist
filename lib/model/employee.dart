@@ -1,6 +1,7 @@
+import 'package:collection/collection.dart';
 import 'package:mmt_mobile/sync/models/sync_action.dart';
-import 'package:odoo_rpc/odoo_rpc.dart';
 
+import '../src/mmt_application.dart';
 import 'company_id.dart';
 
 class Employee {
@@ -38,6 +39,9 @@ class Employee {
         companyList?.add(CompanyId.fromJson(companyJson));
       }
     }
+
+    MMTApplication.selectedCompany = (companyList ?? [])
+        .firstWhereOrNull((element) => element.id == companyId);
   }
 
   String? name;

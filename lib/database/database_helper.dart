@@ -140,6 +140,7 @@ class DatabaseHelper {
     await _createRouteTable(db);
     await _createRouteLineTable(db);
     await _createDashboardTable(db);
+    await _createCompanyTable(db);
     await _createCustomerDashboardTable(db);
     await _createPriceListItemTable(db);
     await _createUomCategoryTable(db);
@@ -330,6 +331,8 @@ class DatabaseHelper {
         '${DBConstant.mobile} TEXT,'
         '${DBConstant.website} TEXT,'
         '${DBConstant.useLooseUom} INTEGER,'
+        '${DBConstant.qtyDigit} INTEGER,'
+        '${DBConstant.priceDigit} INTEGER,'
         '${DBConstant.email} TEXT'
         ')');
   }

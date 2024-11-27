@@ -19,7 +19,9 @@ class CompanyId {
     String? mobile,
     String? email,
     String? website,
-    this.useLooseUom,
+    bool? useLooseUom,
+    int? qtyDigit,
+    int? priceDigit,
   }) {
     _id = id;
     _name = name;
@@ -30,6 +32,9 @@ class CompanyId {
     _mobile = mobile;
     _email = email;
     _website = website;
+    _useLooseUom = useLooseUom;
+    _qtyDigit = qtyDigit;
+    _priceDigit = priceDigit;
   }
 
   CompanyId.fromJson(dynamic json) {
@@ -42,7 +47,9 @@ class CompanyId {
     _mobile = json['mobile'];
     _email = json['email'];
     _website = json['website'];
-    useLooseUom = json['use_loose_uom'];
+    _useLooseUom = json['use_loose_uom'];
+    _qtyDigit = json['qty_digit'];
+    _priceDigit = json['price_digit'];
   }
 
   CompanyId.fromJsonDB(dynamic json) {
@@ -55,7 +62,9 @@ class CompanyId {
     _mobile = json['mobile'];
     _email = json['email'];
     _website = json['website'];
-    useLooseUom = json['use_loose_uom'] == 1;
+    _useLooseUom = json['use_loose_uom'] == 1;
+    _qtyDigit = json['qty_digit'];
+    _priceDigit = json['price_digit'];
   }
 
   int? _id;
@@ -67,7 +76,9 @@ class CompanyId {
   String? _mobile;
   String? _email;
   String? _website;
-  bool? useLooseUom;
+  bool? _useLooseUom;
+  int? _qtyDigit;
+  int? _priceDigit;
 
   CompanyId copyWith({
     int? id,
@@ -80,6 +91,8 @@ class CompanyId {
     String? email,
     String? website,
     bool? useLooseUom,
+    int? qtyDigit,
+    int? priceDigit,
   }) =>
       CompanyId(
         id: id ?? _id,
@@ -91,7 +104,9 @@ class CompanyId {
         mobile: mobile ?? _mobile,
         email: email ?? _email,
         website: website ?? _website,
-        useLooseUom: useLooseUom ?? this.useLooseUom,
+        useLooseUom: useLooseUom ?? _useLooseUom,
+        qtyDigit: qtyDigit ?? _qtyDigit,
+        priceDigit: priceDigit ?? _priceDigit,
       );
 
   int? get id => _id;
@@ -112,6 +127,12 @@ class CompanyId {
 
   String? get website => _website;
 
+  bool? get useLooseUom => _useLooseUom;
+
+  int? get qtyDigit => _qtyDigit;
+
+  int? get priceDigit => _priceDigit;
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['id'] = _id;
@@ -123,7 +144,7 @@ class CompanyId {
     map['mobile'] = _mobile;
     map['email'] = _email;
     map['website'] = _website;
-    map['use_loose_uom'] = useLooseUom;
+    map['use_loose_uom'] = _useLooseUom;
     return map;
   }
 }
