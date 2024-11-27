@@ -150,9 +150,9 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
         );
         return Column(
           children: [
-            _dataRow(title: "subtotal", value: subtotal),
-            _dataRow(title: "discount total", value: _discountAmount),
-            _dataRow(title: "total", value: subtotal - _discountAmount),
+            _dataRow(title: "Subtotal", value: subtotal),
+            _dataRow(title: "Discount total", value: _discountAmount),
+            _dataRow(title: "Total", value: subtotal - _discountAmount),
           ],
         );
       },

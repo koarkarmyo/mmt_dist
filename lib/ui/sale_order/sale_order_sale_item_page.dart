@@ -228,9 +228,13 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                                         deliveryItem.discountPercent);
                               });
                           if (discountAmount != null) {
+                            deliveryItem.discountPercent = discountAmount;
+                            double subtotal = calculateSubtotal([deliveryItem]);
+                            print("Subtotal : $subtotal");
                             _cartCubit.addCartSaleItem(
                                 saleItem: deliveryItem.copyWith(
-                                    discountPercent: discountAmount));
+                                    discountPercent: discountAmount,
+                                    subTotal: subtotal));
                           }
                         },
                         child: Text(

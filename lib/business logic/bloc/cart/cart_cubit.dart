@@ -181,6 +181,8 @@ class CartCubit extends Cubit<CartState> {
             (orderLine.pcQty ?? 0) * (orderLine.singlePCPrice ?? 0) +
             (orderLine.productUomQty ?? 0) * (orderLine.singleItemPrice ?? 0);
 
+    // orderLine.subTotal = (orderLine.subTotal ?? 0) - ((orderLine.subTotal ?? 0) * ((orderLine.discountPercent ?? 0) / 100));
+
     return orderLine;
   }
 
