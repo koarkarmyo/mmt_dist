@@ -136,10 +136,11 @@ class CartCubit extends Cubit<CartState> {
   SaleOrderLine _calculatePrice(
       {required SaleOrderLine orderLine, LooseBoxType? looseBoxType}) {
     if (looseBoxType == LooseBoxType.pk) {
-      print("This is pk type");
       PriceListItem? price = _priceListItems
           .where(
-            (element) => element.productUom == orderLine.pkUomLine?.uomId && element.productId == orderLine.productId,
+            (element) =>
+                element.productUom == orderLine.pkUomLine?.uomId &&
+                    element.productTmplId == orderLine.productId,
           )
           .firstOrNull;
 
@@ -149,7 +150,9 @@ class CartCubit extends Cubit<CartState> {
     } else if (looseBoxType == LooseBoxType.pc) {
       PriceListItem? price = _priceListItems
           .where(
-            (element) => element.productUom == orderLine.pcUomLine?.uomId  && element.productId == orderLine.productId,
+            (element) =>
+                element.productUom == orderLine.pcUomLine?.uomId &&
+                    element.productTmplId == orderLine.productId,
           )
           .firstOrNull;
 
@@ -159,10 +162,16 @@ class CartCubit extends Cubit<CartState> {
     } else {
       PriceListItem? price = _priceListItems
           .where(
-            (element) => element.productUom == orderLine.uomLine?.uomId  && element.productId == orderLine.productId,
+            (element) =>
+                (element.productUom == orderLine.uomLine?.uomId) &&
+                (element.productTmplId == orderLine.productId),
           )
           .firstOrNull;
       orderLine.singleItemPrice = price?.fixedPrice ?? 0;
+
+      print(
+          "Single Item Price : ${orderLine.singleItemPrice} : Price List : ${_priceListItems.length} ");
+
       // orderLine.subTotal =
       //     (orderLine.productUomQty ?? 0) * (orderLine.singleItemPrice ?? 0);
     }
@@ -182,7 +191,7 @@ class CartCubit extends Cubit<CartState> {
     // saleOrderLineList.addAll(state.focItemList);
     // saleOrderLineList.addAll(state.couponList);
     state.itemList.forEach(
-          (element) {
+      (element) {
         if ((element.pcQty ?? 0) > 0) {
           SaleOrderLine saleOrderLine = element.copyWith(
               productUomQty: element.pcQty, uomLine: element.pcUomLine);
@@ -211,7 +220,7 @@ class CartCubit extends Cubit<CartState> {
     );
 
     state.couponList.forEach(
-          (element) {
+      (element) {
         if ((element.pcQty ?? 0) > 0) {
           SaleOrderLine saleOrderLine = element.copyWith(
               productUomQty: element.pcQty, uomLine: element.pcUomLine);

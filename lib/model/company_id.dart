@@ -147,4 +147,19 @@ class CompanyId {
     map['use_loose_uom'] = _useLooseUom;
     return map;
   }
+
+  Map<String, dynamic> toDBJson() {
+    final map = <String, dynamic>{};
+    map['id'] = _id;
+    map['name'] = _name;
+    map['logo'] = _logo;
+    map['street'] = _street;
+    map['street2'] = _street2;
+    map['phone'] = _phone;
+    map['mobile'] = _mobile;
+    map['email'] = _email;
+    map['website'] = _website;
+    map['use_loose_uom'] = (_useLooseUom == true) ? 1 : 0;
+    return map;
+  }
 }

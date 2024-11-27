@@ -13,11 +13,13 @@ import 'package:mmt_mobile/ui/widgets/date_picker_button.dart';
 import 'package:mmt_mobile/ui/widgets/no_item_widget.dart';
 import 'package:mmt_mobile/ui/widgets/responsive.dart';
 
+import '../common_widget/text_widget.dart';
 import '../model/partner.dart';
 import '../model/res_partner.dart';
 import '../model/tag.dart';
 import '../on_clicked_listener.dart';
 import '../src/const_dimen.dart';
+import '../src/const_string.dart';
 import '../src/enum.dart';
 import '../utils/date_time_utils.dart';
 
@@ -145,10 +147,18 @@ class _RoutePageState extends State<RoutePage> {
                   ));
                 }
                 if (state.customerList.isEmpty) {
-                  return Expanded(
-                      child: Center(
-                    child: NoItemWidget('', "No Item"),
-                  ));
+                  return SizedBox(
+                    width: double.infinity,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.hourglass_empty, size: 30,)
+                            .padding(padding: 8.verticalPadding),
+                        const TextWidget(ConstString.noItem).bold()
+                      ],
+                    ),
+                  ).expanded();
                 }
                 return Expanded(
                   child: GridView.builder(

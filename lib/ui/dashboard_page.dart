@@ -117,7 +117,7 @@ class _DashboardPageState extends State<DashboardPage> {
             const SizedBox(
               width: 8,
             ),
-            Text(MMTApplication.currentUser?.name ?? '',
+            Text(MMTApplication.selectedCompany?.name ?? '',
                 style: const TextStyle(fontSize: 18)),
           ],
         ),
