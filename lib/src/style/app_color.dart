@@ -10,3 +10,9 @@ class AppColors {
   static const Color infoColor = Color(0xFF02CAF2);
 
 }
+
+extension ColorExtension on Color{
+  WidgetStateProperty<Color> get materialColor{
+    return WidgetStateProperty.all<Color>(this);
+  }
+}

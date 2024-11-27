@@ -1,3 +1,5 @@
+import 'package:image_picker/image_picker.dart';
+
 class ResPartner {
   int? id;
   String? name;
@@ -14,6 +16,7 @@ class ResPartner {
   String? mobile;
   String? writeDate;
   String? partnerSaleType;
+  XFile? image;
 
   ResPartner(
       { this.id,
@@ -30,7 +33,9 @@ class ResPartner {
         this.phone,
         this.mobile,
         this.partnerSaleType,
-        this.writeDate});
+        this.writeDate,
+      this.image
+      });
 
   ResPartner.fromJson(Map<String, dynamic> json) {
     id = json['id'];

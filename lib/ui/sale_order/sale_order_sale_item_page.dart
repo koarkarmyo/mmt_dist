@@ -173,7 +173,19 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                       const SizedBox(
                         height: 10,
                       ),
-                      const Text("K 10000 / K 300"),
+                      Text((product.priceListItems
+                                      ?.toList() // Convert to a list if it's not already
+                                    ?..sort((a, b) => (a.fixedPrice ?? 0)
+                                        .compareTo(b.productUom ??
+                                            0)) // Sort by productUom
+                                  )
+                                  ?.map((e) =>
+                                      '${e.productUomName} - ${e.fixedPrice} K') // Map to formatted strings
+                                  .join(
+                                      ', ') // Join the list into a single string
+                              ??
+                              '' // Provide an empty string if null
+                          ),
                       const Text("23 PK / 6 PC"),
                       GestureDetector(
                         onTap: () async {

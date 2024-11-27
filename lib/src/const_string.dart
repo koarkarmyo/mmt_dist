@@ -58,7 +58,8 @@ class ConstString {
   static const String stockLoadingHistory = "Stock Loading History";
   static const String customerNameOrPhoneNo =
       "ဖောက်သည်နာမည် သို့မဟုတ် ဖုန်းနံပါတ်";
-  static const String phone = "ဖုန်းနံပါတ်";
+  static const String phone = "phone";
+  static const String mobile = "mobile";
   static const String zoneName = "ဇုန်နာမည်";
   static const String addProduct = "ပစ္စည်းထည့်ရန်";
   static const String requiredProduct = "ပစ္စည်းထည့်ရန်လိုအပ်သည်";
@@ -112,4 +113,10 @@ class ConstString {
   static const String saleOrder = "Sale Order";
   static const String saleOrderNo = 'Sale Order Number';
   static const String customerDashboard = "Customer Dashboard";
+  static const String tag = "Tag";
+  static const String outletType = "Outlet Type";
+  static const String customerGrade = 'Customer Grade';
+  static const String township = "Township";
+  static const String ward = "Ward";
+  static const String street = "Street";
 }

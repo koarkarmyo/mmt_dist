@@ -58,7 +58,7 @@ class CartCubit extends Cubit<CartState> {
       state.itemList.removeAt(index);
     }
 
-    emit(state.copyWith(focItemList: state.itemList));
+    emit(state.copyWith(itemList: state.itemList));
   }
 
   void addCartFocItem(

@@ -294,9 +294,16 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                 const SizedBox(
                   height: 8,
                 ),
-                const Text(
-                  "10000K",
-                  style: TextStyle(fontSize: 14),
+                Text((product.priceListItems
+                    ?.toList() // Convert to a list if it's not already
+                  ?..sort((a, b) => (a.fixedPrice ?? 0)
+                      .compareTo(b.productUom ?? 0)) // Sort by productUom
+                )
+                    ?.map((e) =>
+                '${e.productUomName} - ${e.fixedPrice} K') // Map to formatted strings
+                    .join(', ') // Join the list into a single string
+                    ??
+                    '' // Provide an empty string if null
                 ),
                 const Text("10 PK 5 PC", style: TextStyle(fontSize: 14))
               ],

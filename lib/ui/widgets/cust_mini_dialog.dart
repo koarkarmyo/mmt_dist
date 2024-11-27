@@ -1,9 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:mmt_mobile/common_widget/bottom_choice_sheet_widget.dart';
 import 'package:mmt_mobile/src/enum.dart';
+import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 
 import '../../model/partner.dart';
+import '../../route/route_list.dart';
 import '../../src/style/app_color.dart';
 
 class CustDialog extends SimpleDialog {
@@ -35,6 +38,7 @@ class CustDialog extends SimpleDialog {
                   //     .then((value) {
                   //   Navigator.pop(context, value);
                   // });
+                  context.pushTo(route: RouteList.customerEditPage);
                 },
                 child: const CircleAvatar(
                     foregroundColor: Colors.black,

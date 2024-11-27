@@ -17,6 +17,7 @@ class TextFieldCustomWidget extends StatelessWidget {
       decoration:
           BoxDecoration(color: Colors.white, borderRadius: 8.borderRadius, border: Border.all()),
       child: TextField(
+
         onTapOutside: (event) {
           FocusScope.of(context).unfocus();
         },

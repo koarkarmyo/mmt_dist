@@ -13,6 +13,7 @@ import 'package:mmt_mobile/common_widget/text_widget.dart';
 import 'package:mmt_mobile/route/route_list.dart';
 import 'package:mmt_mobile/sync/bloc/sync_action_bloc/sync_action_bloc_cubit.dart';
 import 'package:mmt_mobile/ui/account_payment_page.dart';
+import 'package:mmt_mobile/ui/customer/customer_edit_page.dart';
 import 'package:mmt_mobile/ui/customer_dashboard_page.dart';
 import 'package:mmt_mobile/ui/customer_visit_report_page.dart';
 import 'package:mmt_mobile/ui/dashboard_page.dart';
@@ -177,6 +178,8 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
               create: (context) => StockLoadingCubit(),
             )
           ], child: const StockLoadingDetailPage()));
+    case RouteList.customerEditPage:
+      return _buildPageRoute(routeSettings, const CustomerEditPage());
 
     default:
       return _buildPageRoute(routeSettings, const NotFoundPage());

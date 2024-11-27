@@ -24,4 +24,5 @@ class RouteList {
   static const String loadingHistoryPage = '/loading_history_page';
   static const String deliveryReturnPage = '/delivery_return_page';
   static const String stockLoadingDetailPage = '/loading_detail_page';
+  static const String customerEditPage = '/customer_edit_page';
 }
