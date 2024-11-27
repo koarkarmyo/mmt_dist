@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
+import 'package:mmt_mobile/business%20logic/bloc/customer/customer_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/login/login_bloc.dart';
+import 'package:mmt_mobile/common_widget/alert_dialog.dart';
 import 'package:mmt_mobile/route/route_list.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
+import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/ui/widgets/cust_mini_dialog.dart';
 import 'package:mmt_mobile/ui/widgets/customer_filter_widget.dart';
 import 'package:mmt_mobile/ui/widgets/date_picker_button.dart';
+import 'package:mmt_mobile/ui/widgets/no_item_widget.dart';
 import 'package:mmt_mobile/ui/widgets/responsive.dart';
 
 import '../model/partner.dart';
+import '../model/res_partner.dart';
 import '../model/tag.dart';
 import '../on_clicked_listener.dart';
 import '../src/const_dimen.dart';
@@ -34,6 +41,7 @@ class _RoutePageState extends State<RoutePage> {
 
   // late String _searchedCustomer = '%';
   late CustomerFilterType _customerFilterType = CustomerFilterType.MISSED;
+  late CustomerCubit _customerCubit;
 
   // late String _selectedCustType = '%';
   // late int _selectedRouteId = 0;
@@ -50,55 +58,12 @@ class _RoutePageState extends State<RoutePage> {
   DateTime _selectedDate = DateTime.now();
   int counter = 1;
 
-
-  Partner selectedCustomer = Partner(
-    id: 1,
-    name: "John Doe",
-    name2: "JD Enterprises",
-    customerRank: 5,
-    street: "123 Main St",
-    street2: "Suite 101",
-    city: "Metropolis",
-    stateId: 23,
-    zip: "54321",
-    phone: "+1234567890",
-    mobile: "+0987654321",
-    email: "john.doe@example.com",
-    image512: "https://example.com/image.png",
-    partnerLatitude: 40.7128,
-    partnerLongitude: -74.0060,
-    writeDate: "2024-10-29T12:34:56",
-    stateName: "New York",
-    pricelistName: "Standard",
-    pricelistId: 101,
-    wardId: 5,
-    wardName: "Downtown",
-    townshipId: 3,
-    townshipName: "Old Town",
-    partnerGradeId: 2,
-    outletTypeId: 4,
-    partnerState: PartnerState.Regular,
-    categoryIds: [
-      Tag(id: 1, name: "VIP"),
-      Tag(id: 2, name: "Frequent Buyer"),
-    ],
-    supplierRank: 3,
-    isVisited: true,
-    number: 456789,
-    reasonCode: "N/A",
-    lastSaleOrder: 1001,
-    lastSaleOrderName: "SO1001",
-    lastSaleAmount: 2500.75,
-    lastSaleOrderDate: "2024-09-25",
-    lastSaleCurrencyId: 840,
-    lastSaleCurrencyName: "USD",
-    totalOrdered: 10,
-    totalDue: 10.00,
-    totalInvoiced: 100.00,
-    saleOrderCount: 25,
-    invoiceCount: 20,
-  );
-
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _customerCubit = context.read<CustomerCubit>()..fetchAllCustomer();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,7 +116,7 @@ class _RoutePageState extends State<RoutePage> {
           //   child: viewType == ViewTypes.list
           //       ?
           FloatingActionButton(
-            backgroundColor: Colors.white,
+        backgroundColor: Colors.white,
         onPressed: () {
           // Navigator.pushNamed(context, RouteList.customerCreateRoute)
           //     .then((value) {
@@ -171,132 +136,157 @@ class _RoutePageState extends State<RoutePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: GridView.builder(
-                itemCount: 10, // Replace with your desired item count
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1,
-                  childAspectRatio: 4 / 2,
-                ),
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            icon: const Icon(
-                              Icons.account_box_rounded,
-                              size: 80,
-                            ),
-                            title: const Text(
-                              "Clock In",
-                              style: TextStyle(fontSize: 24),
-                            ),
-                            content: const Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  "Are you sure to clock in?",
-                                  textAlign: TextAlign.center,
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Icon(
-                                  Icons.camera_alt_outlined,
+            BlocBuilder<CustomerCubit, CustomerState>(
+              builder: (context, state) {
+                if (state.state == BlocCRUDProcessState.fetching) {
+                  return const Expanded(
+                      child: Center(
+                    child: CircularProgressIndicator(),
+                  ));
+                }
+                if (state.customerList.isEmpty) {
+                  return Expanded(
+                      child: Center(
+                    child: NoItemWidget('', "No Item"),
+                  ));
+                }
+                return Expanded(
+                  child: GridView.builder(
+                    itemCount: state.customerList.length,
+                    // Replace with your desired item count
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 1,
+                      childAspectRatio: 4 / 2,
+                    ),
+                    itemBuilder: (context, index) {
+                      ResPartner selectedCustomer = state.customerList[index];
+                      return GestureDetector(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                icon: const Icon(
+                                  Icons.account_box_rounded,
                                   size: 80,
-                                )
-                              ],
-                            ),
-                            actions: [
-                              Center(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    // Navigator.of(context)
-                                    //     .pop(); // Close the dialog
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //     builder: (context) => NextPage(), // Replace with your next page
-                                    //   ),
-                                    // );
-
-                                    Navigator.pushNamed(context, RouteList.customerDashboardPage);
-                                  },
-                                  child: const Text("Clock In"),
                                 ),
-                              ),
-                            ],
+                                title: const Text(
+                                  "Clock In",
+                                  style: TextStyle(fontSize: 24),
+                                ),
+                                content: const Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      "Are you sure to clock in?",
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Icon(
+                                      Icons.camera_alt_outlined,
+                                      size: 80,
+                                    )
+                                  ],
+                                ),
+                                actions: [
+                                  Center(
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        // Navigator.of(context)
+                                        //     .pop(); // Close the dialog
+                                        // Navigator.push(
+                                        //   context,
+                                        //   MaterialPageRoute(
+                                        //     builder: (context) => NextPage(), // Replace with your next page
+                                        //   ),
+                                        // );
+
+                                        Navigator.pushNamed(context,
+                                            RouteList.customerDashboardPage);
+                                      },
+                                      child: const Text("Clock In"),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
                           );
                         },
+                        child: Card(
+                          shadowColor: Colors.grey,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10.0, vertical: 5),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    _customerInfo(context,
+                                        selectedCustomer: selectedCustomer);
+                                  },
+                                  child: Container(
+                                    height: 140,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.grey,
+                                    ),
+                                    child: const Icon(
+                                      Icons.person,
+                                      size: 90,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 12.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(selectedCustomer.name ?? '',
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18)),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(selectedCustomer.phone ?? '',
+                                          style: const TextStyle(fontSize: 14)),
+                                      Text(
+                                        selectedCustomer.street ?? '',
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      const Text("Last Order : Can't Define",
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.lightBlueAccent)),
+                                      Text("Last Order Amount: 0",
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.lightBlueAccent)),
+                                      Text("Amount Due: 0",
+                                          style: TextStyle(
+                                              fontSize: 14, color: Colors.red)),
+                                    ],
+                                  ),
+                                ).expanded(),
+                              ],
+                            ),
+                          ),
+                        ),
                       );
                     },
-                    child: Card(
-                      shadowColor: Colors.grey,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10.0,vertical: 5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                _customerInfo(context,selectedCust: selectedCustomer);
-                              },
-                              child: Container(
-                                height: 140,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.grey,
-                                ),
-                                child: const Icon(
-                                  Icons.person,
-                                  size: 90,
-                                ),
-                              ),
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 12.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Wai Lin Naing",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18)),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text("09-777789648",
-                                      style: TextStyle(fontSize: 14)),
-                                  Text("location",
-                                      style: TextStyle(fontSize: 14)),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text("Last Order : Can't Define",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.lightBlueAccent)),
-                                  Text("Last Order Amount: 0",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.lightBlueAccent)),
-                                  Text("Amount Due: 0",
-                                      style: TextStyle(
-                                          fontSize: 14, color: Colors.red)),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             )
           ],
         ),
@@ -541,8 +531,8 @@ class _RoutePageState extends State<RoutePage> {
 //   });
 
   _customerInfo(BuildContext context,
-      {required Partner selectedCust,
-        OnClickCallBack<bool>? callback}) async {
+      {required ResPartner selectedCustomer,
+      OnClickCallBack<bool>? callback}) async {
     bool? success = await showDialog(
         context: context,
         builder: (BuildContext context) {

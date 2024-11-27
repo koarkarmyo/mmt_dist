@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mmt_mobile/ui/widgets/cust_mini_dialog.dart';
 import 'package:mmt_mobile/ui/widgets/customer_filter_widget.dart';
 import '../model/partner.dart';
+import '../model/res_partner.dart';
 import '../model/tag.dart';
 import '../on_clicked_listener.dart';
 import '../src/enum.dart';
@@ -42,54 +43,18 @@ class _ContactPageState extends State<ContactPage> {
   int length = 2;
   DateTime _selectedDate = DateTime.now();
   int counter = 1;
-  Partner selectedCustomer = Partner(
+  ResPartner selectedCustomer = ResPartner(
     id: 1,
     name: "John Doe",
-    name2: "JD Enterprises",
-    customerRank: 5,
     street: "123 Main St",
-    street2: "Suite 101",
     city: "Metropolis",
     stateId: 23,
     zip: "54321",
     phone: "+1234567890",
     mobile: "+0987654321",
-    email: "john.doe@example.com",
-    image512: "https://example.com/image.png",
-    partnerLatitude: 40.7128,
-    partnerLongitude: -74.0060,
     writeDate: "2024-10-29T12:34:56",
     stateName: "New York",
-    pricelistName: "Standard",
-    pricelistId: 101,
-    wardId: 5,
-    wardName: "Downtown",
-    townshipId: 3,
-    townshipName: "Old Town",
-    partnerGradeId: 2,
-    outletTypeId: 4,
-    partnerState: PartnerState.Regular,
-    categoryIds: [
-      Tag(id: 1, name: "VIP"),
-      Tag(id: 2, name: "Frequent Buyer"),
-    ],
-    supplierRank: 3,
-    isVisited: true,
-    number: 456789,
-    reasonCode: "N/A",
-    lastSaleOrder: 1001,
-    lastSaleOrderName: "SO1001",
-    lastSaleAmount: 2500.75,
-    lastSaleOrderDate: "2024-09-25",
-    lastSaleCurrencyId: 840,
-    lastSaleCurrencyName: "USD",
-    totalOrdered: 10,
-    totalDue: 10.00,
-    totalInvoiced: 100.00,
-    saleOrderCount: 25,
-    invoiceCount: 20,
   );
-
 
   @override
   Widget build(BuildContext context) {
@@ -190,13 +155,14 @@ class _ContactPageState extends State<ContactPage> {
                       shadowColor: Colors.grey,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10.0,vertical: 5),
+                            horizontal: 10.0, vertical: 5),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             GestureDetector(
                               onTap: () {
-                                _customerInfo(context,selectedCust: selectedCustomer);
+                                _customerInfo(context,
+                                    selectedCustomer: selectedCustomer);
                               },
                               child: Container(
                                 height: 140,
@@ -264,8 +230,8 @@ class _ContactPageState extends State<ContactPage> {
   }
 
   _customerInfo(BuildContext context,
-      {required Partner selectedCust,
-        OnClickCallBack<bool>? callback}) async {
+      {required ResPartner selectedCustomer,
+      OnClickCallBack<bool>? callback}) async {
     bool? success = await showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -493,4 +459,3 @@ class _ContactPageState extends State<ContactPage> {
 //     );
 //   });
 }
-

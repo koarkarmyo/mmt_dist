@@ -85,7 +85,12 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
     // case RouteList.dashboardPage:
     //   return _buildPageRoute(routeSettings, const DashboardPage() );
     case RouteList.routePage:
-      return _buildPageRoute(routeSettings, const RoutePage());
+      return _buildPageRoute(
+          routeSettings,
+          MultiBlocProvider(
+            providers: [BlocProvider(create: (context) => CustomerCubit())],
+            child: const RoutePage(),
+          ));
     case RouteList.contactPage:
       return _buildPageRoute(routeSettings, const ContactPage());
     case RouteList.productReportPage:
@@ -179,7 +184,13 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
             )
           ], child: const StockLoadingDetailPage()));
     case RouteList.customerEditPage:
-      return _buildPageRoute(routeSettings, const CustomerEditPage());
+      return _buildPageRoute(
+          routeSettings,
+          MultiBlocProvider(providers: [
+            BlocProvider(
+              create: (context) => CustomerCubit(),
+            )
+          ], child: const CustomerEditPage()));
 
     default:
       return _buildPageRoute(routeSettings, const NotFoundPage());
