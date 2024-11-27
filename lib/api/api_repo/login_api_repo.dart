@@ -48,8 +48,6 @@ class LoginApiRepo extends BaseApiRepo {
     Employee? loginEmployee =
         Employee.fromJson(response.data['data'] as Map<String, dynamic>);
 
-    print("Login Employee : ${loginEmployee.toJson()}");
-
     return loginEmployee;
   }
 

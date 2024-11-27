@@ -1,18 +1,17 @@
 import 'dart:convert' as converter;
 
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:mmt_mobile/model/product_group.dart';
 import 'package:mmt_mobile/model/staff_role.dart';
+import 'package:mmt_mobile/src/mmt_application.dart';
 import 'package:mmt_mobile/sync/models/sync_action.dart';
-import 'package:collection/collection.dart';
 
 import '../src/enum.dart';
 import 'company_id.dart';
 import 'daily_route.dart';
 import 'device.dart';
 import 'employee_location.dart';
-
-
 
 LoginResponse loginResponseFromJson(String str) =>
     LoginResponse.fromJson(converter.json.decode(str));
@@ -133,7 +132,9 @@ class LoginResponse extends Equatable {
       List<dynamic> _jsonList = json['company_ids'];
       companyIds = [];
       _jsonList.forEach((json) {
-        companyIds?.add(CompanyId.fromJson(json));
+        //
+        CompanyId companyId = CompanyId.fromJson(json);
+        companyIds?.add(companyId);
       });
     } else {
       companyIds = [CompanyId.fromJson(json['company_id'])];
@@ -187,6 +188,9 @@ class LoginResponse extends Equatable {
     allowCashIn = json['allow_cash_in'];
     allowCashOut = json['allow_cash_out'];
     defaultCompanyId = json['default_company_id'];
+
+    MMTApplication.selectedCompany = (companyIds ?? [])
+        .firstWhereOrNull((element) => element.id == defaultCompanyId);
   }
 
   // int? qtyDigit;

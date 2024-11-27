@@ -69,9 +69,9 @@ class _StockLoadingAddLotState extends State<StockLoadingAddLot> {
     return PopScope(
       canPop: false,
       child: Material(
-        color: Colors.transparent,
+        // color: Colors.transparent,
         child: Container(
-          margin: 16.allPadding,
+          // margin: 16.allPadding,
           decoration:
               BoxDecoration(color: Colors.white, borderRadius: 16.borderRadius),
           child: Column(
@@ -254,8 +254,6 @@ class _StockLoadingAddLotState extends State<StockLoadingAddLot> {
             lot.productUomName = uom.uomName;
             lot.productUomId = uom.uomId;
             _lotListNotifier.value.add(lot);
-
-
           }
           context.pop(_lotListNotifier.value);
         }

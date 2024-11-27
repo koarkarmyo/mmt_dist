@@ -310,8 +310,6 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
       },
     );
 
-    print("Controller length : ${_controllerList.length}");
-
     return Table(
       border: TableBorder.all(),
       columnWidths: const {
@@ -354,7 +352,7 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
       _tableItem(stockMoveLine.productUomName ?? ''),
       // _tableItem((stockMoveLine.productUomQty ?? 0).toString()),
 
-      _tableItem((stockMoveLine.productUomQty ?? 0).toString()),
+      _tableItem((stockMoveLine.productUomQty ?? 0).toStringAsFixed(MMTApplication.selectedCompany?.qtyDigit ?? 0)),
 
       (stockMoveLine.isLot ?? false)
           ? Align(
@@ -366,7 +364,6 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
                       return IconButton(
                           alignment: Alignment.centerLeft,
                           onPressed: () async {
-                            print("Button pressed");
                             List<Lot> lotList = await showDialog(
                                   context: context,
                                   builder: (context) {
@@ -414,8 +411,8 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
 
       (stockMoveLine.isLot ?? false)
           ? _tableItem(
-              (_calculateQtyDoneFromLot(stockMoveLine: stockMoveLine) ?? 0)
-                  .toString())
+              (_calculateQtyDoneFromLot(stockMoveLine: stockMoveLine))
+                  .toStringAsFixed(MMTApplication.selectedCompany?.qtyDigit ?? 0))
           : BlocBuilder<StockLoadingCubit, StockLoadingState>(
               builder: (context, state) {
                 return TextField(
@@ -518,6 +515,7 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
           String? barcode = await MMTApplication.scanBarcode(context: context);
           if (barcode != null) {
             _batchName = barcode;
+            _searchBatchController.text = _batchName ?? '';
             _stockLoadingCubit.fetchBatchByBarcode(barcode: barcode);
           }
         },
@@ -535,7 +533,6 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
           (element) => element.uomId == uomId,
         );
 
-    print("uomline : ${uomLine?.toJson()}");
 
     if (uomLine?.uomType == UomType.bigger.name) {
       return qty * (uomLine?.ratio ?? 0);
