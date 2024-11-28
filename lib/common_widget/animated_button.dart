@@ -40,10 +40,11 @@ class AnimatedButton extends StatefulWidget {
       {super.key,
       required this.buttonText,
       required this.status,
+      this.onPressed,
       required this.buttonColor});
 
   String buttonText;
-
+  VoidCallback? onPressed;
   ButtonStatus status;
   Color buttonColor;
 
@@ -54,34 +55,37 @@ class AnimatedButton extends StatefulWidget {
 class _AnimatedButtonState extends State<AnimatedButton> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 50,
-      width: 400,
-      decoration: BoxDecoration(
-        borderRadius: 20.borderRadius,
-        border: Border.all(
-            color: (widget.status == ButtonStatus.loading)
-                ? widget.buttonColor
-                : Colors.white),
-        color: (widget.status == ButtonStatus.start)
-            ? widget.buttonColor
-            : widget.status.color,
-      ),
-      child: Stack(
-        children: [
-          Center(
-            child: AnimatedContainer(
-              height: (widget.status == ButtonStatus.loading) ? 50 : 0,
-              width: (widget.status == ButtonStatus.loading) ? 400 : 0,
-              duration: 100.milliseconds,
-              decoration: BoxDecoration(
-                  borderRadius: 20.borderRadius, color: Colors.white),
+    return InkWell(
+      onTap: widget.onPressed,
+      child: Container(
+        height: 50,
+        width: 200,
+        decoration: BoxDecoration(
+          borderRadius: 20.borderRadius,
+          border: Border.all(
+              color: (widget.status == ButtonStatus.loading)
+                  ? widget.buttonColor
+                  : Colors.white),
+          color: (widget.status == ButtonStatus.start)
+              ? widget.buttonColor
+              : widget.status.color,
+        ),
+        child: Stack(
+          children: [
+            Center(
+              child: AnimatedContainer(
+                height: (widget.status == ButtonStatus.loading) ? 50 : 0,
+                width: (widget.status == ButtonStatus.loading) ? 400 : 0,
+                duration: 100.milliseconds,
+                decoration: BoxDecoration(
+                    borderRadius: 20.borderRadius, color: Colors.white),
+              ),
             ),
-          ),
-          Center(
-            child: _getButtonTextWidget(),
-          ),
-        ],
+            Center(
+              child: _getButtonTextWidget(),
+            ),
+          ],
+        ),
       ),
     );
   }

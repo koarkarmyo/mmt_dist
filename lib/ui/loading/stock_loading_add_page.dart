@@ -4,6 +4,7 @@ import 'package:mmt_mobile/business%20logic/bloc/batch/stock_loading_cubit.dart'
 import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
 import 'package:mmt_mobile/business%20logic/bloc/lot/lot_cubit.dart';
 import 'package:mmt_mobile/common_widget/alert_dialog.dart';
+import 'package:mmt_mobile/common_widget/animated_button.dart';
 import 'package:mmt_mobile/common_widget/retry_widget.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
@@ -164,19 +165,211 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
         ],
       ),
       persistentFooterButtons: [
-        BlocBuilder<StockLoadingCubit, StockLoadingState>(
-          builder: (context, state) {
-            return TextWidget(
-              '',
-              dataList: [
-                ConstString.total,
-                ':',
-                state.stockMoveList.length.toString()
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            BlocBuilder<StockLoadingCubit, StockLoadingState>(
+              builder: (context, state) {
+                return TextWidget(
+                  '',
+                  dataList: [
+                    ConstString.total,
+                    ':',
+                    state.stockMoveList.length.toString()
+                  ],
+                  style: const TextStyle(fontSize: 20),
+                );
+              },
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                BlocConsumer<StockLoadingCubit, StockLoadingState>(
+                  listener: (context, state) {
+                    if (state.state == BlocCRUDProcessState.updateFail) {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return CustomAlertDialog(
+                              dialogType: AlertDialogType.fail);
+                        },
+                      );
+                    } else if (state.state ==
+                        BlocCRUDProcessState.updateSuccess) {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return CustomAlertDialog(
+                              dialogType: AlertDialogType.success);
+                        },
+                      );
+                    }
+                  },
+                  builder: (context, state) {
+                    if (state.state == BlocCRUDProcessState.updating) {
+                      return const CircularProgressIndicator();
+                    }
+                    return BlocBuilder<StockLoadingCubit, StockLoadingState>(
+                      builder: (context, state) {
+                        if (state.state == BlocCRUDProcessState.updateSuccess) {
+                          return Container();
+                        }
+                        return AnimatedButton(
+                          onPressed: () async {
+                            ///
+                            bool isAllCheck = true;
+                            bool lotCheck = true;
+                            for (StockMoveLine moveLine
+                                in state.stockMoveWithTotalList) {
+                              isAllCheck = moveLine.isChecked ?? false;
+                              if (!isAllCheck) {
+                                break;
+                              }
+                            }
+
+                            if (state.stockMoveWithTotalList.isEmpty) {
+                              isAllCheck = false;
+                            }
+
+                            if (isAllCheck) {
+                              List<Lot> lotList = [];
+                              state.stockMoveWithTotalList.forEach(
+                                (element) {
+                                  if (element.isLot ?? false) {
+                                    if ((element.lotList ?? []).isEmpty) {
+                                      lotCheck = false;
+                                    }
+                                  }
+                                  lotList.addAll(element.lotList ?? []);
+                                  print(
+                                      "Lot length : ${element.lotList?.length}");
+                                  element.lotList?.forEach(
+                                    (element) {
+                                      print("Lot : ${element.toJson()}");
+                                    },
+                                  );
+                                },
+                              );
+
+                              if (!lotCheck) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const TextWidget(
+                                        ConstString.lotRequired),
+                                    backgroundColor: AppColors.dangerColor,
+                                  ),
+                                );
+                              } else {
+                                bool confirm =
+                                    await MMTApplication.showConfirmDialog(
+                                            confirmQuestion: ConstString
+                                                .loadingConfirmDialog,
+                                            context: context) ??
+                                        false;
+
+                                if (confirm) {
+                                  _stockLoadingCubit.uploadDoneQty(
+                                      stockMoveList:
+                                          state.stockMoveWithTotalList,
+                                      lotList: lotList,
+                                      productList: _productList);
+                                }
+                              }
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: const Text(
+                                      ConstString.pleaseCheckAllItem),
+                                  duration: const Duration(milliseconds: 500),
+                                  backgroundColor: AppColors.dangerColor,
+                                ),
+                              );
+                            }
+                          },
+                          buttonText: "Save",
+                          status: ButtonStatus.start,
+                          buttonColor: Colors.green,
+                        ).expanded();
+                        return IconButton(
+                            onPressed: () async {
+                              bool isAllCheck = true;
+                              bool lotCheck = true;
+                              for (StockMoveLine moveLine
+                                  in state.stockMoveWithTotalList) {
+                                isAllCheck = moveLine.isChecked ?? false;
+                                if (!isAllCheck) {
+                                  break;
+                                }
+                              }
+
+                              if (state.stockMoveWithTotalList.isEmpty) {
+                                isAllCheck = false;
+                              }
+
+                              if (isAllCheck) {
+                                List<Lot> lotList = [];
+                                state.stockMoveWithTotalList.forEach(
+                                  (element) {
+                                    if (element.isLot ?? false) {
+                                      if ((element.lotList ?? []).isEmpty) {
+                                        lotCheck = false;
+                                      }
+                                    }
+                                    lotList.addAll(element.lotList ?? []);
+                                    print(
+                                        "Lot length : ${element.lotList?.length}");
+                                    element.lotList?.forEach(
+                                      (element) {
+                                        print("Lot : ${element.toJson()}");
+                                      },
+                                    );
+                                  },
+                                );
+
+                                if (!lotCheck) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: const TextWidget(
+                                          ConstString.lotRequired),
+                                      backgroundColor: AppColors.dangerColor,
+                                    ),
+                                  );
+                                } else {
+                                  bool confirm =
+                                      await MMTApplication.showConfirmDialog(
+                                              confirmQuestion: ConstString
+                                                  .loadingConfirmDialog,
+                                              context: context) ??
+                                          false;
+
+                                  if (confirm) {
+                                    _stockLoadingCubit.uploadDoneQty(
+                                        stockMoveList:
+                                            state.stockMoveWithTotalList,
+                                        lotList: lotList,
+                                        productList: _productList);
+                                  }
+                                }
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text(
+                                        ConstString.pleaseCheckAllItem),
+                                    duration: const Duration(milliseconds: 500),
+                                    backgroundColor: AppColors.dangerColor,
+                                  ),
+                                );
+                              }
+                            },
+                            icon: const Icon(Icons.cloud_upload_rounded));
+                      },
+                    );
+                  },
+                ),
               ],
-              style: const TextStyle(fontSize: 20),
-            );
-          },
-        )
+            )
+          ],
+        ),
       ],
       body: Column(
         children: [
@@ -265,7 +458,7 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
                         },
                       );
                     },
-                  )
+                  ),
                 ],
               ).padding(padding: 16.allPadding),
             ),
@@ -352,7 +545,8 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
       _tableItem(stockMoveLine.productUomName ?? ''),
       // _tableItem((stockMoveLine.productUomQty ?? 0).toString()),
 
-      _tableItem((stockMoveLine.productUomQty ?? 0).toStringAsFixed(MMTApplication.selectedCompany?.qtyDigit ?? 0)),
+      _tableItem((stockMoveLine.productUomQty ?? 0)
+          .toStringAsFixed(MMTApplication.selectedCompany?.qtyDigit ?? 0)),
 
       (stockMoveLine.isLot ?? false)
           ? Align(
@@ -410,9 +604,8 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
           : Container(),
 
       (stockMoveLine.isLot ?? false)
-          ? _tableItem(
-              (_calculateQtyDoneFromLot(stockMoveLine: stockMoveLine))
-                  .toStringAsFixed(MMTApplication.selectedCompany?.qtyDigit ?? 0))
+          ? _tableItem((_calculateQtyDoneFromLot(stockMoveLine: stockMoveLine))
+              .toStringAsFixed(MMTApplication.selectedCompany?.qtyDigit ?? 0))
           : BlocBuilder<StockLoadingCubit, StockLoadingState>(
               builder: (context, state) {
                 return TextField(
@@ -532,7 +725,6 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
         ?.firstWhere(
           (element) => element.uomId == uomId,
         );
-
 
     if (uomLine?.uomType == UomType.bigger.name) {
       return qty * (uomLine?.ratio ?? 0);
