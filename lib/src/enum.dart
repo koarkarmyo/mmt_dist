@@ -18,6 +18,7 @@ extension SyncExtension on UploadBeforeSync {
   }
 }
 
+
 enum LocationTypes {
   supplier,
   view,

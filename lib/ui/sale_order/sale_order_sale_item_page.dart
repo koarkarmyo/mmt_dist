@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:mmt_mobile/business%20logic/bloc/batch/stock_loading_cubit.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/ui/widgets/no_item_widget.dart';
+import 'package:collection/collection.dart';
 
 import '../../business logic/bloc/cart/cart_cubit.dart';
 import '../../business logic/bloc/product/product_cubit.dart';
@@ -43,10 +45,44 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
       appBar: AppBar(
         title: const TextWidget(ConstString.saleItem),
       ),
+      persistentFooterButtons: [
+        BlocBuilder<CartCubit, CartState>(
+          builder: (context, state) {
+            return Container(
+              padding: 4.allPadding,
+              width: double.infinity,
+              decoration: BoxDecoration(color: AppColors.successColor),
+              child: Align(
+                  alignment: Alignment.centerRight,
+                  child:
+                      Text("Subtotal : ${calculateSubtotal(state.itemList)}")),
+            );
+          },
+        )
+      ],
       body: Column(
         children: [_tableHeaderWidget(), _focItemListWidget()],
       ).padding(padding: 16.allPadding),
     );
+  }
+
+  double calculateSubtotal(List<SaleOrderLine> saleOrderLineList) {
+    double subtotal = 0;
+    double singleItemPrice = 0;
+    double discountPercent = 0;
+    double productUomQty = 0;
+    saleOrderLineList.forEach(
+      (element) {
+        singleItemPrice = element.singleItemPrice ?? 0;
+        discountPercent = element.discountPercent ?? 0;
+        productUomQty = element.productUomQty ?? 0;
+        subtotal +=
+            (singleItemPrice - (singleItemPrice * (discountPercent / 100))) *
+                productUomQty;
+      },
+    );
+
+    return subtotal;
   }
 
   Widget _tableHeaderWidget() {
@@ -173,31 +209,32 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                       const SizedBox(
                         height: 10,
                       ),
-                      Text((product.priceListItems
-                                      ?.toList() // Convert to a list if it's not already
-                                    ?..sort((a, b) => (a.fixedPrice ?? 0)
-                                        .compareTo(b.productUom ??
-                                            0)) // Sort by productUom
-                                  )
-                                  ?.map((e) =>
-                                      '${e.productUomName} - ${e.fixedPrice} K') // Map to formatted strings
-                                  .join(
-                                      ', ') // Join the list into a single string
-                              ??
-                              '' // Provide an empty string if null
-                          ),
-                      const Text("23 PK / 6 PC"),
+                      Text("${(product.priceListItems?.firstWhereOrNull(
+                            (element) =>
+                                element.productUom ==
+                                (deliveryItem.uomLine?.uomId ??
+                                    product.uomLines?.firstOrNull?.uomId),
+                          )?.fixedPrice ?? 0).roundTo(position: 1).toString()} K "),
+                      Text((MMTApplication.currentUser?.useLooseBox ?? false)
+                          ? "23 PK / 6 PC"
+                          : "300 Units"),
                       GestureDetector(
                         onTap: () async {
                           double? discountAmount = await showDialog(
                               context: context,
                               builder: (context) {
-                                return _discountDialog(context);
+                                return _discountDialog(context,
+                                    discountAmount:
+                                        deliveryItem.discountPercent);
                               });
                           if (discountAmount != null) {
+                            deliveryItem.discountPercent = discountAmount;
+                            double subtotal = calculateSubtotal([deliveryItem]);
+                            print("Subtotal : $subtotal");
                             _cartCubit.addCartSaleItem(
                                 saleItem: deliveryItem.copyWith(
-                                    discountPercent: discountAmount));
+                                    discountPercent: discountAmount,
+                                    subTotal: subtotal));
                           }
                         },
                         child: Text(
@@ -312,7 +349,7 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                                                   ? double.tryParse(
                                                       _qtyController.text)
                                                   : 0,
-                                          uomLine: product.uomLines?.first));
+                                          uomLine: newValue));
                                 },
                                 hint: const Text('uom'),
                                 isDense: true,
@@ -370,8 +407,9 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
     );
   }
 
-  Widget _discountDialog(BuildContext context) {
-    TextEditingController controller = TextEditingController();
+  Widget _discountDialog(BuildContext context, {double? discountAmount}) {
+    TextEditingController controller =
+        TextEditingController(text: (discountAmount ?? 0).toString());
     return Material(
       color: Colors.white.withOpacity(0.3),
       child: Center(
@@ -395,6 +433,11 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                       decoration: const InputDecoration(
                           isDense: true, border: InputBorder.none),
                       controller: controller,
+                      onTap: () {
+                        controller.selection = TextSelection(
+                            baseOffset: 0,
+                            extentOffset: controller.text.length);
+                      },
                       keyboardType: TextInputType.number,
                     ).expanded(),
                     const Icon(Icons.percent)

@@ -13,6 +13,7 @@ class ConstString {
   static const String name = "Name";
   static const String saleItem = "Sale Item";
   static const String urlRequired = 'ဆာဗာလင့်ထည့်‌ပေးပါ';
+  static const String pickImageFrom = "Pick Image from";
   static const String lot = 'Lot';
   static const String uom = 'Uom';
   static const String employeeName = "ဝန်ထမ်းနာမည်";

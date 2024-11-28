@@ -1,11 +1,16 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
+import 'package:mmt_mobile/business%20logic/bloc/customer/customer_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/login/login_bloc.dart';
 import 'package:mmt_mobile/common_widget/alert_dialog.dart';
 import 'package:mmt_mobile/common_widget/bottom_choice_sheet_widget.dart';
 import 'package:mmt_mobile/model/res_partner.dart';
+import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/src/mmt_application.dart';
@@ -28,20 +33,34 @@ class _CustomerEditPageState extends State<CustomerEditPage> {
   final TextEditingController _phoneNoController = TextEditingController();
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _streetController = TextEditingController();
-  final ImagePicker picker = ImagePicker();
+  final ImagePicker _picker = ImagePicker();
+
+  final ValueNotifier<XFile?> _profilePhoto = ValueNotifier(null);
 
   late ResPartner _customer;
+  late CustomerCubit _customerCubit;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _customerCubit = context.read<CustomerCubit>();
+  }
 
   @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    Map<String,dynamic>? data = ModalRoute.of(context)?.settings.arguments as Map<String,dynamic>?;
-    if(data != null){
+    Map<String, dynamic>? data =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (data != null) {
       _customer = data['customer'];
+      _profilePhoto.value = _customer.image;
+      _firstNameController.text = _customer.name ?? '';
+      _phoneNoController.text = _customer.phone ?? '';
+      _streetController.text = _customer.street ?? '';
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -54,21 +73,38 @@ class _CustomerEditPageState extends State<CustomerEditPage> {
       persistentFooterButtons: [
         SizedBox(
           width: double.infinity,
-          child: TextButton(
-              style: TextButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                      8.0), // Set the desired border radius
-                ),
-                backgroundColor: AppColors.successColor,
-                // Background color of the button
-                foregroundColor: Colors.white, // Text color
-              ),
-              onPressed: () {},
-              child: const Text(
-                ConstString.save,
-                style: TextStyle(color: Colors.white),
-              )),
+          child: BlocBuilder<CustomerCubit, CustomerState>(
+            builder: (context, state) {
+              return TextButton(
+                  style: TextButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                          8.0), // Set the desired border radius
+                    ),
+                    backgroundColor: AppColors.successColor,
+                    // Background color of the button
+                    foregroundColor: Colors.white, // Text color
+                  ),
+                  onPressed: () {
+                    if (state.state != BlocCRUDProcessState.updating) {
+                      _customerCubit.updateCustomerProfile();
+                    }
+                  },
+                  child: (state.state == BlocCRUDProcessState.updating)
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                           strokeWidth: 5,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          ConstString.save,
+                          style: TextStyle(color: Colors.white),
+                        ));
+            },
+          ),
         )
       ],
       body: SingleChildScrollView(
@@ -81,10 +117,17 @@ class _CustomerEditPageState extends State<CustomerEditPage> {
             Align(
               alignment: Alignment.center,
               child: Stack(children: [
-                CircleAvatar(
-                  radius: 70,
-                  backgroundImage:  MemoryImage(
-                      base64Decode(MMTApplication.defaultUserImage)),
+                ValueListenableBuilder(
+                  valueListenable: _profilePhoto,
+                  builder: (context, value, child) {
+                    return CircleAvatar(
+                      radius: 70,
+                      backgroundImage: (value != null)
+                          ? FileImage(File(value.path))
+                          : MemoryImage(
+                              base64Decode(MMTApplication.defaultUserImage)),
+                    );
+                  },
                 ),
                 Positioned(
                   bottom: 0,
@@ -94,8 +137,44 @@ class _CustomerEditPageState extends State<CustomerEditPage> {
                         backgroundColor: Colors.grey.shade100,
                       ),
                       onPressed: () async {
-                        XFile? photo =
-                            await picker.pickImage(source: ImageSource.gallery);
+                        ImageSource? imageSource = await showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: TextWidget(
+                                ConstString.pickImageFrom,
+                                style: TextStyle(fontSize: 20),
+                              ),
+                              actions: [
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: TextButton(
+                                      onPressed: () {
+                                        context.pop(ImageSource.camera);
+                                      },
+                                      child: const Text("Camera")),
+                                ),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: TextButton(
+                                      onPressed: () {
+                                        context.pop(ImageSource.gallery);
+                                      },
+                                      child: const Text("Gallery")),
+                                )
+                              ],
+                            );
+                          },
+                        );
+
+                        if (imageSource != null) {
+                          XFile? photo = await _picker.pickImage(
+                              source: imageSource, imageQuality: 10);
+
+                          if (photo != null) {
+                            _profilePhoto.value = photo;
+                          }
+                        }
                       },
                       icon: const Icon(Icons.edit)),
                 )

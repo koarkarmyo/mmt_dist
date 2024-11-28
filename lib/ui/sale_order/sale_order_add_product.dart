@@ -2,19 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
-import 'package:mmt_mobile/business%20logic/bloc/fetch_database/fetch_database_cubit.dart';
-import 'package:mmt_mobile/business%20logic/bloc/login/login_bloc.dart';
 import 'package:mmt_mobile/business%20logic/bloc/product/product_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/product_category/product_category_cubit.dart';
-import 'package:mmt_mobile/common_widget/alert_dialog.dart';
+
 import 'package:mmt_mobile/common_widget/constant_widgets.dart';
-import 'package:mmt_mobile/model/delivery/delivery_item.dart';
-import 'package:mmt_mobile/model/price_list/price_list_item.dart';
 import 'package:mmt_mobile/model/product/uom_lines.dart';
 import 'package:mmt_mobile/src/enum.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/src/mmt_application.dart';
+import 'package:collection/collection.dart';
 
 import '../../common_widget/text_widget.dart';
 import '../../model/product/product.dart';
@@ -165,8 +162,6 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
           )
           .firstOrNull;
 
-      print("Delivery Item : ${deliveryItem?.toJson()}");
-
       return Container(
         padding: 8.allPadding,
         decoration: BoxDecoration(
@@ -276,8 +271,6 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
           )
           .firstOrNull;
 
-      print("Delivery Item : ${deliveryItem?.toJson()}");
-
       return Container(
         padding: 8.allPadding,
         decoration: BoxDecoration(
@@ -294,18 +287,13 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                 const SizedBox(
                   height: 8,
                 ),
-                Text((product.priceListItems
-                    ?.toList() // Convert to a list if it's not already
-                  ?..sort((a, b) => (a.fixedPrice ?? 0)
-                      .compareTo(b.productUom ?? 0)) // Sort by productUom
-                )
-                    ?.map((e) =>
-                '${e.productUomName} - ${e.fixedPrice} K') // Map to formatted strings
-                    .join(', ') // Join the list into a single string
-                    ??
-                    '' // Provide an empty string if null
-                ),
-                const Text("10 PK 5 PC", style: TextStyle(fontSize: 14))
+                Text("${(product.priceListItems?.firstWhereOrNull(
+                      (element) =>
+                          element.productUom == (deliveryItem?.uomLine?.uomId ?? product.uomLines?.firstOrNull?.uomId),
+                    )?.fixedPrice ?? 0).roundTo(position: 1).toString()} K "),
+                Text((MMTApplication.currentUser?.useLooseBox ?? false)
+                    ? "23 PK / 6 PC"
+                    : "300 Units"),
               ],
             ).expanded(flex: 6),
             Container(

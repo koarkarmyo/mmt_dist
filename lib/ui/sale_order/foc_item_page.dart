@@ -7,6 +7,7 @@ import 'package:mmt_mobile/src/enum.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
+import 'package:collection/collection.dart';
 
 import '../../model/product/product.dart';
 import '../../model/product/uom_lines.dart';
@@ -76,7 +77,8 @@ class _FocItemPageState extends State<FocItemPage> {
   Widget _tableHeaderWidget() {
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, state) {
-        print("FOC item check : ${state.itemList.length} | ${state.focItemList.length}");
+        print(
+            "FOC item check : ${state.itemList.length} | ${state.focItemList.length}");
         if (state.focItemList.isEmpty) {
           return const Expanded(
               child: Column(
@@ -179,14 +181,21 @@ class _FocItemPageState extends State<FocItemPage> {
                   child: ListTile(
                     contentPadding: 10.horizontalPadding,
                     title: Text(product.name ?? '').boldSize(16),
-                    subtitle: const Column(
+                    subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(
                           height: 10,
                         ),
-                        Text("K 10000 / K 300"),
-                        Text("23 PK / 6 PC"),
+                        Text("${(product.priceListItems?.firstWhereOrNull(
+                              (element) =>
+                                  element.productUom ==
+                                  (deliveryItem.uomLine?.uomId ??
+                                      product.uomLines?.firstOrNull?.uomId),
+                            )?.fixedPrice ?? 0).roundTo(position: 1).toString()} K "),
+                        Text((MMTApplication.currentUser?.useLooseBox ?? false)
+                            ? "23 PK / 6 PC"
+                            : "300 Units"),
                       ],
                     ),
                     trailing: Row(

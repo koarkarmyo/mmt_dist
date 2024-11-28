@@ -9,6 +9,7 @@ import 'package:odoo_rpc/odoo_rpc.dart';
 import '../../../api/api_repo/login_api_repo.dart';
 import '../../../database/database_helper.dart';
 import '../../../database/db_constant.dart';
+import '../../../model/company_id.dart';
 import '../../../model/employee.dart';
 import '../../../model/odoo_session.dart';
 import '../../../sync/models/sync_action.dart';
@@ -63,6 +64,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         emit(state.copyWith(status: LoginStatus.initial));
       } else {
         MMTApplication.currentUser = employee;
+
+        bool saveSuccess =
+            await _saveCompanyListToDB(companyList: employee.companyList ?? []);
+        print("Company Successfully Saved : $saveSuccess");
         MMTApplication.currentUser?.useLooseBox =
             employee.companyList?.firstOrNull?.useLooseUom == true;
         SharePrefUtils()
@@ -84,6 +89,18 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     } on Error {
       _emitFail();
     }
+  }
+
+  Future<bool> _saveCompanyListToDB(
+      {required List<CompanyId> companyList}) async {
+    List<Map<String, dynamic>> companyMapList = companyList
+        .map(
+          (e) => e.toDBJson(),
+        )
+        .toList();
+    bool success = await DatabaseHelper.instance
+        .insertDataListBath(DBConstant.companyTable, companyMapList);
+    return success;
   }
 
   Future<bool> _saveSyncAction(

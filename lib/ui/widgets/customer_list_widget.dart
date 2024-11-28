@@ -3,6 +3,7 @@ import 'package:mmt_mobile/model/employee.dart';
 import '../../common_widget/constant_widgets.dart';
 import '../../grid_utils/grild_utils.dart';
 import '../../model/partner.dart';
+import '../../model/res_partner.dart';
 import '../../on_clicked_listener.dart';
 import '../../src/const_dimen.dart';
 import '../../src/image_assets.dart';
@@ -15,7 +16,7 @@ class CustomerListWidget extends StatelessWidget {
   final OnClickCallBack<bool>? callBack;
   // final CustomerViewTypes viewType;
   // late CustomerBloc _customerBloc;
-  late List<Partner> customers = [];
+  late List<ResPartner> customers = [];
 
   CustomerListWidget(
       {super.key,
@@ -63,7 +64,7 @@ class CustomerListWidget extends StatelessWidget {
             separatorBuilder: ConstantWidgets.separator,
             itemCount: customers.length,
             itemBuilder: (context, index) {
-              Partner customer = customers[index];
+              ResPartner customer = customers[index];
               return Stack(
                 children: [
                   // ListTile(
@@ -129,7 +130,7 @@ class CustomerListWidget extends StatelessWidget {
                           child: Container(
                             width: 100,
                             child: MemoryAssetImage(
-                              memoryImage: customer.image512 ?? '',
+                              memoryImage: '',
                               assetImagePath: ImageAssets.personLogo,
                             ),
                           ),
@@ -151,29 +152,29 @@ class CustomerListWidget extends StatelessWidget {
                                   Text(customer.name ?? '',
                                       style: TextStyle(fontSize: 16)),
                                   Text(customer.phone ?? ''),
-                                  Text(customer.getCustomerAddressInfo()),
-                                  if (customer.reasonCode != null)
-                                    Text(
-                                      customer.reasonCode ?? '',
-                                      style: TextStyle(
-                                        color: AppColors.dangerColor,
-                                      ),
-                                    ),
-                                  Text(
-                                    'Last Order : ${customer.lastOrderDate()}',
-                                    style: TextStyle(
-                                        color: AppColors.primaryColor),
-                                  ),
-                                  Text(
-                                    'Last Order Amount : ${customer.lastSaleAmount}',
-                                    style: TextStyle(
-                                        color: AppColors.primaryColor),
-                                  ),
-                                  Text(
-                                    'Amount Due : ${customer.totalDue ?? 0}',
-                                    style:
-                                    TextStyle(color: AppColors.dangerColor),
-                                  ),
+                                  Text(customer.street ?? ''),
+                                  // if (customer.reasonCode != null)
+                                  //   Text(
+                                  //     customer.reasonCode ?? '',
+                                  //     style: TextStyle(
+                                  //       color: AppColors.dangerColor,
+                                  //     ),
+                                  //   ),
+                                  // Text(
+                                  //   'Last Order : ${customer.lastOrderDate()}',
+                                  //   style: TextStyle(
+                                  //       color: AppColors.primaryColor),
+                                  // ),
+                                  // Text(
+                                  //   'Last Order Amount : ${customer.lastSaleAmount}',
+                                  //   style: TextStyle(
+                                  //       color: AppColors.primaryColor),
+                                  // ),
+                                  // Text(
+                                  //   'Amount Due : ${customer.totalDue ?? 0}',
+                                  //   style:
+                                  //   TextStyle(color: AppColors.dangerColor),
+                                  // ),
                                 ],
                               ),
                             ),
@@ -185,7 +186,7 @@ class CustomerListWidget extends StatelessWidget {
                   Container(
                     padding:
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    child: Text((customer.number ?? (index + 1)).toString()),
+                    child: Text((customer.phone ?? (index + 1)).toString()),
                     color: Colors.green,
                   ),
                 ],
@@ -209,7 +210,7 @@ class CustomerListWidget extends StatelessWidget {
   }
 
   _customerInfo(BuildContext context,
-      {required Partner selectedCustomer,
+      {required ResPartner selectedCustomer,
         OnClickCallBack<bool>? callback}) async {
     bool? success = await showDialog(
         context: context,
@@ -222,47 +223,47 @@ class CustomerListWidget extends StatelessWidget {
     }
   }
 
-  Widget _customerGridView(BuildContext context) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(ConstantDimens.normalPadding),
-      itemCount: customers.length,
-      gridDelegate: GridUtils.createSliverDelicate(context),
-      // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-      //     crossAxisCount: 2, mainAxisSpacing: 10, crossAxisSpacing: 10),
-      itemBuilder: (BuildContext context, int index) {
-        Partner customer = customers[index];
-        // return _customerGridItemWidget(context, customer, onClickCallBack);
-      },
-    );
-  }
+  // Widget _customerGridView(BuildContext context) {
+  //   return GridView.builder(
+  //     padding: const EdgeInsets.all(ConstantDimens.normalPadding),
+  //     itemCount: customers.length,
+  //     gridDelegate: GridUtils.createSliverDelicate(context),
+  //     // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+  //     //     crossAxisCount: 2, mainAxisSpacing: 10, crossAxisSpacing: 10),
+  //     itemBuilder: (BuildContext context, int index) {
+  //       ResPartner customer = customers[index];
+  //       // return _customerGridItemWidget(context, customer, onClickCallBack);
+  //     },
+  //   );
+  // }
 
-  Widget _customerGridItemWidget(BuildContext context, Partner customer,
-      OnClickCallBack<Partner> onClick) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        AspectRatio(
-          aspectRatio: 18 / 13,
-          child: GestureDetector(
-            // onTap: () => onClickCallBack.call(customer),
-            child: MemoryAssetImage(
-                memoryImage: customer.image512 ?? '',
-                assetImagePath: ImageAssets.userImage),
-          ),
-        ),
-        GestureDetector(
-          onTap: () => _customerInfo(context, selectedCustomer: customer),
-          child: Padding(
-            padding: const EdgeInsets.all(ConstantDimens.normalPadding),
-            child: Text(
-              customer.name!,
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+//   Widget _customerGridItemWidget(BuildContext context, ResPartner customer,
+//       OnClickCallBack<ResPartner> onClick) {
+//     return Column(
+//       crossAxisAlignment: CrossAxisAlignment.center,
+//       children: <Widget>[
+//         AspectRatio(
+//           aspectRatio: 18 / 13,
+//           child: GestureDetector(
+//             // onTap: () => onClickCallBack.call(customer),
+//             child: MemoryAssetImage(
+//                 memoryImage:  '',
+//                 assetImagePath: ImageAssets.userImage),
+//           ),
+//         ),
+//         GestureDetector(
+//           onTap: () => _customerInfo(context, selectedCustomer: customer),
+//           child: Padding(
+//             padding: const EdgeInsets.all(ConstantDimens.normalPadding),
+//             child: Text(
+//               customer.name!,
+//               textAlign: TextAlign.center,
+//             ),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
 }
 
 // Container(

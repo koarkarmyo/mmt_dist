@@ -26,6 +26,8 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
   double _discountAmount = 0;
   double _total = 0;
   final TextEditingController _discController = TextEditingController();
+  final ValueNotifier<DiscountTypes> _discountType =
+      ValueNotifier(DiscountTypes.K);
 
   @override
   void initState() {
@@ -148,9 +150,9 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
         );
         return Column(
           children: [
-            _dataRow(title: "subtotal", value: subtotal),
-            _dataRow(title: "discount total", value: _discountAmount),
-            _dataRow(title: "total", value: subtotal - _discountAmount),
+            _dataRow(title: "Subtotal", value: subtotal),
+            _dataRow(title: "Discount total", value: _discountAmount),
+            _dataRow(title: "Total", value: subtotal - _discountAmount),
           ],
         );
       },
@@ -224,24 +226,33 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
   }
 
   Widget _discountTypeChoice() {
-    return PopupMenuButton<String>(
+    return PopupMenuButton<DiscountTypes>(
       elevation: 0.5,
       color: Colors.white,
-      onSelected: (String value) {},
-      itemBuilder: (BuildContext context) =>
-          [PopupMenuItem(child: Text("Disc")), PopupMenuItem(child: Text("%"))],
+      onSelected: (DiscountTypes value) {
+        _discountType.value = value;
+      },
+      itemBuilder: (BuildContext context) => DiscountTypes.values
+          .map(
+            (e) => PopupMenuItem<DiscountTypes>(value: e, child: Text(e.name)),
+          )
+          .toList(),
+
       icon: Container(
         padding: 8.allPadding,
         decoration: BoxDecoration(
           borderRadius: 8.borderRadius,
           color: AppColors.primaryColor,
         ),
-        child: const Row(
+        child: Row(
           children: [
-            Text(
-              "Disc",
-              style: TextStyle(fontSize: 12, color: Colors.white),
-            ),
+            ValueListenableBuilder(
+              valueListenable: _discountType,
+              builder: (context, value, child) => Text(
+                value.name,
+                style: TextStyle(fontSize: 12, color: Colors.white),
+              ),
+            )
           ],
         ),
       ),
