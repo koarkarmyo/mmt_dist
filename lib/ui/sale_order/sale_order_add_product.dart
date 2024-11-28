@@ -83,7 +83,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                 BlocBuilder<ProductCubit, ProductState>(
                   builder: (context, state) {
                     return Text(
-                      "$_filterProductCategory Product List",
+                      "$_filterProductCategory product list",
                       style: const TextStyle(
                           fontSize: 14, fontWeight: FontWeight.w600),
                     );
@@ -387,7 +387,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
             },
             decoration: const InputDecoration(
                 border: InputBorder.none,
-                hintText: "Product Name",
+                hintText: ConstString.productName,
                 hintStyle: TextStyle(fontSize: 14)),
           ).expanded(),
           _productQrScanner()

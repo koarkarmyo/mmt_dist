@@ -410,6 +410,7 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
   Widget _discountDialog(BuildContext context, {double? discountAmount}) {
     TextEditingController controller =
         TextEditingController(text: (discountAmount ?? 0).toString());
+    ValueNotifier<String> warning = ValueNotifier("");
     return Material(
       color: Colors.white.withOpacity(0.3),
       child: Center(
@@ -422,6 +423,7 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 padding: 8.horizontalPadding,
@@ -443,6 +445,13 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                     const Icon(Icons.percent)
                   ],
                 ),
+              ),
+              ValueListenableBuilder(
+                valueListenable: warning,
+                builder: (context, value, child) => Text(
+                  value,
+                  style: TextStyle(color: AppColors.dangerColor),
+                ).padding(padding: 4.verticalPadding),
               ),
               const SizedBox(
                 height: 24,
@@ -468,7 +477,13 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      context.pop(double.tryParse(controller.text));
+                      double percentValue =
+                          double.tryParse(controller.text) ?? 0;
+                      if (percentValue > 100) {
+                        warning.value = ConstString.percentCantExceed100;
+                      } else {
+                        context.pop(double.tryParse(controller.text));
+                      }
                     },
                     child: Container(
                       // width: double.infinity,

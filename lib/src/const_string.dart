@@ -11,9 +11,9 @@ class ConstString {
   static const String createSaleOrder = 'အ‌ရောင်းအော်ဒါတင်ခြင်း';
   static const String coupon = 'Coupon';
   static const String name = "Name";
-  static const String saleItem = "Sale Item";
+  static const String saleItem = "Sale item";
   static const String urlRequired = 'ဆာဗာလင့်ထည့်‌ပေးပါ';
-  static const String pickImageFrom = "Pick Image from";
+  static const String pickImageFrom = "Pick image from";
   static const String lot = 'Lot';
   static const String uom = 'Uom';
   static const String employeeName = "ဝန်ထမ်းနာမည်";
@@ -25,12 +25,13 @@ class ConstString {
   static const String noItem = "မရှိပါ";
   static const String date = "Date";
   static const String qty = 'Qty';
+  static const String percentCantExceed100 = 'Discount cannot exceed 100';
   static const String doneQty = 'DoneQty';
   static const String stock = 'Stock';
   static const String unfinishedToken = 'Ongoing Token';
   static const String addNewToken = "Add New Token";
   static const String createNewToken = "Create New Token";
-  static const String productName = "Product Name";
+  static const String productName = "Product name";
   static const String toLocation = "ဤနေရာသို့";
   static const String fromLocation = "ဤနေရာမှ";
   static const String productList = "ပစ္စည်းစာရင်း";
@@ -43,20 +44,20 @@ class ConstString {
   static const String pickUpMM = "ကုန်ကောက်";
   static const String transferMM = "ကုန်ပြောင်း";
   static const String deliveryMM = "ကုန်ပို့";
-  static const String pickUp = "Pick Up";
+  static const String pickUp = "Pick up";
   static const String transfer = "Transfer";
   static const String delivery = "Delivery";
-  static const String deliveryReturn = "Delivery Return";
-  static const String focItem = 'FOC Item';
-  static const String deliveryItem = 'Delivery Item';
-  static const String deliverySummaryPage = "Delivery Summary Page";
+  static const String deliveryReturn = "Delivery return";
+  static const String focItem = 'FOC item';
+  static const String deliveryItem = 'Delivery item';
+  static const String deliverySummaryPage = "Delivery summary page";
   static const String customerName = "ဖောက်သည်နာမည်";
   static const String shopAddress = "စျေးဆိုင်လိပ်စာ";
   static const String pickUpAddress = "ကုန်သွားယူမည့် လိပ်စာ";
   static const String deliveryAddress = "ပို့ရမည့် လိပ်စာ";
   static const String confirm = "confirm";
   static const String loading = "Loading";
-  static const String stockLoadingHistory = "Stock Loading History";
+  static const String stockLoadingHistory = "Stock loading history";
   static const String customerNameOrPhoneNo =
       "ဖောက်သည်နာမည် သို့မဟုတ် ဖုန်းနံပါတ်";
   static const String phone = "phone";
@@ -74,7 +75,7 @@ class ConstString {
   static const String refute = "မလုပ်ပါ";
   static const String total = "Total";
   static const String subtotal = 'SubTotal';
-  static const String discountTotal = 'Discount Total';
+  static const String discountTotal = 'Discount total';
   static const String individualAmount = "တစ်ခုချင်း အလေးချိန်/ထုထည်";
   static const String productQuantity = "ပစ္စည်းအရေအတွက်";
   static const String products = "Products";
@@ -84,7 +85,7 @@ class ConstString {
   static const String amountRequired = "ငွေအမောင့်ထည့်ပါ";
   static const String needSignNotiString = "လက်မှတ်ထိုးပါ";
   static const String clear = "ရှင်းမည်";
-  static const String cancel = "cancel";
+  static const String cancel = "Cancel";
   static const String save = "Save";
   static const String locationCreate = "နေရာအသစ်ဖန်တီးခြင်း";
   static const String locationNotIdentical = "ရွေးထားသောပစ္စည်းများ နေရာမတူပါ";
@@ -99,9 +100,9 @@ class ConstString {
   static const String productRequired = "ပစ္စည်းစားရင်းမရှိပါ";
   static const String barcodeNotFound = "ဘားကုဒ်မရှိပါ";
   static const String pleaseCheckAllItem = 'Please check all items';
-  static const String totalQtyNotMatch = "Total Quantity does not match";
+  static const String totalQtyNotMatch = "Total quantity does not match";
   static const String lotRequired = "Lot is required in some items";
-  static const String loadingHistory = "Loading History";
+  static const String loadingHistory = "Loading history";
   static const String loadingConfirmDialog =
       "Do you want to confirm the loading?";
 
@@ -110,14 +111,15 @@ class ConstString {
   static const String remark = "Note : ";
   static const String remarkTitle = " မှတ်ချက် ထည့်ပါ ";
 
-  static const String custVisitReport = "Customer Visit Report";
-  static const String saleOrder = "Sale Order";
-  static const String saleOrderNo = 'Sale Order Number';
-  static const String customerDashboard = "Customer Dashboard";
+  static const String custVisitReport = "Customer visit report";
+  static const String saleOrder = "Sale order";
+  static const String saleOrderNo = 'Sale order number';
+  static const String customerDashboard = "Customer dashboard";
   static const String tag = "Tag";
-  static const String outletType = "Outlet Type";
-  static const String customerGrade = 'Customer Grade';
+  static const String outletType = "Outlet type";
+  static const String customerGrade = 'Customer grade';
   static const String township = "Township";
   static const String ward = "Ward";
   static const String street = "Street";
+  static const String summaryPage = "Summary page";
 }

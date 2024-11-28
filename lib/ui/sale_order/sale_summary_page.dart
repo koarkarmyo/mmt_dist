@@ -9,6 +9,7 @@ import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/src/mmt_application.dart';
 
 import '../../model/sale_order/sale_order_6/sale_order.dart';
+import '../../src/const_string.dart';
 import '../../src/enum.dart';
 import '../../src/style/app_color.dart';
 
@@ -41,7 +42,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Summary Page"),
+        title: Text(ConstString.summaryPage),
       ),
       persistentFooterButtons: [
         BlocBuilder<CartCubit, CartState>(
@@ -372,20 +373,23 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
     }
 
     return ListTile(
-      title: Text(item.productName ?? 'product'),
-      subtitle: (MMTApplication.currentUser?.useLooseBox ?? false)
-          ? Text(itemPrice)
-          : Text(
-              "${item.productUomQty.toString()} ${item.uomLine?.uomName}  x ${item.singleItemPrice ?? 0} K"),
-      trailing: (MMTApplication.currentUser?.useLooseBox ?? false)
-          ? Text(
-              " ${item.subTotal.toString()} K",
-              style: const TextStyle(fontSize: 18),
+        title: Text(item.productName ?? 'product'),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            (MMTApplication.currentUser?.useLooseBox ?? false)
+                ? Text(itemPrice)
+                : Text(
+                    "${item.productUomQty.toString()} ${item.uomLine?.uomName}  x ${item.singleItemPrice ?? 0} K"),
+            Text(
+              "Discount ${item.discountPercent ?? 0} %",
+              style: TextStyle(color: AppColors.dangerColor),
             )
-          : Text(
-              "${(item.productUomQty ?? 0) * (item.singleItemPrice ?? 0)} K",
-              style: const TextStyle(fontSize: 18),
-            ).padding(padding: 8.horizontalPadding),
-    );
+          ],
+        ),
+        trailing: Text(
+          " ${(item.subTotal ?? 0).roundTo(position: 3)} K",
+          style: const TextStyle(fontSize: 18),
+        ));
   }
 }

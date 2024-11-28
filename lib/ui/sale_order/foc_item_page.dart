@@ -41,7 +41,7 @@ class _FocItemPageState extends State<FocItemPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("FOC Items"),
+        title: const Text(ConstString.focItem),
         actions: [
           IconButton(
               onPressed: () {

@@ -176,10 +176,12 @@ class CartCubit extends Cubit<CartState> {
       //     (orderLine.productUomQty ?? 0) * (orderLine.singleItemPrice ?? 0);
     }
 
+    double singleItemPriceWithDisc = (orderLine.singleItemPrice ?? 0) - ((orderLine.singleItemPrice ?? 0) * ((orderLine.discountPercent ?? 0) / 100));
+
     orderLine.subTotal =
         (orderLine.pkQty ?? 0) * (orderLine.singlePKPrice ?? 0) +
             (orderLine.pcQty ?? 0) * (orderLine.singlePCPrice ?? 0) +
-            (orderLine.productUomQty ?? 0) * (orderLine.singleItemPrice ?? 0);
+            (orderLine.productUomQty ?? 0) * (singleItemPriceWithDisc);
 
     // orderLine.subTotal = (orderLine.subTotal ?? 0) - ((orderLine.subTotal ?? 0) * ((orderLine.discountPercent ?? 0) / 100));
 
