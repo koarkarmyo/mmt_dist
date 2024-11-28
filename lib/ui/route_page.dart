@@ -10,17 +10,14 @@ import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/ui/widgets/cust_mini_dialog.dart';
 import 'package:mmt_mobile/ui/widgets/customer_filter_widget.dart';
 import 'package:mmt_mobile/ui/widgets/date_picker_button.dart';
-import 'package:mmt_mobile/ui/widgets/no_item_widget.dart';
 import 'package:mmt_mobile/ui/widgets/responsive.dart';
 
 import '../common_widget/text_widget.dart';
-import '../model/partner.dart';
 import '../model/res_partner.dart';
-import '../model/tag.dart';
 import '../on_clicked_listener.dart';
 import '../src/const_dimen.dart';
 import '../src/const_string.dart';
-import '../src/enum.dart';
+import '../src/style/app_color.dart';
 import '../utils/date_time_utils.dart';
 
 class RoutePage extends StatefulWidget {
@@ -85,7 +82,7 @@ class _RoutePageState extends State<RoutePage> {
                   borderSide: BorderSide.none,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                hintText: 'Search Customer',
+                hintText: ConstString.searchCustomer,
                 prefixIcon: const BackButton(color: Colors.black),
               ),
               onChanged: (value) {
@@ -153,8 +150,10 @@ class _RoutePageState extends State<RoutePage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.hourglass_empty, size: 30,)
-                            .padding(padding: 8.verticalPadding),
+                        const Icon(
+                          Icons.hourglass_empty,
+                          size: 30,
+                        ).padding(padding: 8.verticalPadding),
                         const TextWidget(ConstString.noItem).bold()
                       ],
                     ),
@@ -171,128 +170,8 @@ class _RoutePageState extends State<RoutePage> {
                     ),
                     itemBuilder: (context, index) {
                       ResPartner selectedCustomer = state.customerList[index];
-                      return GestureDetector(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                icon: const Icon(
-                                  Icons.account_box_rounded,
-                                  size: 80,
-                                ),
-                                title: const Text(
-                                  "Clock In",
-                                  style: TextStyle(fontSize: 24),
-                                ),
-                                content: const Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      "Are you sure to clock in?",
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Icon(
-                                      Icons.camera_alt_outlined,
-                                      size: 80,
-                                    )
-                                  ],
-                                ),
-                                actions: [
-                                  Center(
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        // Navigator.of(context)
-                                        //     .pop(); // Close the dialog
-                                        // Navigator.push(
-                                        //   context,
-                                        //   MaterialPageRoute(
-                                        //     builder: (context) => NextPage(), // Replace with your next page
-                                        //   ),
-                                        // );
-
-                                        Navigator.pushNamed(context,
-                                            RouteList.customerDashboardPage);
-                                      },
-                                      child: const Text("Clock In"),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                        child: Card(
-                          shadowColor: Colors.grey,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10.0, vertical: 5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    _customerInfo(context,
-                                        selectedCustomer: selectedCustomer);
-                                  },
-                                  child: Container(
-                                    height: 140,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.grey,
-                                    ),
-                                    child: const Icon(
-                                      Icons.person,
-                                      size: 90,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 12.0),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(selectedCustomer.name ?? '',
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 18)),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(selectedCustomer.phone ?? '',
-                                          style: const TextStyle(fontSize: 14)),
-                                      Text(
-                                        selectedCustomer.street ?? '',
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      const Text("Last Order : Can't Define",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.lightBlueAccent)),
-                                      Text("Last Order Amount: 0",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.lightBlueAccent)),
-                                      Text("Amount Due: 0",
-                                          style: TextStyle(
-                                              fontSize: 14, color: Colors.red)),
-                                    ],
-                                  ),
-                                ).expanded(),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
+                      return _customerCardItem(
+                          selectedCustomer: selectedCustomer);
                     },
                   ),
                 );
@@ -301,10 +180,149 @@ class _RoutePageState extends State<RoutePage> {
           ],
         ),
       ),
-      bottomNavigationBar: const Text(
-        "Total Count : 1444",
-        textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 20),
+      bottomNavigationBar: BlocBuilder<CustomerCubit, CustomerState>(
+        builder: (context, state) => TextWidget(
+          "Total Count : 1444",
+          dataList: [
+            ConstString.total,
+            ' : ',
+            state.customerList.length.toString()
+          ],
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 20),
+        ),
+      ),
+    );
+  }
+
+  Widget _customerCardItem({required ResPartner selectedCustomer}) {
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              icon: const Icon(
+                Icons.account_box_rounded,
+                size: 80,
+              ),
+              title: const TextWidget(
+                ConstString.clockIn,
+                style: TextStyle(fontSize: 24),
+              ),
+              content: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextWidget(
+                    ConstString.clockInConfirm,
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Icon(
+                    Icons.camera_alt_outlined,
+                    size: 80,
+                  )
+                ],
+              ),
+              actions: [
+                Center(
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                          backgroundColor: AppColors.primaryColor,
+                          foregroundColor: Colors.white),
+                      onPressed: () {
+                        // Navigator.of(context)
+                        //     .pop(); // Close the dialog
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => NextPage(), // Replace with your next page
+                        //   ),
+                        // );
+
+                        Navigator.pushNamed(
+                            context, RouteList.customerDashboardPage, arguments: {
+                              'customer' : selectedCustomer
+                        });
+                      },
+                      child: const Text(ConstString.clockIn),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+      child: Card(
+        shadowColor: Colors.grey,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  _customerInfo(context, selectedCustomer: selectedCustomer);
+                },
+                child: Container(
+                  height: 140,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.grey.shade300,
+                  ),
+                  child: const Icon(
+                    Icons.person,
+                    size: 90,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(selectedCustomer.name ?? '',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 18)),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Text(selectedCustomer.phone ?? '',
+                        style: const TextStyle(fontSize: 14)),
+                    Text(
+                      selectedCustomer.street ?? '',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    const TextWidget('',
+                        dataList: [
+                          ConstString.lastOrder,
+                          ' : ',
+                          'Can\'t define'
+                        ],
+                        style: TextStyle(
+                            fontSize: 14, color: Colors.lightBlueAccent)),
+                    const TextWidget("",
+                        dataList: [ConstString.lastOrderAmount, ' : ', '0'],
+                        style: TextStyle(
+                            fontSize: 14, color: Colors.lightBlueAccent)),
+                    const TextWidget('',
+                        dataList: [ConstString.amountDue, ' : ', "0"],
+                        style: TextStyle(fontSize: 14, color: Colors.red)),
+                  ],
+                ),
+              ).expanded(),
+            ],
+          ),
+        ),
       ),
     );
   }

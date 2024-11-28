@@ -41,12 +41,16 @@ class AnimatedButton extends StatefulWidget {
       required this.buttonText,
       required this.status,
       this.onPressed,
+      this.height,
+      this.width,
       required this.buttonColor});
 
   String buttonText;
   VoidCallback? onPressed;
   ButtonStatus status;
   Color buttonColor;
+  double? height;
+  double? width;
 
   @override
   State<AnimatedButton> createState() => _AnimatedButtonState();
@@ -58,8 +62,8 @@ class _AnimatedButtonState extends State<AnimatedButton> {
     return InkWell(
       onTap: widget.onPressed,
       child: Container(
-        height: 50,
-        width: 200,
+        height: widget.height ?? 50,
+        width: widget.width ?? 200,
         decoration: BoxDecoration(
           borderRadius: 20.borderRadius,
           border: Border.all(

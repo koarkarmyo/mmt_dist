@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/product/product_cubit.dart';
+import 'package:mmt_mobile/model/res_partner.dart';
 import 'package:mmt_mobile/src/enum.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
@@ -18,7 +19,9 @@ import '../../src/mmt_application.dart';
 import '../../src/style/app_color.dart';
 
 class FocItemPage extends StatefulWidget {
-  const FocItemPage({super.key});
+  const FocItemPage({super.key, this.customer});
+
+  final ResPartner? customer;
 
   @override
   State<FocItemPage> createState() => _FocItemPageState();
@@ -38,6 +41,12 @@ class _FocItemPageState extends State<FocItemPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -47,7 +56,7 @@ class _FocItemPageState extends State<FocItemPage> {
               onPressed: () {
                 context.pushTo(
                     route: RouteList.saleOrderAddExtraPage,
-                    args: {'extra_type': 'foc'});
+                    args: {'extra_type': 'foc', 'customer': widget.customer});
               },
               icon: const Icon(Icons.add))
         ],

@@ -7,6 +7,7 @@ import 'package:mmt_mobile/business%20logic/bloc/product_category/product_catego
 
 import 'package:mmt_mobile/common_widget/constant_widgets.dart';
 import 'package:mmt_mobile/model/product/uom_lines.dart';
+import 'package:mmt_mobile/model/res_partner.dart';
 import 'package:mmt_mobile/src/enum.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
@@ -20,7 +21,9 @@ import '../../src/const_string.dart';
 import '../../src/style/app_color.dart';
 
 class SaleOrderAddProductPage extends StatefulWidget {
-  const SaleOrderAddProductPage({super.key});
+  const SaleOrderAddProductPage({super.key, this.customer});
+
+  final ResPartner? customer;
 
   @override
   State<SaleOrderAddProductPage> createState() =>
@@ -32,6 +35,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
   TextEditingController _searchProduct = TextEditingController();
   String? _filterProductCategory = 'All';
   late CartCubit _cartCubit;
+  ResPartner? _customer;
 
   @override
   void initState() {
@@ -44,6 +48,17 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    Map<String, dynamic>? data =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (data != null) {
+      _customer = data['customer'];
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
@@ -52,9 +67,9 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text(
-            "Customer Name",
-            style: TextStyle(fontSize: 16),
+          title: Text(
+            widget.customer?.name ?? '',
+            style: const TextStyle(fontSize: 16),
           ),
         ),
         persistentFooterButtons: [
@@ -289,7 +304,9 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                 ),
                 Text("${(product.priceListItems?.firstWhereOrNull(
                       (element) =>
-                          element.productUom == (deliveryItem?.uomLine?.uomId ?? product.uomLines?.firstOrNull?.uomId),
+                          element.productUom ==
+                          (deliveryItem?.uomLine?.uomId ??
+                              product.uomLines?.firstOrNull?.uomId),
                     )?.fixedPrice ?? 0).roundTo(position: 1).toString()} K "),
                 Text((MMTApplication.currentUser?.useLooseBox ?? false)
                     ? "23 PK / 6 PC"

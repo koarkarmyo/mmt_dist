@@ -9,6 +9,8 @@ import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import '../../business logic/bloc/cart/cart_cubit.dart';
 import '../../business logic/bloc/product/product_cubit.dart';
 import '../../model/product/product.dart';
+import '../../model/res_partner.dart';
+import '../../src/const_string.dart';
 import '../../src/mmt_application.dart';
 import '../../src/style/app_color.dart';
 
@@ -25,6 +27,7 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
   List<Product> _productList = [];
   String? _filterProductCategory = 'All';
   late CartCubit _cartCubit;
+  ResPartner? _customer;
   Function(SaleOrderLine deliveryItem)? _addItemFunction;
 
   Function(int productId)? _removeItemFunction;
@@ -48,6 +51,7 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     if (data != null) {
       extraType = data['extra_type'];
+      _customer = data['customer'];
       if (data['extra_type'] == 'foc') {
         _addItemFunction =
             (deliveryItem) => _cartCubit.addCartFocItem(focItem: deliveryItem);
@@ -73,8 +77,8 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
           },
         ),
         title: Text(
-          "Customer Name",
-          style: TextStyle(fontSize: 16),
+          _customer?.name ?? '',
+          style: const TextStyle(fontSize: 16),
         ),
         actions: [
           IconButton(onPressed: () {
@@ -175,7 +179,7 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
             },
             decoration: const InputDecoration(
                 border: InputBorder.none,
-                hintText: "Product Name",
+                hintText: ConstString.productName,
                 hintStyle: TextStyle(fontSize: 14)),
           ).expanded(),
           _productQrScanner()

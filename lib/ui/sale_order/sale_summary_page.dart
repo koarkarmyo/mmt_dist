@@ -91,7 +91,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
             height: 10,
           ),
           const Text(
-            "Sale Item",
+           ConstString.saleItem,
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ).padding(padding: 16.horizontalPadding),
           _productInCartWidget(),
@@ -106,7 +106,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
             height: 10,
           ),
           const Text(
-            "FOC Item",
+            ConstString.focItem,
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ).padding(padding: 16.horizontalPadding),
           _focProductInCartWidget(),
@@ -120,18 +120,18 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
           const SizedBox(
             height: 10,
           ),
-          const Text(
-            "Coupon",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-          ).padding(padding: 16.horizontalPadding),
-          _couponInCartWidget(),
-          const SizedBox(
-            height: 10,
-          ),
-          Divider(
-            color: Colors.grey.shade200,
-            thickness: 16,
-          ),
+          // const Text(
+          //   "Coupon",
+          //   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          // ).padding(padding: 16.horizontalPadding),
+          // _couponInCartWidget(),
+          // const SizedBox(
+          //   height: 10,
+          // ),
+          // Divider(
+          //   color: Colors.grey.shade200,
+          //   thickness: 16,
+          // ),
           _discountWidget(),
           _noteWidget(),
           _totalWidget()

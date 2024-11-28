@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mmt_mobile/model/res_partner.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/ui/sale_order/coupon_item_page.dart';
 import 'package:mmt_mobile/ui/sale_order/foc_item_page.dart';
@@ -21,6 +22,7 @@ class SaleOrderPage extends StatefulWidget {
 class _SaleOrderPageState extends State<SaleOrderPage> {
   final PersistentTabController _controller =
       PersistentTabController(initialIndex: 0);
+  ResPartner? _customer;
 
   @override
   void initState() {
@@ -28,11 +30,26 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
     super.initState();
   }
 
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    Map<String, dynamic>? data =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (data != null) {
+      _customer = data['customer'];
+    }
+  }
+
   List<Widget> _buildScreens() {
     return [
-      const SaleOrderAddProductPage(),
+      SaleOrderAddProductPage(
+        customer: _customer,
+      ),
       const SaleOrderSaleItemPage(),
-      const FocItemPage(),
+       FocItemPage(
+        customer: _customer,
+      ),
       // const CouponItemPage(),
       const SaleSummaryPage()
     ];
@@ -107,7 +124,7 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
           activeColorPrimary: CupertinoColors.activeBlue,
           inactiveColorPrimary: CupertinoColors.systemGrey,
           routeAndNavigatorSettings:
-          const RouteAndNavigatorSettings(onGenerateRoute: generateRoute)),
+              const RouteAndNavigatorSettings(onGenerateRoute: generateRoute)),
       PersistentBottomNavBarItem(
           icon: const Icon(CupertinoIcons.settings),
           title: ("FOC"),

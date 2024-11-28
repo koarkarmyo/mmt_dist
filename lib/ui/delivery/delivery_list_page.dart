@@ -90,7 +90,7 @@ class _DeliveryListPageState extends State<DeliveryListPage> {
               padding: 8.allPadding,
               decoration: BoxDecoration(
                   border: Border.all(), borderRadius: 8.borderRadius),
-              child: Text(_customerNotifier.value?.name ?? "Choose Customer"),
+              child: Text(_customerNotifier.value?.name ?? ConstString.chooseCustomer),
             ),
           ),
         );

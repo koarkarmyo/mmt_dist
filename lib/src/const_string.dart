@@ -38,7 +38,7 @@ class ConstString {
   static const String search = "Search";
   static const String searchMM = "ရှာမည်";
   static const String create = "ဖန်တီးမည်";
-  static const String add = "add";
+  static const String add = "Add";
   static const String addNew = "အသစ်ထည့်မည်";
   static const String welcomeText = "ဟိန်းတေဇမိသားစုမှ ကြိုဆိုပါသည်";
   static const String pickUpMM = "ကုန်ကောက်";
@@ -122,4 +122,17 @@ class ConstString {
   static const String ward = "Ward";
   static const String street = "Street";
   static const String summaryPage = "Summary page";
+  static const String chooseCustomer = "Choose customer";
+  static const String searchCustomer = "Search customer";
+  static const String lastOrder = "Last order";
+  static const String lastOrderAmount = 'Last order amount';
+  static const String amountDue = 'Amount due';
+  static const String clockIn = "Clock in";
+  static const String clockInConfirm =  "Are you sure to clock in?";
+  static const String totalOrdered =  "Total ordered";
+  static const String totalInvoiced =  "Total invoiced";
+  static const String totalDue =  "Total due";
+
+
+
 }
