@@ -15,6 +15,7 @@ class DeliveryReturnPage extends StatefulWidget {
 class _DeliveryReturnPageState extends State<DeliveryReturnPage> {
   final ValueNotifier<String?> _vehicleNameNotifier = ValueNotifier(null);
 
+
   List<String> locationList = [
     "7R/3818",
     "4R/3818",
@@ -35,7 +36,7 @@ class _DeliveryReturnPageState extends State<DeliveryReturnPage> {
         children: [
           GestureDetector(
             onTap: () async {
-              String? vehicle = await showModalBottomSheet(
+              _vehicleNameNotifier.value = await showModalBottomSheet(
                 context: context,
                 builder: (context) {
                   return BottomChoiceSheetWidget<String?>(
@@ -46,12 +47,14 @@ class _DeliveryReturnPageState extends State<DeliveryReturnPage> {
               );
             },
             child: Container(
-              padding: 8.horizontalPadding,
+              padding: (12, 10).padding,
+              width: double.infinity,
               decoration: BoxDecoration(
                   border: Border.all(), borderRadius: 8.borderRadius),
               child: ValueListenableBuilder(
                 valueListenable: _vehicleNameNotifier,
-                builder: (context, value, child) => Text(value ?? ''),
+                builder: (context, value, child) =>
+                    Text(value ?? 'Car no').bold(),
               ),
             ),
           ),
@@ -70,7 +73,10 @@ class _DeliveryReturnPageState extends State<DeliveryReturnPage> {
       itemBuilder: (context, index) {
         return const ListTile(
           dense: true,
-          title: Text("Product Name"),
+          title: Text(
+            "Product Name",
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          ),
           subtitle: Text("12 Kg"),
         );
       },
