@@ -10,11 +10,13 @@ class ConstString {
   static const String delete = 'Delete';
   static const String createSaleOrder = 'အ‌ရောင်းအော်ဒါတင်ခြင်း';
   static const String coupon = 'Coupon';
+  static const String location = 'Location';
   static const String name = "Name";
   static const String saleItem = "Sale item";
   static const String urlRequired = 'ဆာဗာလင့်ထည့်‌ပေးပါ';
   static const String pickImageFrom = "Pick image from";
   static const String lot = 'Lot';
+  static const String note = 'note';
   static const String uom = 'Uom';
   static const String employeeName = "ဝန်ထမ်းနာမည်";
   static const String pkgNo = "ပစ္စည်းထုတ်အရေအတွက်";
@@ -128,11 +130,14 @@ class ConstString {
   static const String lastOrderAmount = 'Last order amount';
   static const String amountDue = 'Amount due';
   static const String clockIn = "Clock in";
-  static const String clockInConfirm =  "Are you sure to clock in?";
-  static const String totalOrdered =  "Total ordered";
-  static const String totalInvoiced =  "Total invoiced";
-  static const String totalDue =  "Total due";
-
-
+  static const String clockInConfirm = "Are you sure to clock in?";
+  static const String totalOrdered = "Total ordered";
+  static const String totalInvoiced = "Total invoiced";
+  static const String totalDue = "Total due";
+  static const String balance = "Balance";
+  static const String stockRequestSummary = "Stock request summary";
+  static const String stockRequestDate = "Stock request date";
+  static const String stockOrderSummary = "Stock order summary";
+  static const String requiredStar = "*";
 
 }

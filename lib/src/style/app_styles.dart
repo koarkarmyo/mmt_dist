@@ -19,4 +19,7 @@ class AppStyles {
       padding: MaterialStatePropertyAll(24.horizontalPadding),
       foregroundColor: const MaterialStatePropertyAll(Colors.white),
       backgroundColor: MaterialStatePropertyAll(AppColors.successColor));
+
+  static TextStyle miniTitle = const TextStyle(fontSize: 12, color: Colors.black54);
+
 }

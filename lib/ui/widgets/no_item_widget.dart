@@ -1,57 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:mmt_mobile/ui/widgets/responsive.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../../src/const_dimen.dart';
+class NoItemWidget extends StatelessWidget {
+  final VoidCallback? onClick;
 
-// ignore: must_be_immutable
-class NoItemWidget extends StatefulWidget {
-  final String assetImagePath;
-  final String message;
-  late VoidCallback? retryClickListener;
-  final bool showRetryBtn;
+  const NoItemWidget({super.key, this.onClick});
 
-  NoItemWidget(this.assetImagePath, this.message,
-      {this.showRetryBtn = false, this.retryClickListener}) {
-    retryClickListener ??= () {};
-  }
-
-  @override
-  _NoItemWidgetState createState() => _NoItemWidgetState();
-}
-
-class _NoItemWidgetState extends State<NoItemWidget> {
   @override
   Widget build(BuildContext context) {
-    Widget retryBtn = widget.showRetryBtn
-        ? ElevatedButton(
-            child: Text('Retry'),
-            onPressed: widget.retryClickListener,
-            style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.red)),
-          )
-        : Container();
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (Responsive.currentHeight(context) > 400)
-            Image.asset(
-              widget.assetImagePath,
-              width: Responsive.isMobile(context)
-                  ? 150
-                  : Responsive.isTablet(context)
-                      ? 200
-                      : 250,
-            ),
-          SizedBox(height: ConstantDimens.padding),
-          Text('${widget.message}',
-              style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 25.0,
-                  fontWeight: FontWeight.bold)),
-          SizedBox(height: ConstantDimens.padding),
-          retryBtn
-        ],
+      child: InkWell(
+        onTap: () => onClick?.call(),
+        borderRadius: const BorderRadius.all(Radius.circular(100)),
+        child: const CircleAvatar(
+          maxRadius: 100,
+          backgroundColor: Colors.transparent,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(FontAwesomeIcons.solidFileZipper, size: 40),
+              SizedBox(height: 8),
+              Text('Retry'),
+            ],
+          ),
+        ),
       ),
     );
   }

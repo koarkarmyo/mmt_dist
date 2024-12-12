@@ -25,4 +25,8 @@ class RouteList {
   static const String deliveryReturnPage = '/delivery_return_page';
   static const String stockLoadingDetailPage = '/loading_detail_page';
   static const String customerEditPage = '/customer_edit_page';
+  static const String stockRequestHomePage = '/stock_request_home';
+  static const String stockRequestAddPage = '/stock_request_add_page';
+  static const String stockRequestListPage = '/stock_request_list_page';
+
 }

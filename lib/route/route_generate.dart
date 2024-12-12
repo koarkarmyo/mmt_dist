@@ -5,11 +5,13 @@ import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/customer/customer_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/dashboard/dashboard_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/fetch_database/fetch_database_cubit.dart';
+import 'package:mmt_mobile/business%20logic/bloc/location/location_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/lot/lot_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/product/product_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/product_category/product_category_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/sale_order/sale_order_cubit.dart';
 import 'package:mmt_mobile/common_widget/text_widget.dart';
+import 'package:mmt_mobile/model/product/product.dart';
 import 'package:mmt_mobile/route/route_list.dart';
 import 'package:mmt_mobile/sync/bloc/sync_action_bloc/sync_action_bloc_cubit.dart';
 import 'package:mmt_mobile/ui/account_payment_page.dart';
@@ -27,6 +29,9 @@ import 'package:mmt_mobile/ui/login/login_page.dart';
 import 'package:mmt_mobile/ui/sale_order/sale_order_add_extra.dart';
 import 'package:mmt_mobile/ui/sale_order/sale_order_add_product.dart';
 import 'package:mmt_mobile/ui/sale_order/sale_order_page.dart';
+import 'package:mmt_mobile/ui/stock_request/stock_request_add_product.dart';
+import 'package:mmt_mobile/ui/stock_request/stock_request_home_page.dart';
+import 'package:mmt_mobile/ui/stock_request/stock_request_list_page.dart';
 import 'package:mmt_mobile/ui/today_delivery_page.dart';
 
 import '../business logic/bloc/login/login_bloc.dart';
@@ -161,6 +166,37 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
           MultiBlocProvider(
             providers: [BlocProvider(create: (context) => CustomerCubit())],
             child: const DeliveryListPage(),
+          ));
+    case RouteList.stockRequestHomePage:
+      return _buildPageRoute(
+          routeSettings,
+          MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (context) => LocationCubit()),
+              BlocProvider(create: (context) => ProductCubit()),
+            ],
+            child: const StockRequestHomePage(),
+          ));
+    case RouteList.stockRequestAddPage:
+      return _buildPageRoute(
+          routeSettings,
+          MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (context) => LocationCubit()),
+            ],
+            child: const StockRequestAddProduct(),
+          ));
+    case RouteList.stockRequestListPage:
+      return _buildPageRoute(
+          routeSettings,
+          MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (context) => LocationCubit()),
+              BlocProvider(
+                create: (context) => ProductCubit(),
+              )
+            ],
+            child: const StockRequestListPage(),
           ));
     case RouteList.stockLoadingAddPage:
       return _buildPageRoute(
