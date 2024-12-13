@@ -10,11 +10,13 @@ class KESingleChoiceWidget<T> extends StatefulWidget {
   final String Function(T value) getDisplayString;
   final Widget? trailingIconWidget;
   final ValueChanged<T?> onSelected;
+  final T? selectedValue;
   final String? label;
 
   const KESingleChoiceWidget({
     super.key,
     required this.valueList,
+    this.selectedValue,
     required this.getDisplayString,
     this.trailingIconWidget,
     required this.onSelected,
@@ -28,6 +30,13 @@ class KESingleChoiceWidget<T> extends StatefulWidget {
 
 class KESingleChoiceWidgetState<T> extends State<KESingleChoiceWidget<T>> {
   T? _selectedValue;
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    _selectedValue = widget.selectedValue;
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -10,6 +10,7 @@ import 'package:mmt_mobile/business%20logic/bloc/lot/lot_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/product/product_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/product_category/product_category_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/sale_order/sale_order_cubit.dart';
+import 'package:mmt_mobile/business%20logic/bloc/stock_order/stock_order_bloc.dart';
 import 'package:mmt_mobile/common_widget/text_widget.dart';
 import 'package:mmt_mobile/model/product/product.dart';
 import 'package:mmt_mobile/route/route_list.dart';
@@ -174,18 +175,12 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
             providers: [
               BlocProvider(create: (context) => LocationCubit()),
               BlocProvider(create: (context) => ProductCubit()),
+              BlocProvider(create: (context) => StockOrderBloc()),
             ],
             child: const StockRequestHomePage(),
           ));
     case RouteList.stockRequestAddPage:
-      return _buildPageRoute(
-          routeSettings,
-          MultiBlocProvider(
-            providers: [
-              BlocProvider(create: (context) => LocationCubit()),
-            ],
-            child: const StockRequestAddProduct(),
-          ));
+      return _buildPageRoute(routeSettings, const StockRequestAddProduct());
     case RouteList.stockRequestListPage:
       return _buildPageRoute(
           routeSettings,

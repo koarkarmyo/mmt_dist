@@ -6,6 +6,7 @@ import 'package:sqflite/sqlite_api.dart';
 import '../model/cust_visit.dart';
 import '../model/number_series.dart';
 import '../model/price_list/product_price_list_item.dart';
+import '../model/product/uom_lines.dart';
 import 'database_helper.dart';
 import 'db_constant.dart';
 
@@ -221,28 +222,28 @@ class DataObject {
   //   return saleOrderLineList;
   // }
   //
-  // Future<List<UomLine>> getUomLines(int? productId, {List<int>? ids}) async {
-  //   List<Map<String, dynamic>> jsonList = [];
-  //   if (ids != null) {
-  //     jsonList = await SqlFLiteHelper().readRowsWhereIn(
-  //       tableName: DBConstant.productUomTable,
-  //       where: DBConstant.productId,
-  //       queryValues: ids,
-  //     );
-  //   } else {
-  //     jsonList = await SqlFLiteHelper().readDataByWhereArgs(
-  //         tableName: DBConstant.productUomTable,
-  //         where: '${DBConstant.productId} =? ',
-  //         whereArgs: [productId.toString()]);
-  //   }
-  //   List<UomLine> uomLines = [];
-  //   jsonList.forEach((element) {
-  //     final uomLine = UomLine.fromJsonDB(element);
-  //     uomLines.add(uomLine);
-  //   });
-  //   return uomLines;
-  // }
-  //
+  Future<List<UomLine>> getUomLines(int? productId, {List<int>? ids}) async {
+    List<Map<String, dynamic>> jsonList = [];
+    if (ids != null) {
+      jsonList = await DatabaseHelper.instance.readDataByWhereArgs(
+        tableName: DBConstant.productUomTable,
+        where: "${DBConstant.productId} = ?",
+        whereArgs: ids,
+      );
+    } else {
+      jsonList = await DatabaseHelper.instance.readDataByWhereArgs(
+          tableName: DBConstant.productUomTable,
+          where: '${DBConstant.productId} =? ',
+          whereArgs: [productId.toString()]);
+    }
+    List<UomLine> uomLines = [];
+    jsonList.forEach((element) {
+      final uomLine = UomLine.fromJsonDB(element);
+      uomLines.add(uomLine);
+    });
+    return uomLines;
+  }
+
   // Future<List<StockMoveModel>> getStockMoveModelList() async {
   //   List<StockMoveModel> stockMoveModels = [];
   //   List<Map<String, dynamic>> jsonList = await SqlFLiteHelper()

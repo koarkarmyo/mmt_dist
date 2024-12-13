@@ -5,6 +5,7 @@ import 'package:mmt_mobile/ui/stock_request/stock_request_list_page.dart';
 import 'package:mmt_mobile/ui/stock_request/stock_request_summary.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
+import '../../model/stock_location.dart';
 import '../../route/route_generate.dart';
 
 class StockRequestHomePage extends StatefulWidget {

@@ -2,6 +2,7 @@ import 'package:mmt_mobile/model/price_list/price_list_item.dart';
 import 'package:mmt_mobile/model/product/uom_lines.dart';
 
 import '../../src/enum.dart';
+import '../../src/mmt_application.dart';
 
 class Product {
   int? id;
@@ -203,4 +204,8 @@ class Product {
     data['tracking'] = trackingType?.name;
     return data;
   }
+
+
+  UomLine? getRefUom() => MMTApplication.getReferenceUomLine(uomLines!);
+
 }

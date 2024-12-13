@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mmt_mobile/business%20logic/bloc/stock_order/stock_order_bloc.dart';
 import 'package:mmt_mobile/model/delivery/delivery_item.dart';
 import 'package:mmt_mobile/model/sale_order/sale_order_line.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
@@ -10,6 +11,7 @@ import '../../business logic/bloc/cart/cart_cubit.dart';
 import '../../business logic/bloc/product/product_cubit.dart';
 import '../../model/product/product.dart';
 import '../../model/res_partner.dart';
+import '../../model/stock_order.dart';
 import '../../src/const_string.dart';
 import '../../src/mmt_application.dart';
 import '../../src/style/app_color.dart';
@@ -23,6 +25,7 @@ class StockRequestAddProduct extends StatefulWidget {
 
 class _StockRequestAddProductState extends State<StockRequestAddProduct> {
   late ProductCubit _productCubit;
+  late StockOrderBloc _stockOrderBloc;
   TextEditingController _searchProduct = TextEditingController();
   List<Product> _productList = [];
   String? _filterProductCategory = 'All';
@@ -38,6 +41,7 @@ class _StockRequestAddProductState extends State<StockRequestAddProduct> {
     // TODO: implement initState
     super.initState();
     _productCubit = context.read<ProductCubit>()..getAllProduct();
+    _stockOrderBloc = context.read<StockOrderBloc>();
   }
 
   @override
@@ -55,13 +59,17 @@ class _StockRequestAddProductState extends State<StockRequestAddProduct> {
           style: const TextStyle(fontSize: 16),
         ),
         actions: [
-          // IconButton(onPressed: () {
-          //   context.pop();
-          // }, icon: Badge(
-          //     label: Text((extraType == 'foc')
-          //         ? state.focItemList.length.toString()
-          //         : state.couponList.length.toString()),
-          //     child: const Icon(Icons.shopping_cart)))
+          BlocBuilder<StockOrderBloc, StockOrderState>(
+            builder: (context, state) {
+              return IconButton(
+                  onPressed: () {
+                    context.pop();
+                  },
+                  icon: Badge(
+                      label: Text(state.stockOrderLineList.length.toString()),
+                      child: const Icon(Icons.shopping_cart)));
+            },
+          )
         ],
       ),
       body: Column(
@@ -183,13 +191,33 @@ class _StockRequestAddProductState extends State<StockRequestAddProduct> {
   }
 
   Widget _productItem({required Product product}) {
-    return ListTile(
-        onTap: () {},
-        title: Text(product.name ?? ''),
-        subtitle: Text("Available Qty: ${((0).toString())} ${product.uomName}"),
-        trailing: Icon(
-          Icons.check_circle,
-          color: AppColors.primaryColor,
-        ));
+    return BlocBuilder<StockOrderBloc, StockOrderState>(
+      builder: (context, state) {
+        return ListTile(
+            onTap: () {
+              _stockOrderBloc.add(StockOrderLineAddEvent(
+                  stockOrderLine: StockOrderLine(
+                product: product,
+                productId: product.id,
+                productName: product.name,
+                productQty: 0,
+              )));
+            },
+            title: Text(product.name ?? ''),
+            subtitle:
+                Text("Available Qty: ${((0).toString())} ${product.uomName}"),
+            trailing: (state.stockOrderLineList
+                    .map(
+                      (e) => e.productId,
+                    )
+                    .toList()
+                    .contains(product.id))
+                ? Icon(
+                    Icons.check_circle,
+                    color: AppColors.primaryColor,
+                  )
+                : null);
+      },
+    );
   }
 }
