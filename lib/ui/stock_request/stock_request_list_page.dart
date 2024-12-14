@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:mmt_mobile/business%20logic/bloc/batch/stock_loading_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/location/location_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/login/login_bloc.dart';
@@ -18,6 +19,7 @@ import '../../model/stock_order.dart';
 import '../../route/route_list.dart';
 import '../../src/const_string.dart';
 import '../../src/mmt_application.dart';
+import '../../src/style/app_color.dart';
 import '../../src/style/app_styles.dart';
 
 class StockRequestListPage extends StatefulWidget {
@@ -151,70 +153,82 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
   }
 
   Widget _stockRequestRow({required StockOrderLine stockOrderLine}) {
-    return Container(
-      padding: 8.allPadding,
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Colors.grey.shade300),
+    return Slidable(
+      endActionPane:
+      ActionPane(motion: const ScrollMotion(), children: [
+        SlidableAction(
+            backgroundColor: AppColors.dangerColor,
+            onPressed: (context) {
+              _stockOrderBloc.add(StockOrderLineAddEvent(stockOrderLine: stockOrderLine));
+            },
+            label: "Delete",
+            icon: Icons.delete)
+      ]),
+      child: Container(
+        padding: 8.allPadding,
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: Colors.grey.shade300),
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          Text(stockOrderLine.productName ?? '')
-              .bold()
-              .padding(padding: 4.horizontalPadding)
-              .expanded(flex: 3),
-          const Text("34 Dozen / 3 Units")
-              .padding(padding: 4.horizontalPadding)
-              .expanded(flex: 2),
-          Container(
-            margin: 8.horizontalPadding,
-            width: 200,
-            child: DropdownButton<UomLine>(
-              isExpanded: true,
-              value: stockOrderLine.productUom != null
-                  ? stockOrderLine.product?.uomLines?.firstWhereOrNull(
-                      (element) => element.uomId == stockOrderLine.productUom,
-                    )
-                  : stockOrderLine.product?.uomLines?.firstOrNull,
-              items: stockOrderLine.product?.uomLines
-                  ?.map((UomLine value) => DropdownMenuItem<UomLine>(
-                        value: value,
-                        child: Text(value.uomName ?? ''),
-                      ))
-                  .toList(),
-              onChanged: (UomLine? newValue) {
-                // Handle selection change
+        child: Row(
+          children: [
+            Text(stockOrderLine.productName ?? '')
+                .bold()
+                .padding(padding: 4.horizontalPadding)
+                .expanded(flex: 3),
+            const Text("34 Dozen / 3 Units")
+                .padding(padding: 4.horizontalPadding)
+                .expanded(flex: 2),
+            Container(
+              margin: 8.horizontalPadding,
+              width: 200,
+              child: DropdownButton<UomLine>(
+                isExpanded: true,
+                value: stockOrderLine.productUom != null
+                    ? stockOrderLine.product?.uomLines?.firstWhereOrNull(
+                        (element) => element.uomId == stockOrderLine.productUom,
+                      )
+                    : stockOrderLine.product?.uomLines?.firstOrNull,
+                items: stockOrderLine.product?.uomLines
+                    ?.map((UomLine value) => DropdownMenuItem<UomLine>(
+                          value: value,
+                          child: Text(value.uomName ?? ''),
+                        ))
+                    .toList(),
+                onChanged: (UomLine? newValue) {
+                  // Handle selection change
+                  _stockOrderBloc.add(StockOrderLineUpdateEvent(
+                      stockOrderLine: stockOrderLine.copyWith(
+                          productUomName: newValue?.uomName,
+                          productUom: newValue?.uomId)));
+                },
+                hint: const Text('uom'),
+                isDense: true,
+              ),
+            ).expanded(flex: 2),
+            TextField(
+              onTap: () {
+                stockOrderLine.controller?.selection = TextSelection(
+                    baseOffset: 0,
+                    extentOffset: stockOrderLine.controller?.text.length ?? 0);
+              },
+              onTapOutside: (event) {
+                FocusScope.of(context).unfocus();
+              },
+              onChanged: (value) {
                 _stockOrderBloc.add(StockOrderLineUpdateEvent(
                     stockOrderLine: stockOrderLine.copyWith(
-                        productUomName: newValue?.uomName,
-                        productUom: newValue?.uomId)));
+                        productQty: double.tryParse(value) ?? 0)));
               },
-              hint: const Text('uom'),
-              isDense: true,
-            ),
-          ).expanded(flex: 2),
-          TextField(
-            onTap: () {
-              stockOrderLine.controller?.selection = TextSelection(
-                  baseOffset: 0,
-                  extentOffset: stockOrderLine.controller?.text.length ?? 0);
-            },
-            onTapOutside: (event) {
-              FocusScope.of(context).unfocus();
-            },
-            onChanged: (value) {
-              _stockOrderBloc.add(StockOrderLineUpdateEvent(
-                  stockOrderLine: stockOrderLine.copyWith(
-                      productQty: double.tryParse(value) ?? 0)));
-            },
-            keyboardType: TextInputType.number,
-            controller: stockOrderLine.controller,
-            textAlign: TextAlign.right,
-            decoration: const InputDecoration(
-                border: InputBorder.none, hintText: ConstString.qty),
-          ).padding(padding: 8.horizontalPadding).expanded(flex: 2),
-        ],
+              keyboardType: TextInputType.number,
+              controller: stockOrderLine.controller,
+              textAlign: TextAlign.right,
+              decoration: const InputDecoration(
+                  border: InputBorder.none, hintText: ConstString.qty),
+            ).padding(padding: 8.horizontalPadding).expanded(flex: 2),
+          ],
+        ),
       ),
     );
   }

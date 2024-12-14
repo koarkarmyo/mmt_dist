@@ -1,3 +1,4 @@
+import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/model/delivery/delivery_item.dart';
@@ -41,6 +42,21 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
     _productCubit = context.read<ProductCubit>()..getAllProduct();
 
     _cartCubit = context.read<CartCubit>();
+    BackButtonInterceptor.add(_onBackPressed);
+  }
+
+  @override
+  void dispose() {
+    // Don't forget to remove the back button interceptor when the screen is disposed
+    BackButtonInterceptor.remove(_onBackPressed);
+    super.dispose();
+  }
+
+  // This function handles the back button press
+  bool _onBackPressed(bool stopDefaultButtonEvent, RouteInfo info) {
+    print("BACK BUTTON!"); // Do some stuff.
+    context.pop();
+    return true;
   }
 
   @override

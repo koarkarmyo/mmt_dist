@@ -57,6 +57,7 @@ dependencies:
   flutter_slidable: ^3.1.1
   cached_network_image: ^3.4.1
   image_picker: ^1.1.2
+  back_button_interceptor: ^8.0.0
 
 
 

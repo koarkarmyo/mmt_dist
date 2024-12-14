@@ -1,3 +1,4 @@
+import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/business%20logic/bloc/stock_order/stock_order_bloc.dart';
@@ -42,57 +43,81 @@ class _StockRequestAddProductState extends State<StockRequestAddProduct> {
     super.initState();
     _productCubit = context.read<ProductCubit>()..getAllProduct();
     _stockOrderBloc = context.read<StockOrderBloc>();
+    BackButtonInterceptor.add(_onBackPressed);
+
+  }
+
+  @override
+  void dispose() {
+    // Don't forget to remove the back button interceptor when the screen is disposed
+    BackButtonInterceptor.remove(_onBackPressed);
+    super.dispose();
+  }
+
+  // This function handles the back button press
+  bool _onBackPressed(bool stopDefaultButtonEvent, RouteInfo info) {
+    print("BACK BUTTON!"); // Do some stuff.
+    context.pop();
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.of(context).pop(); // Pops back to the previous screen.
-          },
-        ),
-        title: Text(
-          _customer?.name ?? '',
-          style: const TextStyle(fontSize: 16),
-        ),
-        actions: [
-          BlocBuilder<StockOrderBloc, StockOrderState>(
-            builder: (context, state) {
-              return IconButton(
-                  onPressed: () {
-                    context.pop();
-                  },
-                  icon: Badge(
-                      label: Text(state.stockOrderLineList.length.toString()),
-                      child: const Icon(Icons.shopping_cart)));
-            },
-          )
-        ],
-      ),
-      body: Column(
-        children: [
-          _searchFieldWidget(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              BlocBuilder<ProductCubit, ProductState>(
-                builder: (context, state) {
-                  return Text(
-                    "$_filterProductCategory Product List",
-                    style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.w600),
-                  );
-                },
-              ).padding(padding: 8.verticalPadding),
-              _filterWidget()
-            ],
+    return PopScope(
+      canPop: true, // Allow the pop action on back press
+      onPopInvokedWithResult: (didPop, result) {
+        // Handle result if necessary (could be used for debugging or custom logic)
+        print("Back button !!!");
+      },
+
+      child: Scaffold(
+        appBar: AppBar(
+          // leading: IconButton(
+          //   icon: const Icon(Icons.arrow_back),
+          //   onPressed: () {
+          //     Navigator.of(context).pop(); // Pops back to the previous screen.
+          //   },
+          // ),
+          title: Text(
+            _customer?.name ?? '',
+            style: const TextStyle(fontSize: 16),
           ),
-          _showProductList()
-        ],
-      ).padding(padding: 16.allPadding),
+          actions: [
+            BlocBuilder<StockOrderBloc, StockOrderState>(
+              builder: (context, state) {
+                return IconButton(
+                    onPressed: () {
+                      context.pop();
+                    },
+                    icon: Badge(
+                        label: Text(state.stockOrderLineList.length.toString()),
+                        child: const Icon(Icons.shopping_cart)));
+              },
+            )
+          ],
+        ),
+        body: Column(
+          children: [
+            _searchFieldWidget(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                BlocBuilder<ProductCubit, ProductState>(
+                  builder: (context, state) {
+                    return Text(
+                      "$_filterProductCategory Product List",
+                      style: const TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.w600),
+                    );
+                  },
+                ).padding(padding: 8.verticalPadding),
+                _filterWidget()
+              ],
+            ),
+            _showProductList()
+          ],
+        ).padding(padding: 16.allPadding),
+      ),
     );
   }
 
