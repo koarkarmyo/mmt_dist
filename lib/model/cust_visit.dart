@@ -66,6 +66,27 @@ class CustVisit {
     };
   }
 
+  Map<String, dynamic> toJsonDB() {
+    return {
+      'doc_no': this.docNo,
+      'doc_date': this.docDate,
+      'doc_type': this.docType.name,
+      'employee_id': this.employeeId,
+      'customer_id': this.customerId,
+      'vehicle_id': this.vehicleId,
+      'device_id': this.deviceId,
+      'photo': this.photo ?? '',
+      'latitude': this.latitude,
+      'longitude': this.longitude,
+      'from_delivery': this.fromDelivery == true ? 1 : 0,
+      'from_wh_sale': this.fromWh == true ? 1 : 0,
+      'remarks': this.remarks,
+      'is_upload': this.isUpload == true ? 1 : 0,
+      'sale_order_type_id': this.isTeleSale,
+      'customer_name': this.customerName ?? '',
+    };
+  }
+
   CustVisit copyWith({
     String? docNo,
     String? docDate,

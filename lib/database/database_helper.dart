@@ -144,6 +144,28 @@ class DatabaseHelper {
     await _createCustomerDashboardTable(db);
     await _createPriceListItemTable(db);
     await _createUomCategoryTable(db);
+    await _createCustVisitTable(db);
+  }
+
+  _createCustVisitTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.custVisitTable} '
+        '(${DBConstant.docDate} TEXT,'
+        '${DBConstant.docType} TEXT,'
+        '${DBConstant.docNo} TEXT,'
+        '${DBConstant.customerId} INTEGER,'
+        '${DBConstant.employeeId} INTEGER,'
+        '${DBConstant.vehicleId} INTEGER,'
+        '${DBConstant.deviceId} INTEGER,'
+        '${DBConstant.photo} TEXT,'
+        '${DBConstant.customerName} TEXT,'
+        '${DBConstant.latitude} DOUBLE,'
+        '${DBConstant.longitude} DOUBLE,'
+        '${DBConstant.isUpload} TINYINT,'
+        '${DBConstant.fromDelivery} TINYINT,'
+        '${DBConstant.whSale} TINYINT,'
+        '${DBConstant.saleOrderTypeId} TINYINT,'
+        '${DBConstant.remarks} TEXT'
+        ')');
   }
 
   _createUomTable(Database db) async {
