@@ -9,6 +9,7 @@ import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 import '../../model/sale_order/sale_order_6/sale_order.dart';
 import '../../route/route_generate.dart';
+import '../../src/style/app_color.dart';
 
 class DeliveryPage extends StatefulWidget {
   const DeliveryPage({super.key});
@@ -64,8 +65,7 @@ class _DeliveryPageState extends State<DeliveryPage> {
       hideNavigationBarWhenKeyboardAppears: true,
       // popBehaviorOnSelectedNavBarItemPress: PopActionScreensType.all,
       padding: const EdgeInsets.only(top: 8),
-      backgroundColor: Colors.grey.shade900,
-
+      backgroundColor: AppColors.primaryColor,
       isVisible: true,
       animationSettings: const NavBarAnimationSettings(
         navBarItemAnimation: ItemAnimationSettings(

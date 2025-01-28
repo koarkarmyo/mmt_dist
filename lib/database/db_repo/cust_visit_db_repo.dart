@@ -9,7 +9,8 @@ class CustVisitDBRepo extends BaseDBRepo {
   CustVisitDBRepo._();
 
   Future<bool> saveCustVisit({required CustVisit custVisit}) async {
-    return await helper.insertData(
+    int? id = await helper.insertData(
         table: DBConstant.custVisitTable, values: custVisit.toJsonDB());
+    return id != null;
   }
 }

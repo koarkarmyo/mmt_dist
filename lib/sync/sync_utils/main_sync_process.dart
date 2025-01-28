@@ -51,7 +51,7 @@ class MainSyncProcess {
   MainSyncProcess._() {
     _syncStream = StreamController<AutoSyncResponse>.broadcast();
 
-    Timer.periodic(const Duration(minutes: 1), (timer) async {
+    Timer.periodic(const Duration(minutes: 5), (timer) async {
       if (_autoSyncProcess.isEmpty) {
         _autoSyncProcess = await getSyncList('MASTER', isManual: false);
         print("Automatic sync : ${_autoSyncProcess.length}");
@@ -178,7 +178,7 @@ class MainSyncProcess {
         ),
       );
       //
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       _syncProcessIsRunning = false;
       _stopAutoSync = false;
       _sendToView(_syncResponse(
@@ -311,8 +311,7 @@ class MainSyncProcess {
             isFinished: true),
       );
       return;
-    }
-    catch (e) {
+    } catch (e) {
       _syncProcessIsRunning = false;
       _stopAutoSync = false;
       _sendToView(_syncResponse(

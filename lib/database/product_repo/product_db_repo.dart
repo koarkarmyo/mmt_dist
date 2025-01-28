@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../model/price_list/product_price_list_item.dart';
 import '../../model/product/product.dart';
@@ -34,7 +35,6 @@ class ProductDBRepo extends BaseDBRepo {
 
     for (Map<String, dynamic> jsonData in productJsonList) {
       product = Product.fromJsonDB(jsonData);
-      print("Fetch Product : ${product.toJson()}");
     }
 
     if (product != null) {
@@ -65,26 +65,25 @@ class ProductDBRepo extends BaseDBRepo {
     // List<Map<String, dynamic>> productUomList =
     //     await helper.readAllData(tableName: DBConstant.productUomTable);
     List<Map<String, dynamic>> uomMapList =
-        await helper.readAllData(tableName: DBConstant.uomUomTable);
+        await helper.readAllData(tableName: DBConstant.productUomTable);
 
     List<UomLine> uomList = [];
 
-    uomMapList.forEach(
-      (element) => uomList.add(UomLine.fromJson(element)),
-    );
+    uomMapList.forEach((element) {
+      UomLine uomLine = UomLine.fromJsonDB(element);
+      uomList.add(uomLine);
+    });
 
     for (Map<String, dynamic> element in productJsonList) {
       Product product = Product.fromJsonDB(element);
-      product.uomLines = [];
-      product.uomLines?.addAll(uomList.where(
-        (element) => element.uomCategoryId == product.uomCategoryId,
-      ));
+      List<UomLine> lines = uomList
+          .where((uom) => uom.productId == product.id)
+          .toList(growable: true);
+      product.uomLines = lines;
+      debugPrint(
+          'uomLiness:::${uomList.where((uom) => uom.productId == product.id).length}');
       products.add(product);
     }
-
-    products.forEach(
-      (element) => print("Product : ${element.toJson()}"),
-    );
 
     return products;
   }

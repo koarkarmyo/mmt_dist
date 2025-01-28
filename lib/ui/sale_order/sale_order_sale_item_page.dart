@@ -61,7 +61,11 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
         )
       ],
       body: Column(
-        children: [_tableHeaderWidget(), _focItemListWidget()],
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _tableHeaderWidget(),
+          _focItemListWidget(),
+        ],
       ).padding(padding: 16.allPadding),
     );
   }
@@ -92,7 +96,10 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
           return const Expanded(
               child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [Icon(Icons.hourglass_empty), Text(ConstString.noItem)],
+            children: [
+              Icon(Icons.hourglass_empty),
+              Text(ConstString.noItem),
+            ],
           ));
         }
         return Table(
@@ -147,9 +154,7 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
           itemCount: state.productList.length,
           itemBuilder: (context, index) {
             Product product = state.productList[index];
-            return _productItem(
-              product: product,
-            );
+            return _productItem(product: product);
           },
         ).expanded();
       },
@@ -230,7 +235,7 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                           if (discountAmount != null) {
                             deliveryItem.discountPercent = discountAmount;
                             double subtotal = calculateSubtotal([deliveryItem]);
-                            print("Subtotal : $subtotal");
+                            // print("Subtotal : $subtotal");
                             _cartCubit.addCartSaleItem(
                                 saleItem: deliveryItem.copyWith(
                                     discountPercent: discountAmount,
@@ -356,7 +361,6 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                               ),
                             ),
                             const SizedBox(width: 8),
-
                             SizedBox(
                               width: 80, // Set a fixed width for the TextField
                               child: TextField(
@@ -383,7 +387,8 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                                                   ? double.tryParse(
                                                       _qtyController.text)
                                                   : 0,
-                                          uomLine: product.uomLines?.first));
+                                          uomLine: deliveryItem.uomLine ??
+                                              product.uomLines?.first));
                                 },
                                 decoration: const InputDecoration(
                                   isDense:

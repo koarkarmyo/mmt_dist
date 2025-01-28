@@ -12,7 +12,7 @@ class SaleOrder {
   int? salePerson;
   double? amountTotal;
   OrderStates? state;
-  DeliveryStates? delivery_status;
+  DeliveryStates? deliveryStatus;
 
   SaleOrder({
     this.id,
@@ -23,37 +23,35 @@ class SaleOrder {
     this.salePerson,
     this.amountTotal,
     this.state,
-    this.delivery_status,
+    this.deliveryStatus,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'id': this.id,
-      'name': this.name,
-      'createDate': this.createDate,
-      'partnerId': this.partnerId,
-      'partnerName': this.partnerName,
-      'salePerson': this.salePerson,
-      'amountTotal': this.amountTotal,
-      'state': this.state,
-      'delivery_status': this.delivery_status,
+      'id': id,
+      'name': name,
+      'createDate': createDate,
+      'partnerId': partnerId,
+      'partnerName': partnerName,
+      'salePerson': salePerson,
+      'amountTotal': amountTotal,
+      'state': state,
+      'delivery_status': deliveryStatus,
     };
   }
 
   Map<String, dynamic> toJsonDB() {
     return {
-      'id': id,
+      if (id != null) 'id': id,
       'name': name,
       'partner_id': partnerId,
       'partner_name': partnerName,
       'sale_person': salePerson,
       'amount_total': amountTotal,
       'state': state,
-      'delivery_status': delivery_status,
+      'delivery_status': deliveryStatus,
     };
   }
-
-
 
   factory SaleOrder.fromJson(Map<String, dynamic> map) {
     return SaleOrder(
@@ -66,7 +64,7 @@ class SaleOrder {
       amountTotal: map['amount_total'],
       state: OrderStates.values
           .firstWhereOrNull((element) => element.name == map['state']),
-      delivery_status: DeliveryStates.values.firstWhereOrNull(
+      deliveryStatus: DeliveryStates.values.firstWhereOrNull(
           (element) => element.name == map['delivery_status']),
     );
   }

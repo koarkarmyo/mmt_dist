@@ -45,7 +45,7 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const TextWidget("Stock Request Page"),
+        title: const TextWidget(ConstString.stockRequestPage),
         actions: [
           IconButton(
               onPressed: () {
@@ -79,7 +79,6 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
             ),
             BlocBuilder<StockOrderBloc, StockOrderState>(
               builder: (context, stockOrderState) {
-
                 return KESingleChoiceWidget<StockLocation>(
                   valueList: state.locationList,
                   selectedValue: stockOrderState.location,
@@ -102,12 +101,13 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
   Widget _productTableHeaderWidget() {
     List<TableRow> tableRows = [
       TableRow(
-        decoration: BoxDecoration(color: Colors.grey[200]),
+        decoration: const BoxDecoration(color: AppColors.primaryColor),
         children: [
-          _tableItem(ConstString.name, align: Alignment.centerLeft),
-          _tableItem(ConstString.balance),
-          _tableItem(ConstString.uom),
-          _tableItem(ConstString.qty),
+          _tableItem(ConstString.name,
+              align: Alignment.centerLeft, textColor: Colors.white),
+          _tableItem(ConstString.balance, textColor: Colors.white),
+          _tableItem(ConstString.uom, textColor: Colors.white),
+          _tableItem(ConstString.qty, textColor: Colors.white),
         ],
       )
     ];
@@ -124,12 +124,15 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
     );
   }
 
-  Widget _tableItem(String text, {Alignment align = Alignment.centerRight}) {
+  Widget _tableItem(String text,
+      {Alignment align = Alignment.centerRight,
+      Color textColor = Colors.black}) {
     return Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       child: Align(
         alignment: align,
-        child: Text(text, style: TextStyle(fontWeight: FontWeight.bold)),
+        child: Text(text,
+            style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
       ),
     );
   }
@@ -154,12 +157,12 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
 
   Widget _stockRequestRow({required StockOrderLine stockOrderLine}) {
     return Slidable(
-      endActionPane:
-      ActionPane(motion: const ScrollMotion(), children: [
+      endActionPane: ActionPane(motion: const ScrollMotion(), children: [
         SlidableAction(
             backgroundColor: AppColors.dangerColor,
             onPressed: (context) {
-              _stockOrderBloc.add(StockOrderLineAddEvent(stockOrderLine: stockOrderLine));
+              _stockOrderBloc
+                  .add(StockOrderLineAddEvent(stockOrderLine: stockOrderLine));
             },
             label: "Delete",
             icon: Icons.delete)

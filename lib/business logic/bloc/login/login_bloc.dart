@@ -4,18 +4,20 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mmt_mobile/model/login_response.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:odoo_rpc/odoo_rpc.dart';
+
 import '../../../api/api_repo/login_api_repo.dart';
 import '../../../database/database_helper.dart';
 import '../../../database/db_constant.dart';
 import '../../../model/company_id.dart';
 import '../../../model/employee.dart';
 import '../../../model/odoo_session.dart';
-import '../../../sync/models/sync_action.dart';
 import '../../../share_preference/sh_keys.dart';
 import '../../../share_preference/sh_utils.dart';
 import '../../../src/mmt_application.dart';
+import '../../../sync/models/sync_action.dart';
 import '../../../sync/models/sync_group.dart';
 
 part 'login_event.dart';
@@ -89,6 +91,11 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     } on Error {
       _emitFail();
     }
+  }
+
+  _loginProcess(EmployeeLoginEvent event, Emitter<LoginState> emit) async {
+    LoginResponse? loginResponse = await LoginApiRepo()
+        .oldEmpLogin(username: event.username, password: event.password);
   }
 
   Future<bool> _saveCompanyListToDB(
@@ -217,8 +224,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     MMTApplication.loginDatabase =
         await SharePrefUtils().getString(ShKeys.loginDatabase) ?? 'hmo_db';
     String? userString = await SharePrefUtils().getString(ShKeys.currentUser);
-    print(
-        "Login DB : ${MMTApplication.loginDatabase} : Login User : $userString");
+    // print(
+    //     "Login DB : ${MMTApplication.loginDatabase} : Login User : $userString");
     if (userString != null) {
       MMTApplication.currentUser = Employee.fromJson(jsonDecode(userString));
       return true;

@@ -49,8 +49,9 @@ class StockOrderDBRepo extends BaseDBRepo {
   }
 
   Future<bool> insertStockOrder(StockOrder stockOrder) async {
-    return await helper.insertData(
+    int? id= await helper.insertData(
        table:  DBConstant.stockOrderTable, values:  stockOrder.toJsonDB());
+    return id != null;
   }
 
   Future<bool> insertStockOrderLines(

@@ -1,12 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/ui/stock_request/stock_request_list_page.dart';
 import 'package:mmt_mobile/ui/stock_request/stock_request_summary.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
-import '../../model/stock_location.dart';
 import '../../route/route_generate.dart';
+import '../../src/style/app_color.dart';
 
 class StockRequestHomePage extends StatefulWidget {
   const StockRequestHomePage({super.key});
@@ -16,7 +15,6 @@ class StockRequestHomePage extends StatefulWidget {
 }
 
 class _StockRequestHomePageState extends State<StockRequestHomePage> {
-
   final PersistentTabController _controller =
       PersistentTabController(initialIndex: 0);
 
@@ -52,8 +50,8 @@ class _StockRequestHomePageState extends State<StockRequestHomePage> {
           handleAndroidBackButtonPress: false,
           // popBehaviorOnSelectedNavBarItemPress: PopActionScreensType.all,
           padding: const EdgeInsets.only(top: 8),
-          backgroundColor: Colors.grey.shade900,
-
+          // backgroundColor: Colors.grey.shade900,
+          backgroundColor: AppColors.primaryColor,
           isVisible: true,
           animationSettings: const NavBarAnimationSettings(
             navBarItemAnimation: ItemAnimationSettings(
@@ -71,8 +69,8 @@ class _StockRequestHomePageState extends State<StockRequestHomePage> {
           ),
           confineToSafeArea: true,
           navBarHeight: kBottomNavigationBarHeight,
-          navBarStyle:
-              NavBarStyle.style6, // Choose the nav bar style with this property
+          navBarStyle: NavBarStyle.style6,
+          // Choose the nav bar style with this property
         ),
       ),
     );
@@ -83,18 +81,17 @@ class _StockRequestHomePageState extends State<StockRequestHomePage> {
       PersistentBottomNavBarItem(
           icon: const Icon(CupertinoIcons.list_bullet),
           title: ("Home"),
-          activeColorPrimary: CupertinoColors.activeBlue,
+          activeColorPrimary: Colors.white,
           inactiveColorPrimary: CupertinoColors.systemGrey,
           routeAndNavigatorSettings:
               const RouteAndNavigatorSettings(onGenerateRoute: generateRoute)),
       PersistentBottomNavBarItem(
           icon: const Icon(CupertinoIcons.cart),
           title: ("Summary"),
-          activeColorPrimary: CupertinoColors.activeBlue,
+          activeColorPrimary: Colors.white,
           inactiveColorPrimary: CupertinoColors.systemGrey,
           routeAndNavigatorSettings:
               const RouteAndNavigatorSettings(onGenerateRoute: generateRoute)),
-
     ];
   }
 }

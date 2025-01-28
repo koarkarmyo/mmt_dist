@@ -1,10 +1,9 @@
 import 'package:dio/dio.dart';
-import 'package:mmt_mobile/model/product/uom_lines.dart';
+import 'package:mmt_mobile/model/odoo_response.dart';
 import 'package:mmt_mobile/model/product_category.dart';
 import 'package:mmt_mobile/model/product_template.dart';
 import 'package:mmt_mobile/model/res_partner.dart';
 import 'package:mmt_mobile/model/stock_location.dart';
-import 'package:mmt_mobile/sync/models/sync_response.dart';
 
 import '../../database/database_helper.dart';
 import '../../database/db_constant.dart';
@@ -14,7 +13,6 @@ import '../../model/category.dart';
 import '../../model/currency.dart';
 import '../../model/dashboard.dart';
 import '../../model/price_list/price_list_item.dart';
-import '../../model/price_list/product_price_list_item.dart';
 import '../../model/product/product.dart';
 import '../../model/route/route_plan.dart';
 import '../../model/uom.dart';
@@ -42,12 +40,10 @@ class SyncUtils {
     switch (actionName) {
       case 'get_route':
         return await _getRouteProcess(actionName, response);
-      // case 'get_customer':
-      //   return await _getCustomerProcess(actionName, response);
       case 'get_dashboard':
         return await _getDashboardProcess(actionName, response);
-      // case 'get_cust_dashboard':
-      //   return _getCustDashboardProcess(actionName, response);
+      case 'get_cust_dashboard':
+        return _getCustDashboardProcess(actionName, response);
       case 'get_category':
         return await _getCategoryProcess(actionName, response);
       case 'get_product':
@@ -60,6 +56,14 @@ class SyncUtils {
         return await _getPriceListProcess(actionName, response);
       case 'get_product_template':
         return await _getProductTemplateProcess(actionName, response);
+      case 'get_currencies':
+        return await _getCurrencyProcess(actionName, response);
+      case 'get_uom_category':
+        return await _getUomCategoryProcess(actionName, response);
+      case 'get_journal_list':
+        return await _getJournalList(actionName, response);
+      default:
+        return SyncProcess.NextAction;
       // case 'get_customer_product':
       //   return await _getCustomerRegularSaleProductProcess(
       //       actionName, response);
@@ -88,18 +92,14 @@ class SyncUtils {
       //   return await _getStockOrder(actionName, response);
       // case 'get_cash_collection':
       //   return await _getCashCollection(actionName, response);
-      case 'get_uom':
-        return await _getUomProcess(actionName, response);
+      // case 'get_uom':
+      //   return await _getUomProcess(actionName, response);
       // case 'get_stock_picking_type':
       //   return _getStockPickingType(actionName, response);
       // case 'get_payment_terms':
       //   return await _getPaymentTerms(actionName, response);
       // case 'get_warehouses':
       //   return await _getWareHouse(actionName, response);
-      case 'get_currencies':
-        return await _getCurrencyProcess(actionName, response);
-      case 'get_uom_category':
-        return await _getUomCategoryProcess(actionName, response);
       // case 'get_coin_bill_list':
       //   return await _getCoinBillProcess(actionName, response);
       // case 'get_payment_transfer':
@@ -108,11 +108,6 @@ class SyncUtils {
       //   return await _getCashCollectionProcess(actionName, response);
       // case 'get_account_payment_list':
       //   return await _get_account_payment_list(actionName, response);
-      case 'get_journal_list':
-        return await _getJournalList(actionName, response);
-      default:
-        // MMTApplication.printJob('Save process not found!');
-        return SyncProcess.Fail;
     }
   }
 
@@ -152,9 +147,9 @@ class SyncUtils {
         whereArgs: [actionName],
         data: data);
     if (!success) {
-      final success = await DatabaseHelper.instance
+      final id = await DatabaseHelper.instance
           .insertData(table: DBConstant.syncHistoryTable, values: data);
-      return success;
+      return id != null;
     }
     return success;
   }
@@ -608,11 +603,39 @@ class SyncUtils {
       String actionName, Response response) async {
     // delete dashboards from database
     Map<String, dynamic> res = response.data!;
-    BaseApiResponse<Dashboard> baseResponse =
-        BaseApiResponse.fromJson(res, fromJson: Dashboard.fromJson);
-    if (baseResponse.data!.isEmpty) {
-      return SyncProcess.Finished;
-    }
+    //
+    // BaseApiResponse<Dashboard> baseResponse =
+    //     BaseApiResponse.fromJson(res, fromJson: Dashboard.fromJson);
+    // if (baseResponse.data!.isEmpty) {
+    //   return SyncProcess.Finished;
+    // }
+    List<Dashboard> dashboards = [
+      Dashboard(
+        id: 1,
+        priority: 1,
+        actionUrl: '/route',
+        dashboardName: 'Route',
+        isFolder: false,
+        dashboardGroupName: "Sale",
+        writeDate: '${DateTime.now().microsecondsSinceEpoch}',
+      ),
+      Dashboard(
+        id: 2,
+        priority: 2,
+        actionUrl: '/today_order_route',
+        dashboardName: 'Today order route',
+        isFolder: false,
+        writeDate: '${DateTime.now().microsecondsSinceEpoch}',
+      ),
+      Dashboard(
+        id: 3,
+        priority: 3,
+        actionUrl: '/today_order_report_route',
+        dashboardName: 'Today order report',
+        isFolder: false,
+        writeDate: '${DateTime.now().microsecondsSinceEpoch}',
+      ),
+    ];
 
     // delete process
     // await DatabaseHelper.instance
@@ -620,21 +643,20 @@ class SyncUtils {
     await DatabaseHelper.instance.deleteRows(
         tableName: DBConstant.dashboardTable,
         where: DBConstant.id,
-        wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+        wantDeleteRow: dashboards.map((e) => e.id).toList());
 
     // change to json to insert database
     List<Map<String, dynamic>>? dataList =
-        baseResponse.data!.map((e) => e.toJsonDB()).toList();
+        dashboards.map((e) => e.toJsonDB()).toList();
     // insert dashboard list to database
     final success = await DatabaseHelper.instance
         .insertDataListBath(DBConstant.dashboardTable, dataList);
-    if (success) {
-      return await _insertOrUpdateLastWriteDate(
-              actionName: actionName,
-              lastWriteDate: baseResponse.data!.last.writeDate!)
-          ? SyncProcess.Paginated
-          : SyncProcess.Fail;
-    }
+    // if (success) {
+    //   return await _insertOrUpdateLastWriteDate(
+    //           actionName: actionName, lastWriteDate: dashboards.last.writeDate!)
+    //       ? SyncProcess.Paginated
+    //       : SyncProcess.Fail;
+    // }
     return SyncProcess.Finished;
   }
 
@@ -696,30 +718,51 @@ class SyncUtils {
   }
 
 //
-// static Future<SyncProcess> _getCustDashboardProcess(
-//     String actionName, Response response) async {
-//   // delete dashboards from database
-//   await _helper.deleteAllRow(tableName: DBConstant.customerDashboardTable);
-//   Map<String, dynamic> res = response.data!;
-//   BaseApiResponse<Dashboard> baseResponse = BaseApiResponse.fromJson(res);
-//   if (baseResponse.data!.isEmpty) {
-//     return SyncProcess.Finished;
-//   }
-//   // change to json to insert database
-//   List<Map<String, dynamic>>? dataList =
-//       baseResponse.data!.map((e) => e.toJsonDB()).toList();
-//   // insert dashboard list to database
-//   final success = await _helper.insertDataListBath(
-//       DBConstant.customerDashboardTable, dataList);
-//   // if (success) {
-//   //   return await _insertOrUpdateLastWriteDate(
-//   //           actionName: actionName,
-//   //           lastWriteDate: baseResponse.data!.last.writeDate!)
-//   //       ? SyncProcess.Paginated
-//   //       : SyncProcess.Fail;
-//   // }
-//   return success ? SyncProcess.Finished : SyncProcess.Fail;
-// }
+  static Future<SyncProcess> _getCustDashboardProcess(
+      String actionName, Response response) async {
+    // delete dashboards from database
+    await DatabaseHelper.instance
+        .deleteAllRow(tableName: DBConstant.customerDashboardTable);
+    Map<String, dynamic> res = response.data!;
+    // BaseApiResponse<Dashboard> baseResponse = BaseApiResponse.fromJson(res);
+    // if (baseResponse.data!.isEmpty) {
+    //   return SyncProcess.Finished;
+    // }
+    //
+    List<Dashboard> dashboards = [
+      Dashboard(
+        id: 1,
+        priority: 1,
+        actionUrl: '/sale_order',
+        dashboardName: 'Sale order',
+        isFolder: false,
+        dashboardGroupName: "Sale",
+        writeDate: '${DateTime.now().microsecondsSinceEpoch}',
+      ),
+      Dashboard(
+        id: 2,
+        priority: 2,
+        actionUrl: '/direct_sale',
+        dashboardName: 'Van sale',
+        isFolder: false,
+        writeDate: '${DateTime.now().microsecondsSinceEpoch}',
+      ),
+    ]; // change to json to insert database
+    List<Map<String, dynamic>>? dataList =
+        dashboards.map((e) => e.toJsonDB()).toList();
+    // insert dashboard list to database
+    final success = await DatabaseHelper.instance
+        .insertDataListBath(DBConstant.customerDashboardTable, dataList);
+    // if (success) {
+    //   return await _insertOrUpdateLastWriteDate(
+    //           actionName: actionName,
+    //           lastWriteDate: baseResponse.data!.last.writeDate!)
+    //       ? SyncProcess.Paginated
+    //       : SyncProcess.Fail;
+    // }
+    return success ? SyncProcess.Finished : SyncProcess.Fail;
+  }
+
 //
   static Future<SyncProcess> _getPriceListProcess(
       String actionName, Response response) async {
@@ -1490,37 +1533,37 @@ class SyncUtils {
 //   return SyncProcess.Fail;
 // }
 //
-  static Future<SyncProcess> _getUomProcess(
-      String actionName, Response response) async {
-    // delete dashboards from database
-    Map<String, dynamic> res = response.data!;
-    BaseApiResponse<UomUom> baseResponse =
-        BaseApiResponse.fromJson(res, fromJson: UomUom.fromJson);
-    if (baseResponse.data!.isEmpty) {
-      return SyncProcess.Finished;
-    }
-    // delete process
-
-    await DatabaseHelper.instance.deleteRows(
-        tableName: DBConstant.uomUomTable,
-        where: DBConstant.id,
-        wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-
-    // change to json to insert database
-    List<Map<String, dynamic>>? dataList =
-        baseResponse.data?.map((e) => e.toJsonDB()).toList();
-    // insert dashboard list to database
-    final success = await DatabaseHelper.instance
-        .insertDataListBath(DBConstant.uomUomTable, dataList ?? []);
-    if (success) {
-      return await _insertOrUpdateLastWriteDate(
-              actionName: actionName,
-              lastWriteDate: baseResponse.data!.last.writeDate!)
-          ? SyncProcess.Paginated
-          : SyncProcess.Fail;
-    }
-    return SyncProcess.Finished;
-  }
+//   static Future<SyncProcess> _getUomProcess(
+//       String actionName, Response response) async {
+//     // delete dashboards from database
+//     Map<String, dynamic> res = response.data!;
+//     BaseApiResponse<UomUom> baseResponse =
+//         BaseApiResponse.fromJson(res, fromJson: UomUom.fromJson);
+//     if (baseResponse.data!.isEmpty) {
+//       return SyncProcess.Finished;
+//     }
+//     // delete process
+//
+//     await DatabaseHelper.instance.deleteRows(
+//         tableName: DBConstant.uomUomTable,
+//         where: DBConstant.id,
+//         wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+//
+//     // change to json to insert database
+//     List<Map<String, dynamic>>? dataList =
+//         baseResponse.data?.map((e) => e.toJsonDB()).toList();
+//     // insert dashboard list to database
+//     final success = await DatabaseHelper.instance
+//         .insertDataListBath(DBConstant.uomUomTable, dataList ?? []);
+//     if (success) {
+//       return await _insertOrUpdateLastWriteDate(
+//               actionName: actionName,
+//               lastWriteDate: baseResponse.data!.last.writeDate!)
+//           ? SyncProcess.Paginated
+//           : SyncProcess.Fail;
+//     }
+//     return SyncProcess.Finished;
+//   }
 
 //
 // static _getCoinBillProcess(String actionName, Response response) async {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:mmt_mobile/model/login_response.dart';
 
 import '../../model/employee.dart';
 import '../../model/odoo_session.dart';
@@ -47,6 +48,18 @@ class LoginApiRepo extends BaseApiRepo {
 
     Employee? loginEmployee =
         Employee.fromJson(response.data['data'] as Map<String, dynamic>);
+
+    return loginEmployee;
+  }
+
+  Future<LoginResponse?> oldEmpLogin(
+      {required String username, required String password}) async {
+    Response response = await postApiMethodCall(
+        additionalPath: '/api/get_auth_token/',
+        params: {'username': username, 'password': password});
+
+    LoginResponse? loginEmployee =
+        LoginResponse.fromJson(response.data['data'] as Map<String, dynamic>);
 
     return loginEmployee;
   }

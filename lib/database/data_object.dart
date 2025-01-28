@@ -438,8 +438,9 @@ class DataObject {
   // }
   //
   Future<bool> insertCustVisit(CustVisit custVisit) async {
-    return DatabaseHelper.instance.insertData(
+    int? id = await DatabaseHelper.instance.insertData(
         table: DBConstant.custVisitTable, values: custVisit.toJson());
+    return id != null;
   }
 
   //

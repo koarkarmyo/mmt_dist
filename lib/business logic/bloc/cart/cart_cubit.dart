@@ -4,8 +4,6 @@ import 'package:meta/meta.dart';
 import 'package:mmt_mobile/database/db_repo/price_list_db_repo.dart';
 import 'package:mmt_mobile/src/enum.dart';
 import '../../../database/db_repo/sale_order_db_repo.dart';
-import '../../../model/delivery/delivery_item.dart';
-import '../../../model/price_list/price_list.dart';
 import '../../../model/price_list/price_list_item.dart';
 import '../../../model/sale_order/sale_order_6/sale_order.dart';
 import '../../../model/sale_order/sale_order_line.dart';
@@ -46,7 +44,10 @@ class CartCubit extends Cubit<CartState> {
 
     print("Add Sale Item");
 
-    emit(state.copyWith(itemList: state.itemList));
+    emit(state.copyWith(
+      itemList: state.itemList,
+      state: BlocCRUDProcessState.createSuccess,
+    ));
   }
 
   void removeSaleItem({required int productId}) {
@@ -140,7 +141,7 @@ class CartCubit extends Cubit<CartState> {
           .where(
             (element) =>
                 element.productUom == orderLine.pkUomLine?.uomId &&
-                    element.productTmplId == orderLine.productId,
+                element.productTmplId == orderLine.productId,
           )
           .firstOrNull;
 
@@ -152,7 +153,7 @@ class CartCubit extends Cubit<CartState> {
           .where(
             (element) =>
                 element.productUom == orderLine.pcUomLine?.uomId &&
-                    element.productTmplId == orderLine.productId,
+                element.productTmplId == orderLine.productId,
           )
           .firstOrNull;
 
@@ -176,7 +177,9 @@ class CartCubit extends Cubit<CartState> {
       //     (orderLine.productUomQty ?? 0) * (orderLine.singleItemPrice ?? 0);
     }
 
-    double singleItemPriceWithDisc = (orderLine.singleItemPrice ?? 0) - ((orderLine.singleItemPrice ?? 0) * ((orderLine.discountPercent ?? 0) / 100));
+    double singleItemPriceWithDisc = (orderLine.singleItemPrice ?? 0) -
+        ((orderLine.singleItemPrice ?? 0) *
+            ((orderLine.discountPercent ?? 0) / 100));
 
     orderLine.subTotal =
         (orderLine.pkQty ?? 0) * (orderLine.singlePKPrice ?? 0) +

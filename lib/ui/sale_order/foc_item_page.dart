@@ -86,14 +86,13 @@ class _FocItemPageState extends State<FocItemPage> {
   Widget _tableHeaderWidget() {
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, state) {
-        print(
-            "FOC item check : ${state.itemList.length} | ${state.focItemList.length}");
         if (state.focItemList.isEmpty) {
           return const Expanded(
-              child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [Icon(Icons.hourglass_empty), Text(ConstString.noItem)],
-          ));
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [Icon(Icons.hourglass_empty), Text(ConstString.noItem)],
+            ),
+          );
         }
         return Table(
           border: TableBorder.all(),

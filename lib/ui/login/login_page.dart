@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/style/app_color.dart';
@@ -10,6 +9,7 @@ import '../../common_widget/text_widget.dart';
 import '../../common_widget/textfield_widget.dart';
 import '../../route/route_list.dart';
 import '../../src/const_string.dart';
+import '../../src/mmt_application.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -28,15 +28,26 @@ class _LoginPageState extends State<LoginPage> {
 
   final FocusNode _usernameNode = FocusNode();
   final FocusNode _passwordNode = FocusNode();
+  final FocusNode _urlNode = FocusNode();
 
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _serverUrlController =
+      TextEditingController(text: "161.97.187.243:8090");
+  String _serverUrl = '';
 
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     // TODO: implement initState
+    if (MMTApplication.serverUrl != '') {
+      _serverUrl = MMTApplication.serverUrl;
+      if (MMTApplication.serverUrl.startsWith('http://')) {
+        _serverUrl = MMTApplication.serverUrl.split('http://')[1];
+      }
+      _serverUrlController.text = _serverUrl;
+    }
     _loginBloc = context.read<LoginBloc>();
     super.initState();
   }
@@ -99,8 +110,8 @@ class _LoginPageState extends State<LoginPage> {
           onTap: () {
             _invalidName = !_isInputValid(_usernameController.text);
             _invalidPassword = !_isInputValid(_passwordController.text);
-            print("Username valid status : ${!_invalidName}");
-            print("Password valid status : ${!_invalidPassword}");
+            // print("Username valid status : ${!_invalidName}");
+            // print("Password valid status : ${!_invalidPassword}");
             if (!_invalidPassword && !_invalidName) {
               _loginBloc.add(EmployeeLoginEvent(
                   username: _usernameController.text,
@@ -112,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
           child: AnimatedButton(
             buttonText: 'Login',
             status: status,
-            buttonColor: AppColors.primaryColor,
+            buttonColor: AppColors.successColor,
           ),
         );
       },
@@ -179,6 +190,37 @@ class _LoginPageState extends State<LoginPage> {
         ConstString.appName,
         style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
       ),
+    );
+  }
+
+  Widget _serverUrlWidget() {
+    return TextFieldWidget(
+      onChange: (value) {
+        if (value.startsWith('http://') || value.startsWith('https://')) {
+          MMTApplication.serverUrl = value;
+          _serverUrl = value;
+        } else {
+          MMTApplication.serverUrl = 'http://$value';
+          _serverUrl = 'http://$value';
+        }
+      },
+      controller: _serverUrlController,
+      validator: (url) {
+        if (url == null || url == '') {
+          return 'required';
+        }
+        return null;
+      },
+      inputAction: TextInputAction.next,
+      hintText: "192.168.1.99",
+      prefixIcon: const Icon(Icons.link),
+      backgroundColor: Colors.white,
+      accentColor: AppColors.primaryColor,
+      borderRadius: 10,
+      showWarning: _invalidName,
+      isShadow: false,
+      height: 50,
+      focusNode: _urlNode,
     );
   }
 }

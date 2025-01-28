@@ -1,10 +1,9 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/product/product_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/product_category/product_category_cubit.dart';
-
 import 'package:mmt_mobile/common_widget/constant_widgets.dart';
 import 'package:mmt_mobile/model/product/uom_lines.dart';
 import 'package:mmt_mobile/model/res_partner.dart';
@@ -12,7 +11,6 @@ import 'package:mmt_mobile/src/enum.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/src/mmt_application.dart';
-import 'package:collection/collection.dart';
 
 import '../../common_widget/text_widget.dart';
 import '../../model/product/product.dart';
@@ -32,10 +30,12 @@ class SaleOrderAddProductPage extends StatefulWidget {
 
 class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
   late ProductCubit _productCubit;
-  TextEditingController _searchProduct = TextEditingController();
+  final TextEditingController _searchProduct = TextEditingController();
   String? _filterProductCategory = 'All';
   late CartCubit _cartCubit;
   ResPartner? _customer;
+  final List<TextEditingController> _pk = [];
+  final List<TextEditingController> _pc = [];
 
   @override
   void initState() {
@@ -66,12 +66,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            widget.customer?.name ?? '',
-            style: const TextStyle(fontSize: 16),
-          ),
-        ),
+        appBar: AppBar(title: Text(widget.customer?.name ?? 'Customer 01')),
         persistentFooterButtons: [
           BlocBuilder<ProductCubit, ProductState>(
             builder: (context, state) {
@@ -119,7 +114,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
   Widget _productTableHeaderWidget() {
     List<TableRow> tableRows = [
       TableRow(
-        decoration: BoxDecoration(color: Colors.grey[200]),
+        decoration: const BoxDecoration(color: AppColors.primaryColor),
         children: (MMTApplication.currentUser?.useLooseBox ?? false)
             ? [
                 _tableItem(ConstString.name, align: Alignment.centerLeft),
@@ -157,19 +152,27 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
         return ListView.builder(
           itemCount: state.productList.length,
           itemBuilder: (context, index) {
+            //
+            if (!(MMTApplication.selectedCompany?.useLooseUom ?? true)) {
+              _pc.add(TextEditingController());
+            }
+            _pk.add(TextEditingController());
+            //
             return (MMTApplication.currentUser?.useLooseBox ?? false)
-                ? _productRowWithPKPC(product: state.productList[index])
-                : _productRow(product: state.productList[index]);
+                ? _productRowWithPKPC(
+                    product: state.productList[index],
+                    position: index,
+                  )
+                : _productRow(
+                    product: state.productList[index], position: index);
           },
         ).expanded();
       },
     );
   }
 
-  Widget _productRowWithPKPC({required Product product}) {
-    TextEditingController pkController = TextEditingController();
-    TextEditingController pcController = TextEditingController();
-
+  Widget _productRowWithPKPC(
+      {required Product product, required int position}) {
     return BlocBuilder<CartCubit, CartState>(builder: (context, state) {
       SaleOrderLine? deliveryItem = state.itemList
           .where(
@@ -202,8 +205,8 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
             ).expanded(flex: 6),
             TextField(
               onTap: () {
-                pkController.selection = TextSelection(
-                    baseOffset: 0, extentOffset: pkController.text.length);
+                _pk[position].selection = TextSelection(
+                    baseOffset: 0, extentOffset: _pk[position].text.length);
               },
               onTapOutside: (event) {
                 FocusScope.of(context).unfocus();
@@ -212,15 +215,15 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                 _cartCubit.addCartSaleItem(
                     looseBoxType: LooseBoxType.pk,
                     saleItem: deliveryItem?.copyWith(
-                          pkQty: (pkController.text != '')
-                              ? double.tryParse(pkController.text)
+                          pkQty: (_pk[position].text != '')
+                              ? double.tryParse(_pk[position].text)
                               : 0,
                         ) ??
                         SaleOrderLine(
                             productId: product.id,
                             productName: product.name,
-                            pkQty: (pkController.text != '')
-                                ? double.tryParse(pkController.text)
+                            pkQty: (_pk[position].text != '')
+                                ? double.tryParse(_pk[position].text)
                                 : 0,
                             pcUomLine: UomLine(
                                 uomId: product.looseUomId,
@@ -230,15 +233,15 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                                 uomName: product.boxUomName)));
               },
               keyboardType: TextInputType.number,
-              controller: pkController,
+              controller: _pk[position],
               textAlign: TextAlign.right,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                   border: InputBorder.none, hintText: ConstString.qty),
             ).padding(padding: 8.horizontalPadding).expanded(flex: 3),
             TextField(
               onTap: () {
-                pcController.selection = TextSelection(
-                    baseOffset: 0, extentOffset: pcController.text.length);
+                _pc[position].selection = TextSelection(
+                    baseOffset: 0, extentOffset: _pc[position].text.length);
               },
               onTapOutside: (event) {
                 FocusScope.of(context).unfocus();
@@ -247,15 +250,15 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                 _cartCubit.addCartSaleItem(
                     looseBoxType: LooseBoxType.pc,
                     saleItem: deliveryItem?.copyWith(
-                          pcQty: (pcController.text != '')
-                              ? double.tryParse(pcController.text)
+                          pcQty: (_pc[position].text != '')
+                              ? double.tryParse(_pc[position].text)
                               : 0,
                         ) ??
                         SaleOrderLine(
                             productId: product.id,
                             productName: product.name,
-                            pcQty: (pcController.text != '')
-                                ? double.tryParse(pcController.text)
+                            pcQty: (_pc[position].text != '')
+                                ? double.tryParse(_pc[position].text)
                                 : 0,
                             pcUomLine: UomLine(
                                 uomId: product.looseUomId,
@@ -265,7 +268,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                                 uomName: product.boxUomName)));
               },
               keyboardType: TextInputType.number,
-              controller: pcController,
+              controller: _pc[position],
               textAlign: TextAlign.right,
               decoration: const InputDecoration(
                   border: InputBorder.none, hintText: ConstString.qty),
@@ -276,15 +279,16 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
     });
   }
 
-  Widget _productRow({required Product product}) {
-    TextEditingController controller = TextEditingController();
-
+  Widget _productRow({required Product product, required int position}) {
     return BlocBuilder<CartCubit, CartState>(builder: (context, state) {
       SaleOrderLine? deliveryItem = state.itemList
-          .where(
-            (element) => element.productId == product.id,
-          )
+          .where((element) => element.productId == product.id)
           .firstOrNull;
+
+      _pk[position].text = deliveryItem?.pkQty?.toQty() ?? '';
+      if (!(MMTApplication.selectedCompany?.useLooseUom ?? true)) {
+        _pc[position].text = deliveryItem?.pcQty?.toQty() ?? '';
+      }
 
       return Container(
         padding: 8.allPadding,
@@ -299,9 +303,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(product.name ?? '').bold(),
-                const SizedBox(
-                  height: 8,
-                ),
+                const SizedBox(height: 8),
                 Text("${(product.priceListItems?.firstWhereOrNull(
                       (element) =>
                           element.productUom ==
@@ -328,13 +330,14 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                 onChanged: (UomLine? newValue) {
                   // Handle selection change
                   _cartCubit.addCartSaleItem(
-                      saleItem: SaleOrderLine(
-                          productId: product.id,
-                          productName: product.name,
-                          productUomQty: (controller.text != '')
-                              ? double.tryParse(controller.text)
-                              : 0,
-                          uomLine: newValue));
+                    saleItem: SaleOrderLine(
+                      productId: product.id,
+                      productName: product.name,
+                      pkQty: deliveryItem?.pkQty,
+                      productUomQty: deliveryItem?.productUomQty ?? 0.0,
+                      uomLine: newValue,
+                    ),
+                  );
                 },
                 hint: const Text('uom'),
                 isDense: true,
@@ -342,26 +345,27 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
             ).expanded(flex: 4),
             TextField(
               onTap: () {
-                controller.selection = TextSelection(
-                    baseOffset: 0, extentOffset: controller.text.length);
+                _pk[position].selection = TextSelection(
+                    baseOffset: 0, extentOffset: _pk[position].text.length);
               },
               onTapOutside: (event) {
                 FocusScope.of(context).unfocus();
               },
               onChanged: (value) {
                 _cartCubit.addCartSaleItem(
-                    saleItem: SaleOrderLine(
-                        productId: product.id,
-                        productName: product.name,
-                        productUomQty: (controller.text != '')
-                            ? double.tryParse(controller.text)
-                            : 0,
-                        uomLine: product.uomLines?.firstOrNull));
+                  saleItem: SaleOrderLine(
+                    productId: product.id,
+                    productName: product.name,
+                    pkQty: double.tryParse(value),
+                    productUomQty: double.tryParse(value),
+                    uomLine: deliveryItem?.uomLine ?? product.uomLines?.firstOrNull,
+                  ),
+                );
               },
               keyboardType: TextInputType.number,
-              controller: controller,
+              controller: _pk[position],
               textAlign: TextAlign.right,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                   border: InputBorder.none, hintText: ConstString.qty),
             ).padding(padding: 8.horizontalPadding).expanded(flex: 3),
           ],
@@ -372,10 +376,14 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
 
   Widget _tableItem(String text, {Alignment align = Alignment.centerRight}) {
     return Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       child: Align(
         alignment: align,
-        child: Text(text, style: TextStyle(fontWeight: FontWeight.bold)),
+        child: Text(
+          text,
+          style:
+              const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
       ),
     );
   }
@@ -472,224 +480,234 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
     );
   }
 
-  Widget _showProductList() {
-    return BlocBuilder<ProductCubit, ProductState>(builder: (context, state) {
-      return ListView.builder(
-        itemCount: state.filterProductList.length,
-        itemBuilder: (context, index) {
-          Product product = state.filterProductList[index];
-          return _productItem(product: product);
-        },
-      ).expanded();
-    });
-  }
-
-  Widget _productItem({required Product product}) {
-    TextEditingController _qtyController = TextEditingController();
-    TextEditingController _pcController = TextEditingController();
-    TextEditingController _pkController = TextEditingController();
-
-    return BlocBuilder<CartCubit, CartState>(
-      builder: (context, state) {
-        SaleOrderLine? deliveryItem = state.itemList
-            .where(
-              (element) => element.productId == product.id,
-            )
-            .firstOrNull;
-
-        print("Delivery Item : ${deliveryItem?.toJson()}");
-
-        return ListTile(
-          contentPadding: 10.horizontalPadding,
-          // Adjust padding here
-          shape: RoundedRectangleBorder(
-            side: const BorderSide(color: Colors.black, width: 1),
-            borderRadius: BorderRadius.circular(5),
-          ),
-
-          title: Text(product.name ?? '').boldSize(16),
-          subtitle: Text((product.priceListItems
-                          ?.toList() // Convert to a list if it's not already
-                        ?..sort((a, b) => (a.fixedPrice ?? 0)
-                            .compareTo(b.productUom ?? 0)) // Sort by productUom
-                      )
-                      ?.map((e) =>
-                          '${e.productUomName} ${e.fixedPrice}') // Map to formatted strings
-                      .join(', ') // Join the list into a single string
-                  ??
-                  '' // Provide an empty string if null
-              ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            // Minimize column height
-            crossAxisAlignment: CrossAxisAlignment.end,
-            // Aligns widgets to the right
-            children: MMTApplication.currentUser?.useLooseBox ?? false
-                ? [
-                    SizedBox(
-                      width: 80, // Set a fixed width for the TextField
-                      child: TextField(
-                        keyboardType: TextInputType.number,
-                        onTap: () {
-                          _pkController.selection = TextSelection(
-                              baseOffset: 0,
-                              extentOffset: _pkController.text.length);
-                        },
-                        onTapOutside: (event) {
-                          // Unfocus when tapping anywhere outside the TextField
-                          FocusScope.of(context).unfocus();
-                        },
-                        autofocus: false,
-                        controller: _pkController,
-                        onChanged: (value) {
-                          _cartCubit.addCartSaleItem(
-                              looseBoxType: LooseBoxType.pk,
-                              saleItem: deliveryItem?.copyWith(
-                                    pkQty: (_pkController.text != '')
-                                        ? double.tryParse(_pkController.text)
-                                        : 0,
-                                  ) ??
-                                  SaleOrderLine(
-                                      productId: product.id,
-                                      productName: product.name,
-                                      pkQty: (_pkController.text != '')
-                                          ? double.tryParse(_pkController.text)
-                                          : 0,
-                                      pcUomLine: UomLine(
-                                          uomId: product.looseUomId,
-                                          uomName: product.looseUomName),
-                                      pkUomLine: UomLine(
-                                          uomId: product.boxUomId,
-                                          uomName: product.boxUomName)));
-                        },
-                        decoration: const InputDecoration(
-                            isDense: true,
-                            // Reduces height of the TextField
-                            contentPadding: EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 8),
-                            border: OutlineInputBorder(),
-                            hintText: 'PK',
-                            label: Text("PK")),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    SizedBox(
-                      width: 80, // Set a fixed width for the TextField
-                      child: TextField(
-                        keyboardType: TextInputType.number,
-                        onTap: () {
-                          _pcController.selection = TextSelection(
-                              baseOffset: 0,
-                              extentOffset: _pcController.text.length);
-                        },
-                        onTapOutside: (event) {
-                          // Unfocus when tapping anywhere outside the TextField
-                          FocusScope.of(context).unfocus();
-                        },
-                        autofocus: false,
-                        controller: _pcController,
-                        onChanged: (value) {
-                          _cartCubit.addCartSaleItem(
-                              looseBoxType: LooseBoxType.pc,
-                              saleItem: deliveryItem?.copyWith(
-                                    pcQty: (_pcController.text != '')
-                                        ? double.tryParse(_pcController.text)
-                                        : 0,
-                                  ) ??
-                                  SaleOrderLine(
-                                      productId: product.id,
-                                      productName: product.name,
-                                      pcQty: (_pcController.text != '')
-                                          ? double.tryParse(_pcController.text)
-                                          : 0,
-                                      pcUomLine: UomLine(
-                                          uomId: product.looseUomId,
-                                          uomName: product.looseUomName),
-                                      pkUomLine: UomLine(
-                                          uomId: product.boxUomId,
-                                          uomName: product.boxUomName)));
-                        },
-                        decoration: const InputDecoration(
-                            isDense: true,
-                            // Reduces height of the TextField
-                            contentPadding: EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 8),
-                            border: OutlineInputBorder(),
-                            hintText: 'PC',
-                            label: Text("PC")),
-                      ),
-                    ),
-                  ]
-                : [
-                    SizedBox(
-                      width: 80, // Set a fixed width for the TextField
-                      child: TextField(
-                        keyboardType: TextInputType.number,
-                        onTap: () {
-                          _qtyController.selection = TextSelection(
-                              baseOffset: 0,
-                              extentOffset: _qtyController.text.length);
-                        },
-                        onTapOutside: (event) {
-                          // Unfocus when tapping anywhere outside the TextField
-                          FocusScope.of(context).unfocus();
-                        },
-                        autofocus: false,
-                        controller: _qtyController,
-                        onChanged: (value) {
-                          _cartCubit.addCartSaleItem(
-                              saleItem: SaleOrderLine(
-                                  productId: product.id,
-                                  productName: product.name,
-                                  productUomQty: (_qtyController.text != '')
-                                      ? double.tryParse(_qtyController.text)
-                                      : 0,
-                                  uomLine: product.uomLines?.firstOrNull));
-                        },
-                        textAlign: TextAlign.right,
-                        decoration: const InputDecoration(
-                          isDense: true, // Reduces height of the TextField
-                          contentPadding:
-                              EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                          border: OutlineInputBorder(),
-                          hintText: 'Qty',
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                        width: 8), // Spacing between TextField and Dropdown
-                    Container(
-                      padding: 7.allPadding,
-                      decoration: BoxDecoration(
-                          border: Border.all(), borderRadius: 4.borderRadius),
-                      child: DropdownButton<UomLine>(
-                        value: deliveryItem?.uomLine ??
-                            product.uomLines?.firstOrNull,
-                        items: product.uomLines
-                            ?.map((UomLine value) => DropdownMenuItem<UomLine>(
-                                  value: value,
-                                  child: Text(value.uomName ?? ''),
-                                ))
-                            .toList(),
-                        onChanged: (UomLine? newValue) {
-                          // Handle selection change
-                          _cartCubit.addCartSaleItem(
-                              saleItem: SaleOrderLine(
-                                  productId: product.id,
-                                  productName: product.name,
-                                  productUomQty: (_qtyController.text != '')
-                                      ? double.tryParse(_qtyController.text)
-                                      : 0,
-                                  uomLine: newValue));
-                        },
-                        hint: const Text('uom'),
-                        isDense: true,
-                      ),
-                    ),
-                  ],
-          ),
-        );
-      },
-    ).padding(padding: 4.verticalPadding);
-  }
+// Widget _showProductList() {
+//   return BlocBuilder<ProductCubit, ProductState>(builder: (context, state) {
+//     return ListView.builder(
+//       itemCount: state.filterProductList.length,
+//       itemBuilder: (context, index) {
+//         Product product = state.filterProductList[index];
+//         //
+//         if (!(MMTApplication.selectedCompany?.useLooseUom ?? true)) {
+//           _pc.add(TextEditingController());
+//         }
+//         _pk.add(TextEditingController());
+//         //
+//         return _productItem(product: product, position: index);
+//       },
+//     ).expanded();
+//   });
+// }
+//
+// Widget _productItem({required Product product, required int position}) {
+//   //
+//   return BlocBuilder<CartCubit, CartState>(
+//     builder: (context, state) {
+//       SaleOrderLine? deliveryItem = state.itemList
+//           .where((element) => element.productId == product.id)
+//           .firstOrNull;
+//
+//       print('orderrr:::${deliveryItem?.pcQty}');
+//       print('orderrr:::${deliveryItem?.pkQty}');
+//
+//       _pk[position].text = deliveryItem?.pkQty?.toQty() ?? '';
+//       if (!(MMTApplication.selectedCompany?.useLooseUom ?? true)) {
+//         _pc[position].text = deliveryItem?.pcQty?.toQty() ?? '';
+//       }
+//
+//       return ListTile(
+//         contentPadding: 10.horizontalPadding,
+//         // Adjust padding here
+//         shape: RoundedRectangleBorder(
+//           side: const BorderSide(color: Colors.black, width: 1),
+//           borderRadius: BorderRadius.circular(5),
+//         ),
+//
+//         title: Text(product.name ?? '').boldSize(16),
+//         subtitle: Text((product.priceListItems
+//                         ?.toList() // Convert to a list if it's not already
+//                       ?..sort((a, b) => (a.fixedPrice ?? 0)
+//                           .compareTo(b.productUom ?? 0)) // Sort by productUom
+//                     )
+//                     ?.map((e) =>
+//                         '${e.productUomName} ${e.fixedPrice}') // Map to formatted strings
+//                     .join(', ') // Join the list into a single string
+//                 ??
+//                 '' // Provide an empty string if null
+//             ),
+//         trailing: Row(
+//           mainAxisSize: MainAxisSize.min,
+//           // Minimize column height
+//           crossAxisAlignment: CrossAxisAlignment.end,
+//           // Aligns widgets to the right
+//           children: MMTApplication.currentUser?.useLooseBox ?? false
+//               ? [
+//                   SizedBox(
+//                     width: 80, // Set a fixed width for the TextField
+//                     child: TextField(
+//                       keyboardType: TextInputType.number,
+//                       onTap: () {
+//                         _pk[position].selection = TextSelection(
+//                             baseOffset: 0,
+//                             extentOffset: _pk[position].text.length);
+//                       },
+//                       onTapOutside: (event) {
+//                         // Unfocus when tapping anywhere outside the TextField
+//                         FocusScope.of(context).unfocus();
+//                       },
+//                       autofocus: false,
+//                       controller: _pk[position],
+//                       onChanged: (value) {
+//                         _cartCubit.addCartSaleItem(
+//                             looseBoxType: LooseBoxType.pk,
+//                             saleItem: deliveryItem?.copyWith(
+//                                   pkQty: (_pk[position].text != '')
+//                                       ? double.tryParse(_pk[position].text)
+//                                       : 0,
+//                                 ) ??
+//                                 SaleOrderLine(
+//                                     productId: product.id,
+//                                     productName: product.name,
+//                                     pkQty: (_pk[position].text != '')
+//                                         ? double.tryParse(_pk[position].text)
+//                                         : 0,
+//                                     pcUomLine: UomLine(
+//                                         uomId: product.looseUomId,
+//                                         uomName: product.looseUomName),
+//                                     pkUomLine: UomLine(
+//                                         uomId: product.boxUomId,
+//                                         uomName: product.boxUomName)));
+//                       },
+//                       decoration: const InputDecoration(
+//                           isDense: true,
+//                           // Reduces height of the TextField
+//                           contentPadding: EdgeInsets.symmetric(
+//                               vertical: 8, horizontal: 8),
+//                           border: OutlineInputBorder(),
+//                           hintText: 'PK',
+//                           label: Text("PK")),
+//                     ),
+//                   ),
+//                   const SizedBox(width: 8),
+//                   SizedBox(
+//                     width: 80, // Set a fixed width for the TextField
+//                     child: TextField(
+//                       keyboardType: TextInputType.number,
+//                       onTap: () {
+//                         _pc[position].selection = TextSelection(
+//                             baseOffset: 0,
+//                             extentOffset: _pc[position].text.length);
+//                       },
+//                       onTapOutside: (event) {
+//                         // Unfocus when tapping anywhere outside the TextField
+//                         FocusScope.of(context).unfocus();
+//                       },
+//                       autofocus: false,
+//                       controller: _pc[position],
+//                       onChanged: (value) {
+//                         _cartCubit.addCartSaleItem(
+//                           looseBoxType: LooseBoxType.pc,
+//                           saleItem: deliveryItem?.copyWith(
+//                                 pcQty: (_pc[position].text != '')
+//                                     ? double.tryParse(_pc[position].text)
+//                                     : 0,
+//                               ) ??
+//                               SaleOrderLine(
+//                                   productId: product.id,
+//                                   productName: product.name,
+//                                   pcQty: (_pc[position].text != '')
+//                                       ? double.tryParse(_pc[position].text)
+//                                       : 0,
+//                                   pcUomLine: UomLine(
+//                                       uomId: product.looseUomId,
+//                                       uomName: product.looseUomName),
+//                                   pkUomLine: UomLine(
+//                                     uomId: product.boxUomId,
+//                                     uomName: product.boxUomName,
+//                                   )),
+//                         );
+//                       },
+//                       decoration: const InputDecoration(
+//                           isDense: true,
+//                           // Reduces height of the TextField
+//                           contentPadding: EdgeInsets.symmetric(
+//                               vertical: 8, horizontal: 8),
+//                           border: OutlineInputBorder(),
+//                           hintText: 'PC',
+//                           label: Text("PC")),
+//                     ),
+//                   ),
+//                 ]
+//               : [
+//                   SizedBox(
+//                     width: 80, // Set a fixed width for the TextField
+//                     child: TextField(
+//                       keyboardType: TextInputType.number,
+//                       onTap: () {
+//                         _pk[position].selection = TextSelection(
+//                             baseOffset: 0,
+//                             extentOffset: _pk[position].text.length);
+//                       },
+//                       onTapOutside: (event) {
+//                         // Unfocus when tapping anywhere outside the TextField
+//                         FocusScope.of(context).unfocus();
+//                       },
+//                       autofocus: false,
+//                       controller: _pk[position],
+//                       onChanged: (value) {
+//                         _cartCubit.addCartSaleItem(
+//                           saleItem: SaleOrderLine(
+//                             productId: product.id,
+//                             productName: product.name,
+//                             pkQty: double.tryParse(value),
+//                             productUomQty: double.tryParse(value),
+//                             uomLine: product.uomLines?.firstOrNull,
+//                           ),
+//                         );
+//                       },
+//                       textAlign: TextAlign.right,
+//                       decoration: const InputDecoration(
+//                         isDense: true, // Reduces height of the TextField
+//                         contentPadding:
+//                             EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+//                         border: OutlineInputBorder(),
+//                         hintText: 'Qty',
+//                       ),
+//                     ),
+//                   ),
+//                   const SizedBox(
+//                       width: 8), // Spacing between TextField and Dropdown
+//                   Container(
+//                     padding: 7.allPadding,
+//                     decoration: BoxDecoration(
+//                         border: Border.all(), borderRadius: 4.borderRadius),
+//                     child: DropdownButton<UomLine>(
+//                       value: deliveryItem?.uomLine ??
+//                           product.uomLines?.firstOrNull,
+//                       items: product.uomLines
+//                           ?.map((UomLine value) => DropdownMenuItem<UomLine>(
+//                                 value: value,
+//                                 child: Text(value.uomName ?? ''),
+//                               ))
+//                           .toList(),
+//                       onChanged: (UomLine? newValue) {
+//                         // Handle selection change
+//                         _cartCubit.addCartSaleItem(
+//                             saleItem: SaleOrderLine(
+//                                 productId: product.id,
+//                                 productName: product.name,
+//                                 productUomQty: (_pk[position].text != '')
+//                                     ? double.tryParse(_pk[position].text)
+//                                     : 0,
+//                                 uomLine: newValue));
+//                       },
+//                       hint: const Text('uom'),
+//                       isDense: true,
+//                     ),
+//                   ),
+//                 ],
+//         ),
+//       );
+//     },
+//   ).padding(padding: 4.verticalPadding);
+// }
 }

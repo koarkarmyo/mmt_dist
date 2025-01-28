@@ -2,15 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mmt_mobile/model/res_partner.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
-import 'package:mmt_mobile/ui/sale_order/coupon_item_page.dart';
 import 'package:mmt_mobile/ui/sale_order/foc_item_page.dart';
 import 'package:mmt_mobile/ui/sale_order/sale_order_add_product.dart';
 import 'package:mmt_mobile/ui/sale_order/sale_order_sale_item_page.dart';
 import 'package:mmt_mobile/ui/sale_order/sale_summary_page.dart';
-import 'package:mmt_mobile/ui/sale_order_history_page.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 import '../../route/route_generate.dart';
+import '../../src/style/app_color.dart';
 
 class SaleOrderPage extends StatefulWidget {
   const SaleOrderPage({super.key});
@@ -25,12 +24,6 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
   ResPartner? _customer;
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
@@ -43,13 +36,9 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
 
   List<Widget> _buildScreens() {
     return [
-      SaleOrderAddProductPage(
-        customer: _customer,
-      ),
+      SaleOrderAddProductPage(customer: _customer),
       const SaleOrderSaleItemPage(),
-       FocItemPage(
-        customer: _customer,
-      ),
+      FocItemPage(customer: _customer),
       // const CouponItemPage(),
       const SaleSummaryPage()
     ];
@@ -83,8 +72,7 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
           handleAndroidBackButtonPress: false,
           // popBehaviorOnSelectedNavBarItemPress: PopActionScreensType.all,
           padding: const EdgeInsets.only(top: 8),
-          backgroundColor: Colors.grey.shade900,
-
+          backgroundColor: AppColors.primaryColor,
           isVisible: true,
           animationSettings: const NavBarAnimationSettings(
             navBarItemAnimation: ItemAnimationSettings(
@@ -114,21 +102,21 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
       PersistentBottomNavBarItem(
           icon: const Icon(CupertinoIcons.list_bullet),
           title: ("Home"),
-          activeColorPrimary: CupertinoColors.activeBlue,
+          activeColorPrimary: Colors.white,
           inactiveColorPrimary: CupertinoColors.systemGrey,
           routeAndNavigatorSettings:
               const RouteAndNavigatorSettings(onGenerateRoute: generateRoute)),
       PersistentBottomNavBarItem(
           icon: const Icon(CupertinoIcons.cart),
           title: ("Sale"),
-          activeColorPrimary: CupertinoColors.activeBlue,
+          activeColorPrimary: Colors.white,
           inactiveColorPrimary: CupertinoColors.systemGrey,
           routeAndNavigatorSettings:
               const RouteAndNavigatorSettings(onGenerateRoute: generateRoute)),
       PersistentBottomNavBarItem(
           icon: const Icon(CupertinoIcons.settings),
           title: ("FOC"),
-          activeColorPrimary: CupertinoColors.activeBlue,
+          activeColorPrimary: Colors.white,
           inactiveColorPrimary: CupertinoColors.systemGrey,
           routeAndNavigatorSettings:
               const RouteAndNavigatorSettings(onGenerateRoute: generateRoute)),
@@ -143,7 +131,7 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
       PersistentBottomNavBarItem(
         icon: const Icon(CupertinoIcons.sum),
         title: ("Summary"),
-        activeColorPrimary: CupertinoColors.activeBlue,
+        activeColorPrimary: Colors.white,
         inactiveColorPrimary: CupertinoColors.systemGrey,
       ),
     ];

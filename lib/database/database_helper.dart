@@ -27,10 +27,10 @@ class DatabaseHelper {
         version: _databaseVersion, onCreate: _onCreateDatabase);
   }
 
-  Future<bool> insertData(
+  Future<int?> insertData(
       {required String table, required Map<String, dynamic> values}) async {
     int? id = await _database?.insert(table, values);
-    return id != null;
+    return id;
   }
 
   Future deleteAllRow({required String tableName}) async {
@@ -38,8 +38,9 @@ class DatabaseHelper {
     if (db.isOpen) {
       int affectedRow = await db.delete(tableName);
       return affectedRow;
-    } else
+    } else {
       return 0;
+    }
   }
 
   Future<bool> deleteRows(

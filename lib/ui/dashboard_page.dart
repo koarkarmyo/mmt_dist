@@ -1,18 +1,20 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
 import 'package:mmt_mobile/common_widget/constant_widgets.dart';
 import 'package:mmt_mobile/model/dashboard_group.dart';
+import 'package:mmt_mobile/src/const_string.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/src/mmt_application.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
+
 import '../business logic/bloc/dashboard/dashboard_cubit.dart';
 import '../common_widget/alert_dialog.dart';
 import '../common_widget/bottom_sheet_selection_widget.dart';
@@ -23,7 +25,6 @@ import '../src/style/app_color.dart';
 import '../sync/bloc/sync_action_bloc/sync_action_bloc_cubit.dart';
 import '../sync/models/sync_response.dart';
 import '../sync/sync_utils/main_sync_process.dart';
-import 'package:collection/collection.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -219,9 +220,9 @@ class _DashboardPageState extends State<DashboardPage> {
               context.pushTo(route: RouteList.stockLoadingAddPage);
             },
             child: const Text(
-              "Dashboard",
+              ConstString.dashboard,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ).padding(padding: 10.allPadding),
+            ).padding(padding: (16, 16).padding),
           ),
           buildWorkingPart(),
           // Move the process list to follow the title list
@@ -233,7 +234,6 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget buildWorkingPart() {
     return BlocBuilder<DashboardCubit, DashboardState>(
       builder: (context, state) {
-        print("Dashboard State : ${state.state}");
         if (state.state == BlocCRUDProcessState.fetching) {
           return const Center(child: CircularProgressIndicator()).expanded();
         } else if (state.state == BlocCRUDProcessState.fetchSuccess) {
@@ -259,7 +259,6 @@ class _DashboardPageState extends State<DashboardPage> {
             builder: (context, selectedTitleIndex, _) {
               _dashboardList = state.dashboardList;
               List<DashboardGroup> groupList = [];
-
               _dashboardList.forEach(
                 (element) {
                   if (!groupList
@@ -298,7 +297,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                   topRight: Radius.circular(25))),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
+                              horizontal: 16.0,
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -351,7 +350,7 @@ class _DashboardPageState extends State<DashboardPage> {
           );
         } else {
           return const Center(
-          child: Column(
+              child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.numbers),
@@ -375,6 +374,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return SizedBox(
       height: 100,
       child: ListView.builder(
+        padding: 16.horizontalPadding,
         controller: _scrollController,
         itemCount: dashboardGroupList.length,
         scrollDirection: Axis.horizontal,
@@ -396,7 +396,8 @@ class _DashboardPageState extends State<DashboardPage> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     color: selectedTitleIndex == index
-                        ? Colors.blueAccent
+                        // ? Colors.blueAccent
+                        ? AppColors.primaryColor
                         : Colors.black12,
                   ),
                   alignment: Alignment.center,
@@ -417,7 +418,6 @@ class _DashboardPageState extends State<DashboardPage> {
                                   "Cookie":
                                       "session_id=${MMTApplication.session?.sessionId}"
                                 },
-
                                 errorWidget: (context, url, error) =>
                                     const Icon(Icons.error),
                               );
@@ -454,7 +454,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Expanded buildProcessList(List<Dashboard> dashboardList) {
     return Expanded(
       child: GridView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        // padding: const EdgeInsets.symmetric(horizontal: 8),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           crossAxisSpacing: 5,

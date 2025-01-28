@@ -3,12 +3,14 @@ class ConstString {
   static const String version = '1.0.0';
   static const String welcome = 'Welcome';
   static const String history = 'History';
+  static const String stockRequestPage = 'Stock request page';
   static const String saleOrderMM = 'အ‌ရောင်းအော်ဒါများ';
   static const String voucherNo = 'အော်ဒါနံပါတ်';
   static const String pc = 'PC';
   static const String pk = 'PK';
   static const String delete = 'Delete';
   static const String createSaleOrder = 'အ‌ရောင်းအော်ဒါတင်ခြင်း';
+  static const String dashboard = 'Dashboard';
   static const String coupon = 'Coupon';
   static const String location = 'Location';
   static const String name = "Name";

@@ -1,8 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
-import 'package:meta/meta.dart';
 import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
-import 'package:mmt_mobile/database/database_helper.dart';
 import 'package:mmt_mobile/database/db_repo/dashboard_db_repo.dart';
 
 import '../../../model/dashboard.dart';
@@ -34,7 +32,8 @@ class DashboardCubit extends Cubit<DashboardState> {
   Future<void> fetchDashboardFromApi() async {
     try {
       emit(state.copyWith(state: BlocCRUDProcessState.fetching));
-      Response response = await SyncApiRepo().sendAction('get_dashboard', limit: 100);
+      Response response =
+          await SyncApiRepo().sendAction('get_dashboard', limit: 100);
       SyncProcess syncProcess = await SyncUtils.insertToDatabase(
           actionName: 'get_dashboard', response: response);
       List<Dashboard> dashboards =

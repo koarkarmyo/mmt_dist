@@ -169,8 +169,8 @@ class _AdminLoginPage extends State<AdminLoginPage> {
           onTap: () {
             _invalidName = !_isInputValid(_usernameController.text);
             _invalidPassword = !_isInputValid(_passwordController.text);
-            print("Username valid status : ${!_invalidName}");
-            print("Password valid status : ${!_invalidPassword}");
+            // print("Username valid status : ${!_invalidName}");
+            // print("Password valid status : ${!_invalidPassword}");
             if (!_invalidPassword && !_invalidName) {
               _loginBloc.add(UserLoginEvent(
                   username: _usernameController.text,
@@ -184,7 +184,7 @@ class _AdminLoginPage extends State<AdminLoginPage> {
           child: AnimatedButton(
             buttonText: 'Login',
             status: status,
-            buttonColor:  AppColors.primaryColor,
+            buttonColor:  AppColors.successColor,
           ),
         );
       },

@@ -5,6 +5,8 @@ import 'package:mmt_mobile/database/db_repo/price_list_db_repo.dart';
 import 'package:mmt_mobile/database/product_repo/product_db_repo.dart';
 import 'package:mmt_mobile/model/price_list/price_list_item.dart';
 import 'package:collection/collection.dart';
+import 'package:mmt_mobile/model/product/uom_lines.dart';
+import 'package:mmt_mobile/model/uom.dart';
 
 import '../../../model/product/product.dart';
 
@@ -22,23 +24,18 @@ class ProductCubit extends Cubit<ProductState> {
 
     try {
       List<Product> productList = await ProductDBRepo.instance.getProductList();
+
       List<PriceListItem> priceListItems =
           await PriceListDbRepo.instance.getAllPriceList();
 
       productList.forEachIndexed(
         (index, product) {
-          print(
-              "product : ${product.id} | product_temp_id : ${priceListItems.length}");
           productList[index].priceListItems = priceListItems.where((e) {
-            // print("product temp : ${e.productTmplId}");
             return e.productTmplId == product.id;
           }).toList();
         },
       );
 
-      // {
-      //
-      // },
 
       // productList.forEach((element) => print("Product fetch : ${element.toJson()}"),);
       emit(state.copyWith(

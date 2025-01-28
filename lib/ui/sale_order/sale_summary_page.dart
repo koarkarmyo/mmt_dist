@@ -42,7 +42,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(ConstString.summaryPage),
+        title: const Text(ConstString.summaryPage),
       ),
       persistentFooterButtons: [
         BlocBuilder<CartCubit, CartState>(
@@ -50,28 +50,28 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
             return GestureDetector(
               onTap: () {
                 SaleOrder saleOrder = SaleOrder(
-                    id: 1,
-                    name: 'S0234',
-                    amountTotal: _total - _discountAmount,
-                    createDate: DateTime.now().toString());
-
+                  name: 'S0234',
+                  amountTotal: _total - _discountAmount,
+                  createDate: DateTime.now().toString(),
+                );
                 _cartCubit.saveSaleOrder(saleOrder: saleOrder);
               },
               child: Container(
-                  padding: 16.allPadding,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      color: AppColors.primaryColor,
-                      borderRadius: 12.borderRadius,
-                      border: Border.all()),
-                  child: Center(
-                    child: (state.state == BlocCRUDProcessState.creating)
-                        ? CircularProgressIndicator()
-                        : const Text(
-                            "Confirm",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                  )),
+                padding: 16.allPadding,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    color: AppColors.successColor,
+                    borderRadius: 12.borderRadius,
+                    border: Border.all(color: AppColors.successColor)),
+                child: Center(
+                  child: (state.state == BlocCRUDProcessState.creating)
+                      ? const CircularProgressIndicator()
+                      : const Text(
+                          "Confirm",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                ),
+              ),
             );
           },
         )
@@ -91,7 +91,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
             height: 10,
           ),
           const Text(
-           ConstString.saleItem,
+            ConstString.saleItem,
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ).padding(padding: 16.horizontalPadding),
           _productInCartWidget(),
@@ -170,7 +170,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
         ),
         Text(
           "${value.toString()} K",
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
@@ -251,7 +251,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
               valueListenable: _discountType,
               builder: (context, value, child) => Text(
                 value.name,
-                style: TextStyle(fontSize: 12, color: Colors.white),
+                style: const TextStyle(fontSize: 12, color: Colors.white),
               ),
             )
           ],

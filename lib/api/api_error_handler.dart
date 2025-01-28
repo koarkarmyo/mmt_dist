@@ -14,7 +14,7 @@ class ApiErrorHandler {
   static const String _message = 'message';
 
 
-  static Map<String, String> createError(DioError error) {
+  static Map<String, String> createError(DioException error) {
     if (error.type == DioExceptionType.badResponse) {
       if (error.response?.statusCode == 400) {
         return {_message: 'bad request'};
@@ -44,9 +44,9 @@ class ApiErrorHandler {
         return {_message: 'server unavailable!'};
       }
     } else if (error.type == DioExceptionType.connectionTimeout ||
-        error.type == DioErrorType.sendTimeout) {
+        error.type == DioExceptionType.sendTimeout) {
       return {_message: 'connection time out'};
-    } else if (error.type == DioErrorType.receiveTimeout) {
+    } else if (error.type == DioExceptionType.receiveTimeout) {
       return {_message: 'receive time out'};
     }
 

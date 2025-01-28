@@ -43,12 +43,12 @@ class AnimatedButton extends StatefulWidget {
       this.onPressed,
       this.height,
       this.width,
-      required this.buttonColor});
+      this.buttonColor});
 
   String buttonText;
   VoidCallback? onPressed;
   ButtonStatus status;
-  Color buttonColor;
+  Color? buttonColor;
   double? height;
   double? width;
 
@@ -63,15 +63,16 @@ class _AnimatedButtonState extends State<AnimatedButton> {
       onTap: widget.onPressed,
       child: Container(
         height: widget.height ?? 50,
-        width: widget.width ?? 200,
+        width: widget.width ?? MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           borderRadius: 20.borderRadius,
           border: Border.all(
               color: (widget.status == ButtonStatus.loading)
-                  ? widget.buttonColor
+                  ? widget.buttonColor ?? AppColors.successColor
                   : Colors.white),
           color: (widget.status == ButtonStatus.start)
-              ? widget.buttonColor
+              ? widget.buttonColor ?? AppColors.successColor
+              // ? widget.buttonColor
               : widget.status.color,
         ),
         child: Stack(
