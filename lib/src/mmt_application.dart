@@ -1,11 +1,9 @@
-import 'package:flutter/cupertino.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mmt_mobile/model/company_id.dart';
 import 'package:mmt_mobile/model/language_model.dart';
 import 'package:mmt_mobile/model/login_response.dart';
-import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/ui/widgets/confirm_dialog_widget.dart';
-import 'package:odoo_rpc/odoo_rpc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
@@ -14,15 +12,13 @@ import '../model/number_series.dart';
 import '../model/odoo_session.dart';
 import '../model/product/product.dart';
 import '../model/product/uom_lines.dart';
-import 'package:collection/collection.dart';
-import '../route/route_list.dart';
 import 'enum.dart';
 
 class MMTApplication {
   // Server
   // static const String serverUrl = 'http://217.15.166.234:8069';
 
-  static String serverUrl = 'http://161.97.187.243:8090';
+  static String serverUrl = 'http://150.95.27.145';
   static Employee? currentUser;
   static CompanyId? selectedCompany;
   static String defaultUserImage =

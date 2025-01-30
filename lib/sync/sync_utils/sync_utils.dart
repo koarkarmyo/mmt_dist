@@ -724,10 +724,11 @@ class SyncUtils {
     await DatabaseHelper.instance
         .deleteAllRow(tableName: DBConstant.customerDashboardTable);
     Map<String, dynamic> res = response.data!;
-    // BaseApiResponse<Dashboard> baseResponse = BaseApiResponse.fromJson(res);
-    // if (baseResponse.data!.isEmpty) {
-    //   return SyncProcess.Finished;
-    // }
+    BaseApiResponse<Dashboard> baseResponse =
+        BaseApiResponse.fromJson(res, fromJson: Dashboard.fromJson);
+    if (baseResponse.data!.isEmpty) {
+      return SyncProcess.Finished;
+    }
     //
     List<Dashboard> dashboards = [
       Dashboard(

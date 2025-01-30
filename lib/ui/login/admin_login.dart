@@ -40,7 +40,7 @@ class _AdminLoginPage extends State<AdminLoginPage> {
   final FocusNode _passwordNode = FocusNode();
 
   final TextEditingController _usernameController = TextEditingController(text: "developer.mmtcompany@gmail.com");
-  final TextEditingController _passwordController = TextEditingController(text: "password.ppt123");
+  final TextEditingController _passwordController = TextEditingController(text: "1223334444");
   final TextEditingController _serverUrlController = TextEditingController(text: "161.97.187.243:8090");
 
   ValueNotifier<String> selectedDatabase =

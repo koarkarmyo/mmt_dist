@@ -51,14 +51,15 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   FutureOr<void> _loginEmployee(
       EmployeeLoginEvent event, Emitter<LoginState> emit) async {
-    print('SESSION::::${MMTApplication.session?.toJson()}');
+    //
+    debugPrint('SESSION::::${MMTApplication.session?.toJson()}');
 
     emit(state.copyWith(status: LoginStatus.loading));
     try {
       Employee? employee = await LoginApiRepo()
           .employeeLogin(username: event.username, password: event.password);
 
-      print("Login User : ${employee?.toJson()}");
+      debugPrint("Login User : ${employee?.toJson()}");
 
       if (employee == null) {
         emit(state.copyWith(status: LoginStatus.fail));
@@ -69,7 +70,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
         bool saveSuccess =
             await _saveCompanyListToDB(companyList: employee.companyList ?? []);
-        print("Company Successfully Saved : $saveSuccess");
+        debugPrint("Company Successfully Saved : $saveSuccess");
         MMTApplication.currentUser?.useLooseBox =
             employee.companyList?.firstOrNull?.useLooseUom == true;
         SharePrefUtils()
@@ -91,6 +92,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     } on Error {
       _emitFail();
     }
+
+    await Future.delayed(1.second);
+    emit(state.copyWith(status: LoginStatus.initial));
   }
 
   _loginProcess(EmployeeLoginEvent event, Emitter<LoginState> emit) async {

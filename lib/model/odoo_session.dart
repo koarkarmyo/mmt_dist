@@ -25,8 +25,10 @@ class Session {
       String expiresString = match.group(2)!;
       String maxAgeString = match.group(3)!;
 
-      DateFormat format =
-          DateFormat("EEE, dd-MMM-yyyy HH:mm:ss 'GMT'", "en_US");
+      // DateFormat format =
+      //     DateFormat("EEE, dd-MMM-yyyy HH:mm:ss 'GMT'");
+      final DateFormat format = DateFormat("EEE, d MMM yyyy HH:mm:s 'GMT'");
+
       DateTime expires = format.parseUtc(expiresString);
 
       int maxAge = int.parse(maxAgeString);
