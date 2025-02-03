@@ -22,25 +22,25 @@ class PriceListItem {
 
   PriceListItem(
       {this.id,
-        this.productTmplId,
-        this.productTmplName,
-        this.productId,
-        this.productName,
-        this.minQuantity,
-        this.fixedPrice,
-        this.dateStart,
-        this.dateEnd,
-        this.companyId,
-        this.companyName,
-        this.pricelistId,
-        this.pricelistName,
-        this.currencyId,
-        this.currencyName,
-        this.productUomMinQty,
-        this.productUom,
-        this.productUomName,
-        this.discountPercent,
-        this.writeDate});
+      this.productTmplId,
+      this.productTmplName,
+      this.productId,
+      this.productName,
+      this.minQuantity,
+      this.fixedPrice,
+      this.dateStart,
+      this.dateEnd,
+      this.companyId,
+      this.companyName,
+      this.pricelistId,
+      this.pricelistName,
+      this.currencyId,
+      this.currencyName,
+      this.productUomMinQty,
+      this.productUom,
+      this.productUomName,
+      this.discountPercent,
+      this.writeDate});
 
   PriceListItem.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -60,33 +60,34 @@ class PriceListItem {
     currencyName = json['currency_name'];
     productUomMinQty = json['product_uom_min_qty'];
     productUom = json['product_uom'];
+    productUom = json['product_uom'];
     productUomName = json['product_uom_name'];
     discountPercent = json['discount_percent'];
     writeDate = json['write_date'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['product_tmpl_id'] = this.productTmplId;
-    data['product_tmpl_name'] = this.productTmplName;
-    data['product_id'] = this.productId;
-    data['product_name'] = this.productName;
-    data['min_quantity'] = this.minQuantity;
-    data['fixed_price'] = this.fixedPrice;
-    data['date_start'] = this.dateStart;
-    data['date_end'] = this.dateEnd;
-    data['company_id'] = this.companyId;
-    data['company_name'] = this.companyName;
-    data['pricelist_id'] = this.pricelistId;
-    data['pricelist_name'] = this.pricelistName;
-    data['currency_id'] = this.currencyId;
-    data['currency_name'] = this.currencyName;
-    data['product_uom_min_qty'] = this.productUomMinQty;
-    data['product_uom'] = this.productUom;
-    data['product_uom_name'] = this.productUomName;
-    data['discount_percent'] = this.discountPercent;
-    data['write_date'] = this.writeDate;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['product_tmpl_id'] = productTmplId;
+    data['product_tmpl_name'] = productTmplName;
+    data['product_id'] = productId;
+    data['product_name'] = productName;
+    data['min_quantity'] = minQuantity;
+    data['fixed_price'] = fixedPrice;
+    data['date_start'] = dateStart;
+    data['date_end'] = dateEnd;
+    data['company_id'] = companyId;
+    data['company_name'] = companyName;
+    data['pricelist_id'] = pricelistId;
+    data['pricelist_name'] = pricelistName;
+    data['currency_id'] = currencyId;
+    data['currency_name'] = currencyName;
+    data['product_uom_min_qty'] = productUomMinQty;
+    data['product_uom'] = productUom;
+    data['product_uom_name'] = productUomName;
+    data['discount_percent'] = discountPercent;
+    data['write_date'] = writeDate;
     return data;
   }
 }

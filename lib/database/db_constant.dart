@@ -237,9 +237,21 @@ class DBConstant {
   static const String stateName = 'state_name';
   static const String priceListId = 'pricelist_id';
   static const String priceListName = 'pricelist_name';
+  static const String productPricelistId = 'product_pricelist_id';
+  static const String productPricelistName = 'product_pricelist_name';
   static const String zip = 'zip';
   static const String phone = 'phone';
   static const String mobile = 'mobile';
+  static const String zoneId = 'zone_id';
+  static const String zoneName = 'zone_name';
+  static const String townshipId = 'township_id';
+  static const String townshipName = 'township_name';
+  static const String wardId = 'ward_id';
+  static const String wardName = 'ward_name';
+  static const String cityId = 'city_id';
+  static const String cityName = 'city_name';
+  static const String territoryId = 'territory_id';
+  static const String territoryName = 'territory_name';
   static const String website = 'website';
   static const String email = 'email';
   static const String image512 = 'image_512';
@@ -269,6 +281,9 @@ class DBConstant {
   static const String looseUomName = 'loose_uom_name';
   static const String boxUomId = 'box_uom_id';
   static const String boxUomName = 'box_uom_name';
+  static const String isStorable = 'is_storable';
+  static const String purchaseOk = 'purchase_ok';
+  static const String saleOk = 'sale_ok';
 
   static const String dashboardId = 'dashboard_id';
   static const String icon = 'icon';
@@ -396,11 +411,6 @@ class DBConstant {
   static const String longitude = 'longitude';
   static const String docNo = 'doc_no';
 
-  static const String townshipId = 'township_id';
-  static const String townshipName = 'township_name';
-  static const String wardId = 'ward_id';
-  static const String wardName = 'ward_name';
-
   static const String invoiceDate = 'invoice_date';
   static const String invoiceOrign = 'invoice_orign';
   static const String ref = 'ref';
@@ -481,6 +491,7 @@ class DBConstant {
   static const String canBeExpensed = 'can_be_expensed';
   static const String uomPoId = 'uom_po_id';
   static const String uomPoName = 'uom_po_name';
+  static const String tracking = 'tracking';
 
   static const String saleOrderTypeId = 'sale_order_type_id';
   static const String saleOrderTypeName = 'sale_order_type_name';

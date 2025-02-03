@@ -4,7 +4,7 @@ import 'package:mmt_mobile/model/product/uom_lines.dart';
 import '../../src/enum.dart';
 import '../../src/mmt_application.dart';
 
-class ProductTemplate {
+class ProductProduct {
   int? id;
   String? name;
   int? categId;
@@ -38,7 +38,7 @@ class ProductTemplate {
   bool? isStorable;
   bool? availableInMobile;
 
-  ProductTemplate({
+  ProductProduct({
     this.id,
     this.name,
     this.categId,
@@ -73,7 +73,7 @@ class ProductTemplate {
     this.availableInMobile,
   });
 
-  ProductTemplate.fromJson(Map<String, dynamic> json) {
+  ProductProduct.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     categId = json['categ_id'];
@@ -95,11 +95,12 @@ class ProductTemplate {
     uomPoId = json['uom_po_id'];
     uomPoName = json['uom_po_name'];
     productTmplId = json['product_tmpl_id'];
-    productTmplName = json['product_tmpl_id'];
+    productTmplName = json['product_tmpl_name'];
     looseUomId = json['loose_uom_id'];
     looseUomName = json['loose_uom_name'];
     boxUomId = json['box_uom_id'];
     boxUomName = json['box_uom_name'];
+    availableInMobile = json['available_in_mobile'];
     if (json['uom_lines'] != null) {
       uomLines = <UomLine>[];
       json['uom_lines'].forEach((v) {
@@ -115,7 +116,6 @@ class ProductTemplate {
     );
     writeDate = json['write_date'];
     isStorable = json['is_storable'];
-    availableInMobile = json['available_in_mobile'];
   }
 
   Map<String, dynamic> toJson() {
@@ -155,7 +155,7 @@ class ProductTemplate {
     return data;
   }
 
-  ProductTemplate.fromJsonDB(Map<String, dynamic> json) {
+  ProductProduct.fromJsonDB(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     categId = json['categ_id'];

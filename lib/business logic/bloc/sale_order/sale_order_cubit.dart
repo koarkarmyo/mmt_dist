@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
 import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
 import 'package:mmt_mobile/database/db_repo/sale_order_db_repo.dart';
 import 'package:mmt_mobile/model/sale_order/sale_order_line.dart';
@@ -17,7 +16,7 @@ class SaleOrderCubit extends Cubit<SaleOrderState> {
       {required SaleOrder saleOrder,
       required List<SaleOrderLine> saleOrderLineList}) async {
     emit(state.copyWith(state: BlocCRUDProcessState.creating));
-    bool success = await SaleOrderDbRepo.instance.saveSaleOrder(
+    bool success = await SaleOrderDBRepo.instance.saveSaleOrder(
         saleOrder: saleOrder, saleOrderLineList: saleOrderLineList);
 
     if (success) {

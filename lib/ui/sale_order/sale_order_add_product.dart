@@ -13,7 +13,7 @@ import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/src/mmt_application.dart';
 
 import '../../common_widget/text_widget.dart';
-import '../../model/product/product.dart';
+import '../../model/product/product_product.dart';
 import '../../model/sale_order/sale_order_line.dart';
 import '../../src/const_string.dart';
 import '../../src/style/app_color.dart';
@@ -172,7 +172,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
   }
 
   Widget _productRowWithPKPC(
-      {required Product product, required int position}) {
+      {required ProductProduct product, required int position}) {
     return BlocBuilder<CartCubit, CartState>(builder: (context, state) {
       SaleOrderLine? deliveryItem = state.itemList
           .where(
@@ -279,7 +279,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
     });
   }
 
-  Widget _productRow({required Product product, required int position}) {
+  Widget _productRow({required ProductProduct product, required int position}) {
     return BlocBuilder<CartCubit, CartState>(builder: (context, state) {
       SaleOrderLine? deliveryItem = state.itemList
           .where((element) => element.productId == product.id)

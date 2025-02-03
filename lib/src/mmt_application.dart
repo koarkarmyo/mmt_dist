@@ -10,7 +10,7 @@ import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 import '../model/employee.dart';
 import '../model/number_series.dart';
 import '../model/odoo_session.dart';
-import '../model/product/product.dart';
+import '../model/product/product_product.dart';
 import '../model/product/uom_lines.dart';
 import 'enum.dart';
 
@@ -19,6 +19,7 @@ class MMTApplication {
   // static const String serverUrl = 'http://217.15.166.234:8069';
 
   static String serverUrl = 'http://150.95.27.145';
+  // static String serverUrl = 'http://150.95.27.145';
   static Employee? currentUser;
   static CompanyId? selectedCompany;
   static String defaultUserImage =
@@ -35,7 +36,7 @@ class MMTApplication {
 
   static int qtyDigit = loginResponse?.deviceId?.qtyDigit ?? 0;
   static int priceDigit = loginResponse?.deviceId?.priceDigit ?? 0;
-  static late NumberSeries? generatedNoSeries = null;
+  static NumberSeries? generatedNoSeries;
 
   static UomLine? getReferenceUomLine(List<UomLine> uomLines) {
     return uomLines
@@ -135,7 +136,7 @@ class MMTApplication {
   }
 
   static String lBQtyLongFormChanger(
-      {required Product product, required double refQty}) {
+      {required ProductProduct product, required double refQty}) {
     // print(refQty);
     // print(product.uomLines?.length);
     if (refQty < 0) return '0/0';
@@ -169,7 +170,7 @@ class MMTApplication {
     return buffer.isEmpty ? '' : (goNextLine ? '\n' : ' ');
   }
 
-  static UomLine? getBoxUomLine(Product product) {
+  static UomLine? getBoxUomLine(ProductProduct product) {
     if ((product.uomLines ?? []).isNotEmpty) {
       return product.uomLines
           ?.firstWhereOrNull((element) => element.uomId == product.boxUomId);
@@ -177,7 +178,7 @@ class MMTApplication {
     return null;
   }
 
-  static UomLine? getLUomLine(Product product) {
+  static UomLine? getLUomLine(ProductProduct product) {
     if ((product.uomLines ?? []).isNotEmpty) {
       return product.uomLines
           ?.firstWhereOrNull((element) => element.uomId == product.looseUomId);

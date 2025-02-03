@@ -13,12 +13,10 @@ import '../../../exception/require_obj_missing_exception.dart';
 import '../../../model/qty_check_response.dart';
 import '../../../model/stock_location.dart';
 import '../../../model/stock_order.dart';
-import '../../../src/mmt_application.dart';
 import '../../../utils/sale_order_utils.dart';
 import '../bloc_crud_process_state.dart';
 
 part 'stock_order_event.dart';
-
 part 'stock_order_state.dart';
 
 class StockOrderBloc extends Bloc<StockOrderEvent, StockOrderState> {

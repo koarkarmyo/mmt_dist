@@ -1,26 +1,22 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mmt_mobile/business%20logic/bloc/login/login_bloc.dart';
 import 'package:mmt_mobile/common_widget/constant_widgets.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/src/mmt_application.dart';
 import 'package:mmt_mobile/src/style/app_color.dart';
-import 'package:collection/collection.dart';
 
 import '../common_widget/alert_dialog.dart';
 import '../common_widget/bottom_sheet_selection_widget.dart';
 import '../common_widget/sync_progress_dialog.dart';
-import '../model/partner.dart';
-import '../model/tag.dart';
 import '../route/route_list.dart';
 import '../share_preference/sh_keys.dart';
 import '../share_preference/sh_utils.dart';
 import '../src/const_string.dart';
-import '../src/enum.dart';
 import '../sync/bloc/sync_action_bloc/sync_action_bloc_cubit.dart';
 import '../sync/models/sync_response.dart';
 import '../sync/sync_utils/main_sync_process.dart';

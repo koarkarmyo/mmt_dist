@@ -1,30 +1,40 @@
-import 'dart:convert';
-
 import 'package:collection/collection.dart';
-import 'package:equatable/equatable.dart';
-import 'package:mmt_mobile/model/device.dart';
-import 'package:mmt_mobile/model/product/product_group.dart';
-import 'package:mmt_mobile/model/staff_role.dart';
+import 'package:mmt_mobile/model/number_series.dart';
 import 'package:mmt_mobile/sync/models/sync_action.dart';
 
-import '../src/enum.dart';
 import '../src/mmt_application.dart';
 import 'company_id.dart';
-import 'daily_route.dart';
-import 'employee_location.dart';
 
 class Employee {
-  Employee(
-      {this.name,
-      this.id,
-      this.phone,
-      this.email,
-      this.defaultLocationId,
-      this.defaultLocationName,
-      this.companyId,
-      this.syncActionList,
-      this.useLooseBox,
-      this.companyList});
+  String? name;
+  int? id;
+  String? phone;
+  String? email;
+  int? defaultLocationId;
+  String? defaultLocationName;
+  int? defaultPricelistId;
+  String? defaultPricelistName;
+  int? companyId;
+  List<SyncAction>? syncActionList;
+  bool? useLooseBox;
+  List<CompanyId>? companyList;
+  List<NumberSeries>? numberSeriesList;
+
+  Employee({
+    this.name,
+    this.id,
+    this.phone,
+    this.email,
+    this.defaultLocationId,
+    this.defaultLocationName,
+    this.companyId,
+    this.syncActionList,
+    this.useLooseBox,
+    this.companyList,
+    this.numberSeriesList,
+    this.defaultPricelistId,
+    this.defaultPricelistName,
+  });
 
   Employee.fromJson(Map<String, dynamic> json) {
     name = json['name'];
@@ -33,6 +43,8 @@ class Employee {
     phone = json['email'];
     defaultLocationId = json['default_location_id'];
     defaultLocationName = json['default_location_name'];
+    defaultPricelistId = json['default_pricelist_id'];
+    defaultPricelistName = json['default_pricelist_name'];
     companyId = json['company_id'];
     useLooseBox = json['use_loose_box'];
     if (json['sync_action'] != null) {
@@ -48,21 +60,16 @@ class Employee {
         companyList?.add(CompanyId.fromJson(companyJson));
       }
     }
+    if (json['number_series_line'] != null) {
+      numberSeriesList = [];
+      for (var numberSeries in (json['number_series_line'] as List<dynamic>)) {
+        numberSeriesList?.add(NumberSeries.fromJson(numberSeries));
+      }
+    }
 
     MMTApplication.selectedCompany = (companyList ?? [])
         .firstWhereOrNull((element) => element.id == companyId);
   }
-
-  String? name;
-  int? id;
-  String? phone;
-  String? email;
-  int? defaultLocationId;
-  String? defaultLocationName;
-  int? companyId;
-  List<SyncAction>? syncActionList;
-  bool? useLooseBox;
-  List<CompanyId>? companyList;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -83,7 +90,8 @@ class Employee {
       },
     );
     map['company_list'] = companyJsonList;
-
+    map['default_pricelist_id'] = defaultPricelistId;
+    map['default_pricelist_name'] = defaultPricelistName;
     return map;
   }
 }

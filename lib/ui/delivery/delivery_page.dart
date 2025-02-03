@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mmt_mobile/src/extension/navigator_extension.dart';
-import 'package:mmt_mobile/ui/delivery/delivery_coupon_page.dart';
 import 'package:mmt_mobile/ui/delivery/delivery_foc_item_page.dart';
 import 'package:mmt_mobile/ui/delivery/delivery_item_page.dart';
 import 'package:mmt_mobile/ui/delivery/delivery_summary_page.dart';

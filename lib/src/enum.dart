@@ -1,23 +1,9 @@
 import 'dart:ui';
 
 import 'package:intl/intl.dart';
-import 'package:mmt_mobile/api/api_request.dart';
 import 'package:mmt_mobile/src/style/app_color.dart';
 import '../utils/date_time_utils.dart';
 import 'mmt_application.dart';
-
-enum UploadBeforeSync { get_sale_order, get_delivery_order }
-
-extension SyncExtension on UploadBeforeSync {
-  Future<bool> get uploadRequest {
-    switch (this) {
-      // here lies the functions that sends what has stored in db and return bool
-      default:
-        return Future.value(false);
-    }
-  }
-}
-
 
 enum LocationTypes {
   supplier,
@@ -49,7 +35,9 @@ enum StockMoveType { deli, load, unload, variant }
 
 enum NoSeriesDocType { loading, unloading, order, delivery, stock_order }
 
-enum ProductDetailTypes { product, consu, service }
+// enum ProductDetailTypes { product, consu, service }
+
+enum ProductTypes { consu, service, combo }
 
 // enum PurchaseOrderStates { draft, sent, toApprove, purchase, done, cancel }
 

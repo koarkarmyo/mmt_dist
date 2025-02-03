@@ -1,17 +1,22 @@
 import 'dart:async';
 
-import 'package:dio/dio.dart';
 import 'package:collection/collection.dart';
+import 'package:dio/dio.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:mmt_mobile/database/db_repo/sale_order_db_repo.dart';
+import 'package:mmt_mobile/model/sale_order/sale_order_6/sale_order.dart';
 import 'package:mmt_mobile/sync/sync_utils/sync_utils.dart';
 
 import '../../api/api_error_handler.dart';
+import '../../api/sale_order_repo/sale_order_api_repo.dart';
+import '../../database/database_helper.dart';
+import '../../database/db_constant.dart';
 import '../../database/db_repo/cust_visit_repo/cust_visit_db_repo.dart';
-import '../models/auto_sync_response.dart';
 import '../../model/cust_visit.dart';
 import '../../src/mmt_application.dart';
 import '../../utils/date_time_utils.dart';
 import '../../utils/location_utils.dart';
+import '../models/auto_sync_response.dart';
 import '../models/sync_group.dart';
 import '../models/sync_response.dart';
 import '../repo/api_repo/sync_api_repo.dart';
@@ -62,6 +67,12 @@ class MainSyncProcess {
     Timer.periodic(const Duration(minutes: 5), (timer) async {
       await _locationSaver();
     });
+  }
+
+  Future<void> startManualSyncWithSyncGroup(String syncGroup) async {
+    List<SyncResponse> sync =
+        await MainSyncProcess.instance.getSyncList(syncGroup);
+    MainSyncProcess.instance.startManualSyncProcess(sync);
   }
 
   Future<List<SyncResponse>> getSyncList(String syncGroup,
@@ -148,7 +159,8 @@ class MainSyncProcess {
       /// don't write like this, should be use [completer]
       /// api call
       ///
-      SyncProcess syncProcess = await _sendApiRequest(actionName, limit: limit);
+      SyncProcess syncProcess =
+          await _sendApiRequest(_autoSyncProcess.first, limit: limit);
 
       // await Future.delayed(Duration(milliseconds: 500));
       // SyncProcess syncProcess = SyncProcess.Finished;
@@ -251,7 +263,7 @@ class MainSyncProcess {
   }
 
   Future<void> _startManualSync(List<SyncResponse> actionList) async {
-    if (actionList.length <= 0) {
+    if (actionList.isEmpty) {
       return;
     }
     int index = (_manualSyncProcess.length - actionList.length);
@@ -272,55 +284,55 @@ class MainSyncProcess {
       _sendToView(_syncResponse(name: actionDescription, progress: progress));
     }
 
-    try {
-      SyncProcess syncProcess =
-          await _sendApiRequest(actionName, limit: actionList.first.syncLimit);
+    // try {
+    SyncProcess syncProcess = await _sendApiRequest(actionList.first,
+        limit: actionList.first.syncLimit);
 
-      if (syncProcess == SyncProcess.Paginated) {
-        await _startManualSync(actionList);
-      } else if (syncProcess == SyncProcess.Fail) {
-        _sendToView(
-          _syncResponse(
-              name: actionDescription,
-              error: failMessage,
-              message: failMessage,
-              isFinished: true),
-        );
-        return;
-      }
-
-      if (actionList.length <= 0) {
-        return;
-      }
-      actionList.removeAt(0);
-
-      // send
-      _sendToView(_syncResponse(
-        name: actionDescription,
-        progress: actionList.isEmpty ? 1.0 : progress,
-        isFinished: actionList.isEmpty,
-      ));
-    } on DioError catch (e) {
-      _syncProcessIsRunning = false;
-      _stopAutoSync = false;
+    if (syncProcess == SyncProcess.Paginated) {
+      await _startManualSync(actionList);
+    } else if (syncProcess == SyncProcess.Fail) {
       _sendToView(
         _syncResponse(
             name: actionDescription,
-            error: ApiErrorHandler.createError(e).values.first,
+            error: failMessage,
             message: failMessage,
             isFinished: true),
       );
       return;
-    } catch (e) {
-      _syncProcessIsRunning = false;
-      _stopAutoSync = false;
-      _sendToView(_syncResponse(
-          name: actionDescription,
-          error: e.toString(),
-          message: failMessage,
-          isFinished: true));
+    }
+
+    if (actionList.isEmpty) {
       return;
     }
+    actionList.removeAt(0);
+
+    // send
+    _sendToView(_syncResponse(
+      name: actionDescription,
+      progress: actionList.isEmpty ? 1.0 : progress,
+      isFinished: actionList.isEmpty,
+    ));
+    // } on DioError catch (e) {
+    //   _syncProcessIsRunning = false;
+    //   _stopAutoSync = false;
+    //   _sendToView(
+    //     _syncResponse(
+    //         name: actionDescription,
+    //         error: ApiErrorHandler.createError(e).values.first,
+    //         message: failMessage,
+    //         isFinished: true),
+    //   );
+    //   return;
+    // } catch (e) {
+    //   _syncProcessIsRunning = false;
+    //   _stopAutoSync = false;
+    //   _sendToView(_syncResponse(
+    //       name: actionDescription,
+    //       error: e.toString(),
+    //       message: failMessage,
+    //       isFinished: true));
+    //   return;
+    // }
     // assign auto sync is running or not
     _syncProcessIsRunning = actionList.isNotEmpty;
 
@@ -330,11 +342,53 @@ class MainSyncProcess {
       _stopAutoSync = false;
       return;
     } else {
-      if (actionList.length <= 0) {
+      if (actionList.isEmpty) {
         return;
       }
       // recursive process
       await _startManualSync(actionList);
+    }
+  }
+
+  Future<SyncProcess> _sendApiRequest(SyncResponse syncAction,
+      {int? limit}) async {
+    SyncProcess syncProcess = SyncProcess.Finished;
+    bool needToUpload = await _checkNeedToUpload(syncAction);
+    if (needToUpload) {
+      await _uploadProcess(syncAction);
+      return SyncProcess.Paginated;
+    } else {
+      // if (syncAction.isUpload ?? false) {}
+      // api call
+      Response response =
+          await _syncApiRepo.sendAction(syncAction.name ?? '', limit: limit);
+      //
+      syncProcess = await SyncUtils.insertToDatabase(
+        actionName: syncAction.name ?? '',
+        response: response,
+      );
+    }
+    //
+    return syncProcess;
+  }
+
+  Future<bool> _checkNeedToUpload(SyncResponse syncResponse) async {
+    if (syncResponse.name == 'get_stock_picking' &&
+        (syncResponse.isUpload ?? false)) {
+      List<Map<String, dynamic>> list =
+          await DatabaseHelper.instance.readDataByWhereArgs(
+        tableName: DBConstant.saleOrderTable,
+        where: '${DBConstant.isUpload} =?',
+        whereArgs: [0],
+      );
+      return list.isNotEmpty;
+    }
+    return false;
+  }
+
+  _uploadProcess(SyncResponse syncResponse) async {
+    if (syncResponse.name == 'get_sale_order') {
+      await _uploadSaleOrder();
     }
   }
 
@@ -489,8 +543,28 @@ class MainSyncProcess {
       // I commented this line because this is giving me an error. So PLEASE BE FUCKING SURE to uncomment if you have all the necessary data to save
       // bool dbInsertSuccess = await _custVisitDBRepo.saveCustVisit(custVisit);
     } catch (e) {
-      print('location_error : ' + e.toString());
+      print('location_error : $e');
     }
+  }
+
+  _uploadSaleOrder() async {
+    List<SaleOrder> list = await SaleOrderDBRepo().fetchSaleOrder(isUpload: false);
+    bool needToPost = true;
+    do {
+      needToPost = list.isNotEmpty;
+      if (list.isEmpty) {
+        return;
+      }
+
+      await SaleOrderApiRepo().sendApiCall(list.first);
+      //
+      // await stockPickingDBRepo.setUpload(
+      //     DBConstant.stockPickingTable, list.first.localId);
+
+      list.removeAt(0);
+      //
+      needToPost = list.isNotEmpty;
+    } while (needToPost);
   }
 
 //
@@ -510,8 +584,8 @@ class MainSyncProcess {
 //     return true;
 //   }
 //
-  Future<SyncProcess> _sendApiRequest(String actionName, {int? limit}) async {
-    SyncProcess syncProcess = SyncProcess.Finished;
+//   Future<SyncProcess> _sendApiRequest(String actionName, {int? limit}) async {
+//     SyncProcess syncProcess = SyncProcess.Finished;
 //     // await Future.delayed(const Duration(milliseconds: 1000));
 //     // Completer<void> completer = Completer();
 //     if (actionName == 'send_sale_order') {
@@ -534,14 +608,14 @@ class MainSyncProcess {
 //       bool isNeedToSend = await _sendCustVisit();
 //       if (isNeedToSend) syncProcess = SyncProcess.Paginated;
 //     } else {
-    // api call
-    Response response = await _syncApiRepo.sendAction(actionName, limit: limit);
-
-    syncProcess = await SyncUtils.insertToDatabase(
-        actionName: actionName, response: response);
-    // }
-    return syncProcess;
-  }
+// api call
+//   Response response = await _syncApiRepo.sendAction(actionName, limit: limit);
+//
+//   syncProcess = await SyncUtils.insertToDatabase(
+//       actionName: actionName, response: response);
+//   // }
+//   return syncProcess;
+// }
 }
 
 // don't write like this, should be use [completer]

@@ -1,5 +1,5 @@
 
-import '../product/product.dart';
+import '../product/product_product.dart';
 import '../product/uom_lines.dart';
 import '../stock_picking/stock_picking_model.dart';
 
@@ -11,7 +11,7 @@ class DeliveryItem {
   double? deliverBQty;
   double? deliverLQty;
   String? balanceString;
-  Product? product;
+  ProductProduct? product;
   double? subtotal;
   double? bPrice;
   SaleType? saleType;
@@ -61,7 +61,7 @@ class DeliveryItem {
     double? deliverRefQty,
     double? deliverBQty,
     String? balanceString,
-    Product? product,
+    ProductProduct? product,
     double? subtotal,
     SaleType? saleType,
     double? deliverLQty,

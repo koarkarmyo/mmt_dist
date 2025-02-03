@@ -55,7 +55,7 @@ class _CustomerEditPageState extends State<CustomerEditPage> {
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     if (data != null) {
       _customer = data['customer'];
-      _profilePhoto.value = _customer.image;
+      // _profilePhoto.value = _customer.image;
       _firstNameController.text = _customer.name ?? '';
       _phoneNoController.text = _customer.phone ?? '';
       _streetController.text = _customer.street ?? '';

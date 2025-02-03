@@ -12,7 +12,6 @@ import 'package:mmt_mobile/business%20logic/bloc/product_category/product_catego
 import 'package:mmt_mobile/business%20logic/bloc/sale_order/sale_order_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/stock_order/stock_order_bloc.dart';
 import 'package:mmt_mobile/common_widget/text_widget.dart';
-import 'package:mmt_mobile/model/product/product.dart';
 import 'package:mmt_mobile/route/route_list.dart';
 import 'package:mmt_mobile/sync/bloc/sync_action_bloc/sync_action_bloc_cubit.dart';
 import 'package:mmt_mobile/ui/account_payment_page.dart';

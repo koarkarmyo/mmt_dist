@@ -10,7 +10,7 @@ import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:collection/collection.dart';
 
-import '../../model/product/product.dart';
+import '../../model/product/product_product.dart';
 import '../../model/product/uom_lines.dart';
 import '../../model/sale_order/sale_order_line.dart';
 import '../../route/route_list.dart';
@@ -73,7 +73,7 @@ class _FocItemPageState extends State<FocItemPage> {
         return ListView.builder(
           itemCount: state.productList.length,
           itemBuilder: (context, index) {
-            Product product = state.productList[index];
+            ProductProduct product = state.productList[index];
             return _productItem(
               product: product,
             );
@@ -139,7 +139,7 @@ class _FocItemPageState extends State<FocItemPage> {
     );
   }
 
-  Widget _productItem({required Product product}) {
+  Widget _productItem({required ProductProduct product}) {
     TextEditingController _qtyController = TextEditingController();
     TextEditingController _pkController = TextEditingController();
     TextEditingController _pcController = TextEditingController();

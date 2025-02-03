@@ -1,21 +1,17 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:mmt_mobile/business%20logic/bloc/batch/stock_loading_cubit.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
-import 'package:mmt_mobile/ui/widgets/no_item_widget.dart';
-import 'package:collection/collection.dart';
 
 import '../../business logic/bloc/cart/cart_cubit.dart';
 import '../../business logic/bloc/product/product_cubit.dart';
 import '../../common_widget/text_widget.dart';
-import '../../model/delivery/delivery_item.dart';
-import '../../model/product/product.dart';
+import '../../model/product/product_product.dart';
 import '../../model/product/uom_lines.dart';
 import '../../model/sale_order/sale_order_line.dart';
-import '../../route/route_list.dart';
 import '../../src/const_string.dart';
 import '../../src/mmt_application.dart';
 import '../../src/style/app_color.dart';
@@ -153,7 +149,7 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
         return ListView.builder(
           itemCount: state.productList.length,
           itemBuilder: (context, index) {
-            Product product = state.productList[index];
+            ProductProduct product = state.productList[index];
             return _productItem(product: product);
           },
         ).expanded();
@@ -161,7 +157,7 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
     );
   }
 
-  Widget _productItem({required Product product}) {
+  Widget _productItem({required ProductProduct product}) {
     TextEditingController _qtyController = TextEditingController();
     TextEditingController _pkController = TextEditingController();
     TextEditingController _pcController = TextEditingController();
@@ -200,13 +196,6 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
               children: [
                 ListTile(
                   contentPadding: 10.horizontalPadding,
-                  // Adjust padding here
-
-                  // shape: RoundedRectangleBorder(
-                  //   side: const BorderSide(color: Colors.black, width: 1),
-                  //   borderRadius: BorderRadius.circular(5),
-                  // ),
-
                   title: Text(product.name ?? '').boldSize(14),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -391,8 +380,8 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                                               product.uomLines?.first));
                                 },
                                 decoration: const InputDecoration(
-                                  isDense:
-                                      true, // Reduces height of the TextField
+                                  isDense: true,
+                                  // Reduces height of the TextField
                                   contentPadding: EdgeInsets.symmetric(
                                       vertical: 8, horizontal: 8),
                                   border: OutlineInputBorder(),
@@ -403,7 +392,7 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                           ],
                   ),
                 ).padding(padding: 8.verticalPadding),
-                Divider()
+                const Divider()
               ],
             ),
           );

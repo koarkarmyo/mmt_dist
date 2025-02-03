@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
-import 'package:mmt_mobile/model/product/product.dart';
+import 'package:mmt_mobile/model/product/product_product.dart';
 
 
 /// id : 1
@@ -168,7 +168,7 @@ class StockOrderLine {
 
   int? id;
   int? productId;
-  Product? product;
+  ProductProduct? product;
   int? orderId;
   String? productName;
   double? totalRefQty;
@@ -217,7 +217,7 @@ class StockOrderLine {
   StockOrderLine copyWith({
     int? id,
     int? productId,
-    Product? product,
+    ProductProduct? product,
     int? orderId,
     String? productName,
     double? totalRefQty,

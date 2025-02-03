@@ -1,16 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:mmt_mobile/business%20logic/bloc/login/login_bloc.dart';
-import 'package:mmt_mobile/common_widget/alert_dialog.dart';
-import 'package:mmt_mobile/common_widget/bottom_choice_sheet_widget.dart';
-import 'package:mmt_mobile/src/enum.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 
 import '../../common_widget/text_widget.dart';
-import '../../model/partner.dart';
 import '../../model/res_partner.dart';
 import '../../route/route_list.dart';
 import '../../src/const_string.dart';

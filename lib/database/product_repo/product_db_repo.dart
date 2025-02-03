@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../model/price_list/product_price_list_item.dart';
-import '../../model/product/product.dart';
+import '../../model/product/product_product.dart';
 import '../../model/product/uom_lines.dart';
 import '../../src/enum.dart';
 import '../base_db_repo.dart';
@@ -23,7 +23,7 @@ class ProductDBRepo extends BaseDBRepo {
     return priceList;
   }
 
-  Future<Product?> getProductById({required int productId}) async {
+  Future<ProductProduct?> getProductById({required int productId}) async {
     List<Map<String, dynamic>> productJsonList = await helper
         .readDataByWhereArgs(
             tableName: DBConstant.productProductTable,
@@ -31,10 +31,10 @@ class ProductDBRepo extends BaseDBRepo {
             where: '${DBConstant.id} =? ',
             whereArgs: [productId]);
 
-    Product? product;
+    ProductProduct? product;
 
     for (Map<String, dynamic> jsonData in productJsonList) {
-      product = Product.fromJsonDB(jsonData);
+      product = ProductProduct.fromJsonDB(jsonData);
     }
 
     if (product != null) {
@@ -53,15 +53,16 @@ class ProductDBRepo extends BaseDBRepo {
     return product;
   }
 
-  Future<List<Product>> getProductList() async {
-    List<Product> products = [];
+  Future<List<ProductProduct>> getProductList() async {
+    List<ProductProduct> products = [];
 
-    List<Map<String, dynamic>> productJsonList = await helper
-        .readDataByWhereArgs(
-            tableName: DBConstant.productProductTable,
-            orderBy: DBConstant.name,
-            where: '${DBConstant.detialType} =? ',
-            whereArgs: [ProductDetailTypes.product.name]);
+    List<Map<String, dynamic>> productJsonList =
+        await helper.readDataByWhereArgs(
+      tableName: DBConstant.productProductTable,
+      orderBy: DBConstant.name,
+      where: '${DBConstant.type} =? ',
+      whereArgs: [ProductTypes.consu.name],
+    );
     // List<Map<String, dynamic>> productUomList =
     //     await helper.readAllData(tableName: DBConstant.productUomTable);
     List<Map<String, dynamic>> uomMapList =
@@ -75,7 +76,7 @@ class ProductDBRepo extends BaseDBRepo {
     });
 
     for (Map<String, dynamic> element in productJsonList) {
-      Product product = Product.fromJsonDB(element);
+      ProductProduct product = ProductProduct.fromJsonDB(element);
       List<UomLine> lines = uomList
           .where((uom) => uom.productId == product.id)
           .toList(growable: true);
@@ -88,8 +89,8 @@ class ProductDBRepo extends BaseDBRepo {
     return products;
   }
 
-  Future<List<Product>> getProductByCategory({int? categoryId}) async {
-    List<Product> productList = [];
+  Future<List<ProductProduct>> getProductByCategory({int? categoryId}) async {
+    List<ProductProduct> productList = [];
     List<Map<String, dynamic>> jsonList = [];
 
     if (categoryId != null) {
@@ -103,7 +104,7 @@ class ProductDBRepo extends BaseDBRepo {
     }
 
     for (final json in jsonList) {
-      productList.add(Product.fromJsonDB(json));
+      productList.add(ProductProduct.fromJsonDB(json));
     }
     return productList;
   }

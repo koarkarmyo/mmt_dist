@@ -8,8 +8,7 @@ import 'package:mmt_mobile/src/extension/widget_extension.dart';
 
 import '../../business logic/bloc/cart/cart_cubit.dart';
 import '../../business logic/bloc/product/product_cubit.dart';
-import '../../model/delivery/delivery_item.dart';
-import '../../model/product/product.dart';
+import '../../model/product/product_product.dart';
 import '../../model/product/uom_lines.dart';
 import '../../model/sale_order/sale_order_line.dart';
 import '../../route/route_list.dart';
@@ -62,7 +61,7 @@ class _CouponItemPageState extends State<CouponItemPage> {
         return ListView.builder(
           itemCount: state.productList.length,
           itemBuilder: (context, index) {
-            Product product = state.productList[index];
+            ProductProduct product = state.productList[index];
             return _productItem(
               product: product,
             );
@@ -72,7 +71,7 @@ class _CouponItemPageState extends State<CouponItemPage> {
     ).expanded();
   }
 
-  Widget _productItem({required Product product}) {
+  Widget _productItem({required ProductProduct product}) {
     TextEditingController _qtyController = TextEditingController();
     TextEditingController _pkController = TextEditingController();
     TextEditingController _pcController = TextEditingController();

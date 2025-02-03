@@ -1,6 +1,5 @@
 import 'package:mmt_mobile/database/base_db_repo.dart';
 
-import '../../model/price_list/price_list.dart';
 import '../../model/price_list/price_list_item.dart';
 import '../db_constant.dart';
 

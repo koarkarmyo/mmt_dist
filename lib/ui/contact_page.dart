@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mmt_mobile/ui/widgets/cust_mini_dialog.dart';
 import 'package:mmt_mobile/ui/widgets/customer_filter_widget.dart';
-import '../model/partner.dart';
+
 import '../model/res_partner.dart';
-import '../model/tag.dart';
 import '../on_clicked_listener.dart';
-import '../src/enum.dart';
 import '../utils/date_time_utils.dart';
 
 class ContactPage extends StatefulWidget {

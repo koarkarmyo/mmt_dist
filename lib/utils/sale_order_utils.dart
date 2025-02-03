@@ -3,7 +3,7 @@ import 'package:mmt_mobile/database/product_repo/product_db_repo.dart';
 
 import '../database/base_db_repo.dart';
 import '../database/data_object.dart';
-import '../model/product/product.dart';
+import '../model/product/product_product.dart';
 import '../model/product/uom_lines.dart';
 import '../model/sale_order/sale_order_line.dart';
 import '../model/stock_quant.dart';
@@ -88,7 +88,7 @@ class SaleOrderUtils extends BaseDBRepo {
   }
 
   static Future<String> refQtyToLBString(int productId, double refQty) async {
-    Product? product =
+    ProductProduct? product =
         await ProductDBRepo.instance.getProductById(productId: productId);
 
     if (product == null) return '0/$refQty';

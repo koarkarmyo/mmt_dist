@@ -1,14 +1,11 @@
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
+import 'package:collection/collection.dart';
 import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
 import 'package:mmt_mobile/database/db_repo/price_list_db_repo.dart';
 import 'package:mmt_mobile/database/product_repo/product_db_repo.dart';
 import 'package:mmt_mobile/model/price_list/price_list_item.dart';
-import 'package:collection/collection.dart';
-import 'package:mmt_mobile/model/product/uom_lines.dart';
-import 'package:mmt_mobile/model/uom.dart';
 
-import '../../../model/product/product.dart';
+import '../../../model/product/product_product.dart';
 
 part 'product_state.dart';
 
@@ -23,7 +20,7 @@ class ProductCubit extends Cubit<ProductState> {
     emit(state.copyWith(state: BlocCRUDProcessState.fetching, productList: []));
 
     try {
-      List<Product> productList = await ProductDBRepo.instance.getProductList();
+      List<ProductProduct> productList = await ProductDBRepo.instance.getProductList();
 
       List<PriceListItem> priceListItems =
           await PriceListDbRepo.instance.getAllPriceList();
@@ -50,7 +47,7 @@ class ProductCubit extends Cubit<ProductState> {
   Future<void> getProductById({required int productId}) async {
     emit(state.copyWith(state: BlocCRUDProcessState.fetching));
     try {
-      Product? product =
+      ProductProduct? product =
           await ProductDBRepo.instance.getProductById(productId: productId);
       print("Product Cubit : ${product?.toJson()}");
       emit(state.copyWith(
@@ -63,7 +60,7 @@ class ProductCubit extends Cubit<ProductState> {
   Future<void> searchProduct(
       {String? text, String? categoryName, String? barcode}) async {
     if (text != null) {
-      List<Product> filterProductList = state.productList
+      List<ProductProduct> filterProductList = state.productList
           .where((element) =>
               (element.categName == (categoryName ?? element.categName)))
           .toList();

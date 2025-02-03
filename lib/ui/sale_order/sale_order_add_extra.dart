@@ -1,7 +1,6 @@
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mmt_mobile/model/delivery/delivery_item.dart';
 import 'package:mmt_mobile/model/sale_order/sale_order_line.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
@@ -9,7 +8,7 @@ import 'package:mmt_mobile/src/extension/widget_extension.dart';
 
 import '../../business logic/bloc/cart/cart_cubit.dart';
 import '../../business logic/bloc/product/product_cubit.dart';
-import '../../model/product/product.dart';
+import '../../model/product/product_product.dart';
 import '../../model/res_partner.dart';
 import '../../src/const_string.dart';
 import '../../src/mmt_application.dart';
@@ -24,8 +23,8 @@ class SaleOrderAddExtra extends StatefulWidget {
 
 class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
   late ProductCubit _productCubit;
-  TextEditingController _searchProduct = TextEditingController();
-  List<Product> _productList = [];
+  final TextEditingController _searchProduct = TextEditingController();
+  List<ProductProduct> _productList = [];
   String? _filterProductCategory = 'All';
   late CartCubit _cartCubit;
   ResPartner? _customer;
@@ -221,14 +220,14 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
       return ListView.builder(
         itemCount: state.filterProductList.length,
         itemBuilder: (context, index) {
-          Product product = state.filterProductList[index];
+          ProductProduct product = state.filterProductList[index];
           return _productItem(product: product);
         },
       ).expanded();
     });
   }
 
-  Widget _productItem({required Product product}) {
+  Widget _productItem({required ProductProduct product}) {
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, state) {
         List<SaleOrderLine> _itemList = [];

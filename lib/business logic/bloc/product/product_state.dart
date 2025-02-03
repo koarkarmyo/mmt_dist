@@ -2,9 +2,9 @@ part of 'product_cubit.dart';
 
 class ProductState {
   BlocCRUDProcessState state;
-  List<Product> productList;
-  List<Product> filterProductList;
-  Product? product;
+  List<ProductProduct> productList;
+  List<ProductProduct> filterProductList;
+  ProductProduct? product;
 
   ProductState(
       {required this.state,
@@ -14,9 +14,9 @@ class ProductState {
 
   ProductState copyWith(
       {BlocCRUDProcessState? state,
-      List<Product>? productList,
-      List<Product>? filterProductList,
-      Product? product}) {
+      List<ProductProduct>? productList,
+      List<ProductProduct>? filterProductList,
+      ProductProduct? product}) {
     return ProductState(
         state: state ?? this.state,
         productList: productList ?? this.productList,

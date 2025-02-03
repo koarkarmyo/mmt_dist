@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mmt_mobile/model/employee.dart';
+
 import '../../common_widget/constant_widgets.dart';
-import '../../grid_utils/grild_utils.dart';
-import '../../model/partner.dart';
 import '../../model/res_partner.dart';
 import '../../on_clicked_listener.dart';
 import '../../src/const_dimen.dart';
 import '../../src/image_assets.dart';
-import '../../src/style/app_color.dart';
 import 'cust_mini_dialog.dart';
 import 'memory_asset_image_view.dart';
 

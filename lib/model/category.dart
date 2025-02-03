@@ -22,6 +22,7 @@ class Category {
   List<int>? childId;
   String? writeDate;
   String? parentName;
+  bool? availableInMobile;
 
   Category({
     this.id,
@@ -32,6 +33,7 @@ class Category {
     this.childId,
     this.writeDate,
     this.parentName,
+    this.availableInMobile,
   });
 
   Category.fromJson(dynamic json) {
@@ -43,6 +45,7 @@ class Category {
     childId = json['child_id'] != null ? json['child_id'].cast<int>() : [];
     writeDate = json['write_date'];
     parentName = json['parent_name'];
+    availableInMobile = json['available_in_mobile'];
   }
 
   Map<String, dynamic> toJson() {
@@ -55,6 +58,7 @@ class Category {
     map['child_id'] = childId;
     map['write_date'] = writeDate;
     map['parent_name'] = parentName;
+    map['available_in_mobile'] = availableInMobile;
     return map;
   }
 

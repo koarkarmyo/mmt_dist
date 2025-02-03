@@ -14,7 +14,7 @@ import 'package:collection/collection.dart';
 import '../../business logic/bloc/product/product_cubit.dart';
 import '../../common_widget/text_widget.dart';
 import '../../model/lot.dart';
-import '../../model/product/product.dart';
+import '../../model/product/product_product.dart';
 import '../../model/product/uom_lines.dart';
 import '../../model/stock_move.dart';
 import '../../src/const_string.dart';
@@ -39,7 +39,7 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
 
   // final ValueNotifier<List<StockMoveLine>> _stockMoveLineListNotifier =
   //     ValueNotifier([]);
-  List<Product> _productList = [];
+  List<ProductProduct> _productList = [];
   List<TextEditingController> _controllerList = [];
 
   // TextEditingController controller = TextEditingController();
@@ -291,78 +291,78 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
                           status: ButtonStatus.start,
                           buttonColor: Colors.green,
                         ).expanded();
-                        return IconButton(
-                            onPressed: () async {
-                              bool isAllCheck = true;
-                              bool lotCheck = true;
-                              for (StockMoveLine moveLine
-                                  in state.stockMoveWithTotalList) {
-                                isAllCheck = moveLine.isChecked ?? false;
-                                if (!isAllCheck) {
-                                  break;
-                                }
-                              }
-
-                              if (state.stockMoveWithTotalList.isEmpty) {
-                                isAllCheck = false;
-                              }
-
-                              if (isAllCheck) {
-                                List<Lot> lotList = [];
-                                state.stockMoveWithTotalList.forEach(
-                                  (element) {
-                                    if (element.isLot ?? false) {
-                                      if ((element.lotList ?? []).isEmpty) {
-                                        lotCheck = false;
-                                      }
-                                    }
-                                    lotList.addAll(element.lotList ?? []);
-                                    print(
-                                        "Lot length : ${element.lotList?.length}");
-                                    element.lotList?.forEach(
-                                      (element) {
-                                        print("Lot : ${element.toJson()}");
-                                      },
-                                    );
-                                  },
-                                );
-
-                                if (!lotCheck) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: const TextWidget(
-                                          ConstString.lotRequired),
-                                      backgroundColor: AppColors.dangerColor,
-                                    ),
-                                  );
-                                } else {
-                                  bool confirm =
-                                      await MMTApplication.showConfirmDialog(
-                                              confirmQuestion: ConstString
-                                                  .loadingConfirmDialog,
-                                              context: context) ??
-                                          false;
-
-                                  if (confirm) {
-                                    _stockLoadingCubit.uploadDoneQty(
-                                        stockMoveList:
-                                            state.stockMoveWithTotalList,
-                                        lotList: lotList,
-                                        productList: _productList);
-                                  }
-                                }
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: const Text(
-                                        ConstString.pleaseCheckAllItem),
-                                    duration: const Duration(milliseconds: 500),
-                                    backgroundColor: AppColors.dangerColor,
-                                  ),
-                                );
-                              }
-                            },
-                            icon: const Icon(Icons.cloud_upload_rounded));
+                        // return IconButton(
+                        //     onPressed: () async {
+                        //       bool isAllCheck = true;
+                        //       bool lotCheck = true;
+                        //       for (StockMoveLine moveLine
+                        //           in state.stockMoveWithTotalList) {
+                        //         isAllCheck = moveLine.isChecked ?? false;
+                        //         if (!isAllCheck) {
+                        //           break;
+                        //         }
+                        //       }
+                        //
+                        //       if (state.stockMoveWithTotalList.isEmpty) {
+                        //         isAllCheck = false;
+                        //       }
+                        //
+                        //       if (isAllCheck) {
+                        //         List<Lot> lotList = [];
+                        //         state.stockMoveWithTotalList.forEach(
+                        //           (element) {
+                        //             if (element.isLot ?? false) {
+                        //               if ((element.lotList ?? []).isEmpty) {
+                        //                 lotCheck = false;
+                        //               }
+                        //             }
+                        //             lotList.addAll(element.lotList ?? []);
+                        //             print(
+                        //                 "Lot length : ${element.lotList?.length}");
+                        //             element.lotList?.forEach(
+                        //               (element) {
+                        //                 print("Lot : ${element.toJson()}");
+                        //               },
+                        //             );
+                        //           },
+                        //         );
+                        //
+                        //         if (!lotCheck) {
+                        //           ScaffoldMessenger.of(context).showSnackBar(
+                        //             SnackBar(
+                        //               content: const TextWidget(
+                        //                   ConstString.lotRequired),
+                        //               backgroundColor: AppColors.dangerColor,
+                        //             ),
+                        //           );
+                        //         } else {
+                        //           bool confirm =
+                        //               await MMTApplication.showConfirmDialog(
+                        //                       confirmQuestion: ConstString
+                        //                           .loadingConfirmDialog,
+                        //                       context: context) ??
+                        //                   false;
+                        //
+                        //           if (confirm) {
+                        //             _stockLoadingCubit.uploadDoneQty(
+                        //                 stockMoveList:
+                        //                     state.stockMoveWithTotalList,
+                        //                 lotList: lotList,
+                        //                 productList: _productList);
+                        //           }
+                        //         }
+                        //       } else {
+                        //         ScaffoldMessenger.of(context).showSnackBar(
+                        //           SnackBar(
+                        //             content: const Text(
+                        //                 ConstString.pleaseCheckAllItem),
+                        //             duration: const Duration(milliseconds: 500),
+                        //             backgroundColor: AppColors.dangerColor,
+                        //           ),
+                        //         );
+                        //       }
+                        //     },
+                        //     icon: const Icon(Icons.cloud_upload_rounded));
                       },
                     );
                   },
@@ -492,7 +492,7 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
             stockMoveLine.controller = controller;
           }
         }
-        Product? product = _productList
+        ProductProduct? product = _productList
             .where(
               (element) => element.id == stockMoveLine.productId,
             )
@@ -661,7 +661,7 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
   double _calculateQtyDoneFromLot({required StockMoveLine stockMoveLine}) {
     double doneQty = 0;
 
-    Product? product = _productList
+    ProductProduct? product = _productList
         .where(
           (element) => element.id == stockMoveLine.productId,
         )

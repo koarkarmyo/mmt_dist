@@ -30,8 +30,10 @@ class _LoginPageState extends State<LoginPage> {
   final FocusNode _passwordNode = FocusNode();
   final FocusNode _urlNode = FocusNode();
 
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController =
+      TextEditingController(text: 'admin');
+  final TextEditingController _passwordController =
+      TextEditingController(text: 'admin');
   final TextEditingController _serverUrlController =
       TextEditingController(text: "161.97.187.243:8090");
   String _serverUrl = '';
@@ -99,9 +101,13 @@ class _LoginPageState extends State<LoginPage> {
         }
       },
       builder: (context, state) {
+        String btnText = 'Login';
         if (state.status == LoginStatus.loading) {
           status = ButtonStatus.loading;
         } else if (state.status == LoginStatus.fail) {
+          if (state.error != null) {
+            btnText = state.error ?? 'Error';
+          }
           status = ButtonStatus.fail;
         } else if (state.status == LoginStatus.initial) {
           status = ButtonStatus.start;
@@ -121,7 +127,7 @@ class _LoginPageState extends State<LoginPage> {
             }
           },
           child: AnimatedButton(
-            buttonText: 'Login',
+            buttonText: btnText,
             status: status,
             buttonColor: AppColors.successColor,
           ),

@@ -35,10 +35,8 @@ class ApiRequest {
       List<Map<String, dynamic>> stockMoveJsonList) async {
     NumberSeries? numberSeries = MMTApplication.generatedNoSeries;
 
-    if (numberSeries == null) {
-      numberSeries = await DataObject.instance
+    numberSeries ??= await DataObject.instance
           .getNumberSeries(moduleName: NoSeriesDocType.delivery.name);
-    }
 
     return {
       "token": '${DateTime.now().millisecondsSinceEpoch}',
@@ -92,7 +90,7 @@ class ApiRequest {
     required int? saleOrderTypeId,
     required String? saleOrderTypeName,
     String? note,
-    required NumberSeries numberSeries,
+    // required NumberSeries numberSeries,
     CashCollect? cashCollect,
   }) {
     if (fromDirectSale) action = 'create_direct_sale';
@@ -109,7 +107,7 @@ class ApiRequest {
             "partner_id": partnerId,
             "sale_person": salePerson,
             "remark": note,
-            "pricelist_id": MMTApplication.loginResponse?.deviceId?.priceListId,
+            "pricelist_id": MMTApplication.currentUser?.defaultPricelistId,
             if (action == 'create_order_promo') "state": "draft",
             "sale_order_type_id": saleOrderTypeId,
             "delivery_location": vehicleId,
@@ -118,17 +116,17 @@ class ApiRequest {
           }
         },
         {'name': 'company_id', 'value': MMTApplication.selectedCompany?.id},
-        {
-          "name": "device_id",
-          "value": {
-            "name": MMTApplication.loginResponse!.deviceId!.id!,
-            "numberseries_name": numberSeries.name,
-            "number_last": numberSeries.numberLast,
-            "year_last": numberSeries.yearLast,
-            "month_last": numberSeries.monthLast,
-            "day_last": numberSeries.dayLast
-          }
-        }
+        // {
+        //   "name": "device_id",
+        //   "value": {
+        //     "name": MMTApplication.loginResponse!.deviceId!.id!,
+        //     "numberseries_name": numberSeries.name,
+        //     "number_last": numberSeries.numberLast,
+        //     "year_last": numberSeries.yearLast,
+        //     "month_last": numberSeries.monthLast,
+        //     "day_last": numberSeries.dayLast
+        //   }
+        // }
       ]
     };
   }

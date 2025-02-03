@@ -1,7 +1,4 @@
-import 'package:flutter/foundation.dart';
 import 'package:mmt_mobile/model/stock_location.dart';
-import 'package:mmt_mobile/ui/loading/stock_loading_add_page.dart';
-import 'package:sqflite/sqlite_api.dart';
 
 import '../model/cust_visit.dart';
 import '../model/number_series.dart';
@@ -310,10 +307,10 @@ class DataObject {
             tableName: DBConstant.numberSeriesTable,
             where: '${DBConstant.name} =? ',
             whereArgs: [moduleName]);
-    if (json.isNotEmpty)
+    if (json.isNotEmpty) {
       return NumberSeries.fromJsonDB(json.first);
-    else
-      null;
+    }
+    return null;
   }
 
   //
@@ -507,9 +504,9 @@ class DataObject {
     // SaleOrderType type = saleOrderTypes.firstWhere((element) => element.conditionType == SaleOrderReqTypes.wh_sale.name);
     List<Map<String, dynamic>> json = await DatabaseHelper.instance.readDataRaw(
         'SELECT * FROM ${DBConstant.custVisitTable} WHERE ${DBConstant.docType} <> \'${CustVisitTypes.gps.name}\' AND (${DBConstant.whSale} IS Null OR ${DBConstant.whSale} <> 1) ORDER BY ${DBConstant.docDate} DESC');
-    if (json.isEmpty)
+    if (json.isEmpty) {
       return null;
-    else {
+    } else {
       CustVisit custVisit = CustVisit.fromJson(json.first);
       return custVisit;
     }

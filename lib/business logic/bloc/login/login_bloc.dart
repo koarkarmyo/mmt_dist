@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/model/login_response.dart';
+import 'package:mmt_mobile/model/number_series.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:odoo_rpc/odoo_rpc.dart';
 
@@ -21,7 +22,6 @@ import '../../../sync/models/sync_action.dart';
 import '../../../sync/models/sync_group.dart';
 
 part 'login_event.dart';
-
 part 'login_state.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
@@ -61,6 +61,20 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
       debugPrint("Login User : ${employee?.toJson()}");
 
+      List<NumberSeries> numberSeries = employee?.numberSeriesList ?? [];
+      if (numberSeries.isEmpty) {
+        emit(state.copyWith(
+            status: LoginStatus.fail, error: "Missing number series"));
+        return;
+      }
+      // insert number series
+      List<Map<String, dynamic>> seriesJson = [];
+      numberSeries.forEach((element) {
+        seriesJson.add(element.toJson());
+      });
+      await DatabaseHelper.instance
+          .insertDataListBath(DBConstant.numberSeriesTable, seriesJson);
+
       if (employee == null) {
         emit(state.copyWith(status: LoginStatus.fail));
         await Future.delayed(1.second);
@@ -77,7 +91,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
             .saveString(ShKeys.currentUser, jsonEncode(employee.toJson()));
         bool _saveSyncActionSuccess = await _saveSyncAction(
             syncActionList: employee.syncActionList ?? []);
-        print("Save Sync Action : $_saveSyncActionSuccess");
+        debugPrint("Save Sync Action : $_saveSyncActionSuccess");
         if (!_saveSyncActionSuccess) {
           emit(state.copyWith(
               status: LoginStatus.fail, error: "Sync Action Save Fail"));

@@ -10,7 +10,7 @@ import 'package:mmt_mobile/src/extension/widget_extension.dart';
 
 import '../../business logic/bloc/cart/cart_cubit.dart';
 import '../../business logic/bloc/product/product_cubit.dart';
-import '../../model/product/product.dart';
+import '../../model/product/product_product.dart';
 import '../../model/res_partner.dart';
 import '../../model/stock_order.dart';
 import '../../src/const_string.dart';
@@ -28,7 +28,7 @@ class _StockRequestAddProductState extends State<StockRequestAddProduct> {
   late ProductCubit _productCubit;
   late StockOrderBloc _stockOrderBloc;
   TextEditingController _searchProduct = TextEditingController();
-  List<Product> _productList = [];
+  List<ProductProduct> _productList = [];
   String? _filterProductCategory = 'All';
   ResPartner? _customer;
   Function(SaleOrderLine deliveryItem)? _addItemFunction;
@@ -208,14 +208,14 @@ class _StockRequestAddProductState extends State<StockRequestAddProduct> {
       return ListView.builder(
         itemCount: state.filterProductList.length,
         itemBuilder: (context, index) {
-          Product product = state.filterProductList[index];
+          ProductProduct product = state.filterProductList[index];
           return _productItem(product: product);
         },
       ).expanded();
     });
   }
 
-  Widget _productItem({required Product product}) {
+  Widget _productItem({required ProductProduct product}) {
     return BlocBuilder<StockOrderBloc, StockOrderState>(
       builder: (context, state) {
         return ListTile(

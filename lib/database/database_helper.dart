@@ -22,6 +22,7 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDatabase() async {
+    Sqflite.devSetDebugModeOn(true);
     String path = join(await getDatabasesPath(), _databaseName);
     return await openDatabase(path,
         version: _databaseVersion, onCreate: _onCreateDatabase);
@@ -123,6 +124,7 @@ class DatabaseHelper {
 
   _onCreateDatabase(Database db, int version) async {
     await _createProductTable(db);
+    await _createNumberSeriesTable(db);
     await _createProductTemplateTable(db);
     await _createSyncActionTable(db);
     await _createSyncGroupTable(db);
@@ -296,24 +298,37 @@ class DatabaseHelper {
   }
 
   _createResPartnerTable(Database db) async {
-    return await db.execute('CREATE TABLE ${DBConstant.resPartnerTable} '
-        '(${DBConstant.id} INTEGER PRIMARY KEY,' // Assuming id is the primary key
-        '${DBConstant.name} TEXT,'
-        '${DBConstant.street} TEXT,' // Changed to TEXT to fit the model
-        '${DBConstant.stateId} INTEGER,'
-        '${DBConstant.stateName} TEXT,'
-        '${DBConstant.city} TEXT,' // Changed to TEXT to fit the model
-        '${DBConstant.countryId} INTEGER,'
-        '${DBConstant.countryName} TEXT,'
-        '${DBConstant.companyId} INTEGER,'
-        '${DBConstant.companyName} TEXT,'
-        '${DBConstant.zip} TEXT,'
-        '${DBConstant.phone} TEXT,'
-        '${DBConstant.mobile} TEXT,'
-        '${DBConstant.writeDate} TEXT,'
-        '${DBConstant.partnerSaleType} TEXT'
-        // Store writeDate as TEXT for easy date formatting
-        ')');
+    // ${DBConstant.cityId} INTEGER,
+
+    return await db.execute('''CREATE TABLE ${DBConstant.resPartnerTable} (
+        ${DBConstant.id} INTEGER PRIMARY KEY,
+        ${DBConstant.name} TEXT,
+        ${DBConstant.street2} TEXT,
+        ${DBConstant.street} TEXT,
+        ${DBConstant.zoneId} INTEGER,
+        ${DBConstant.zoneName} TEXT,
+        ${DBConstant.townshipId} INTEGER,
+        ${DBConstant.townshipName} TEXT,
+        ${DBConstant.wardId} INTEGER,
+        ${DBConstant.wardName} TEXT,
+        ${DBConstant.city} TEXT,
+        ${DBConstant.cityId} INTEGER,
+        ${DBConstant.cityName} TEXT,
+        ${DBConstant.territoryId} INTEGER,
+        ${DBConstant.territoryName} TEXT,
+        ${DBConstant.stateId} INTEGER,
+        ${DBConstant.stateName} TEXT,
+        ${DBConstant.countryId} INTEGER,
+        ${DBConstant.countryName} TEXT,
+        ${DBConstant.companyId} INTEGER,
+        ${DBConstant.companyName} TEXT,
+        ${DBConstant.zip} TEXT,
+        ${DBConstant.phone} TEXT,
+        ${DBConstant.mobile} TEXT,
+        ${DBConstant.productPricelistId} INTEGER,
+        ${DBConstant.productPricelistName} TEXT,
+        ${DBConstant.writeDate} TEXT
+  )''');
   }
 
   Future<void> _createSyncHistoryTable(Database db) async {
@@ -411,7 +426,7 @@ class DatabaseHelper {
         '${DBConstant.companyName} TEXT,' // Added company_name
         '${DBConstant.listPrice} DOUBLE,'
         '${DBConstant.defaultCode} TEXT,'
-        '${DBConstant.detialType} TEXT,' // Fixed typo 'detialType' to 'detailedType'
+        '${DBConstant.type} TEXT,' // Fixed typo 'detialType' to 'detailedType'
         '${DBConstant.saleOK} INTEGER,' // Added sale_ok
         '${DBConstant.purchaseOK} INTEGER,' // Added purchase_ok
         '${DBConstant.canBeExpensed} INTEGER,' // Added can_be_expensed
@@ -428,43 +443,47 @@ class DatabaseHelper {
         '${DBConstant.looseUomId} INTEGER,'
         '${DBConstant.looseUomName} TEXT,'
         '${DBConstant.boxUomId} INTEGER,'
-        '${DBConstant.trackingType} TEXT,'
         '${DBConstant.boxUomName} TEXT,'
+        '${DBConstant.trackingType} TEXT,'
+        '${DBConstant.isStorable} TINYINT,'
         '${DBConstant.writeDate} TEXT'
         ')');
   }
 
   _createProductTemplateTable(Database db) async {
-    return await db.execute('CREATE TABLE ${DBConstant.productTemplateTable} ('
-        '${DBConstant.id} INTEGER,'
-        '${DBConstant.name} TEXT,'
-        '${DBConstant.categId} INTEGER,'
-        '${DBConstant.categName} TEXT,'
-        '${DBConstant.companyId} INTEGER,' // Added company_id
-        '${DBConstant.companyName} TEXT,' // Added company_name
-        '${DBConstant.listPrice} DOUBLE,'
-        '${DBConstant.defaultCode} TEXT,'
-        '${DBConstant.detialType} TEXT,' // Fixed typo 'detialType' to 'detailedType'
-        '${DBConstant.saleOK} INTEGER,' // Added sale_ok
-        '${DBConstant.purchaseOK} INTEGER,' // Added purchase_ok
-        '${DBConstant.canBeExpensed} INTEGER,' // Added can_be_expensed
-        '${DBConstant.barcode} TEXT,'
-        '${DBConstant.productTmplId} INTEGER,' // Added product_tmpl_id
-        '${DBConstant.productTmplName} TEXT,' // Added product_tmpl_name
-        '${DBConstant.active} INTEGER,'
-        '${DBConstant.uomCategoryId} INTEGER,' // Added uom_category_id
-        '${DBConstant.uomCategoryName} TEXT,' // Added uom_category_name
-        '${DBConstant.uomId} INTEGER,' // Added uom_id
-        '${DBConstant.uomName} TEXT,' // Added uom_name
-        '${DBConstant.uomPoId} INTEGER,' // Added uom_po_id
-        '${DBConstant.uomPoName} TEXT,' // Added uom_po_name
-        '${DBConstant.looseUomId} INTEGER,'
-        '${DBConstant.looseUomName} TEXT,'
-        '${DBConstant.boxUomId} INTEGER,'
-        '${DBConstant.boxUomName} TEXT,'
-        '${DBConstant.trackingType} TEXT,'
-        '${DBConstant.writeDate} TEXT'
-        ')');
+    return await db.execute('''CREATE TABLE ${DBConstant.productTemplateTable} (
+        ${DBConstant.id} INTEGER PRIMARY KEY,
+        ${DBConstant.name} TEXT,
+        ${DBConstant.categId} INTEGER,
+        ${DBConstant.categName} TEXT,
+        ${DBConstant.companyId} INTEGER,
+        ${DBConstant.companyName} TEXT,
+        ${DBConstant.listPrice} DOUBLE,
+        ${DBConstant.defaultCode} TEXT,
+        ${DBConstant.type} TEXT,
+        ${DBConstant.isStorable} INTEGER,
+        ${DBConstant.saleOk} INTEGER,
+        ${DBConstant.purchaseOk} INTEGER,
+        ${DBConstant.canBeExpensed} INTEGER,
+        ${DBConstant.barcode} TEXT,
+        ${DBConstant.productTmplId} INTEGER,
+        ${DBConstant.productTmplName} TEXT,
+        ${DBConstant.active} INTEGER,
+        ${DBConstant.uomCategoryId} INTEGER,
+        ${DBConstant.uomCategoryName} TEXT,
+        ${DBConstant.uomId} INTEGER,
+        ${DBConstant.uomName} TEXT,
+        ${DBConstant.uomPoId} INTEGER,
+        ${DBConstant.uomPoName} TEXT,
+        ${DBConstant.tracking} TEXT,
+        ${DBConstant.looseUomId} INTEGER,
+        ${DBConstant.looseUomName} TEXT,
+        ${DBConstant.boxUomId} INTEGER,
+        ${DBConstant.boxUomName} TEXT,
+        ${DBConstant.writeDate} TEXT
+  )
+''');
+    //   ${DBConstant.availableInMobile} INTEGER,
   }
 
   _createRouteLineTable(Database db) async {
@@ -558,6 +577,23 @@ class DatabaseHelper {
       '${DBConstant.companyName} TEXT'
       ')',
     );
+  }
+
+  _createNumberSeriesTable(Database db) async {
+    return await db.execute('CREATE TABLE ${DBConstant.numberSeriesTable} '
+        '(${DBConstant.id} INTEGER,'
+        '${DBConstant.name} TEXT,'
+        '${DBConstant.prefix} TEXT,'
+        '${DBConstant.useYear} INTEGER,'
+        '${DBConstant.useMonth} INTEGER,'
+        '${DBConstant.useDay} INTEGER,'
+        '${DBConstant.resetIn} TEXT,'
+        '${DBConstant.numberLength} INTEGER,'
+        '${DBConstant.numberLast} INTEGER,'
+        '${DBConstant.yearLast} INTEGER,'
+        '${DBConstant.monthLast} INTEGER,'
+        '${DBConstant.dayLast} INTEGER'
+        ')');
   }
 
   _createChildCategoryTable(Database db) async {

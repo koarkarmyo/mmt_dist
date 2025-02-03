@@ -1,12 +1,9 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mmt_mobile/business%20logic/bloc/batch/stock_loading_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
-import 'package:mmt_mobile/business%20logic/bloc/login/login_bloc.dart';
 import 'package:mmt_mobile/business%20logic/bloc/product/product_cubit.dart';
-import 'package:mmt_mobile/common_widget/alert_dialog.dart';
 import 'package:mmt_mobile/common_widget/bottom_choice_sheet_widget.dart';
-import 'package:mmt_mobile/model/product/product.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
@@ -20,7 +17,6 @@ import '../../src/const_string.dart';
 import '../../src/enum.dart';
 import '../../src/style/app_color.dart';
 import '../widgets/textfield_custom_widget.dart';
-import 'package:collection/collection.dart';
 
 class StockLoadingAddLot extends StatefulWidget {
   const StockLoadingAddLot(

@@ -18,7 +18,7 @@ class ResPartnerRepo extends BaseDBRepo {
 
     partnerJsonList.forEach(
       (element) {
-        partnerList.add(ResPartner.fromJsonDB(element));
+        partnerList.add(ResPartner.fromJson(element));
       },
     );
 

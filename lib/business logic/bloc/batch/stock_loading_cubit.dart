@@ -1,17 +1,14 @@
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
+import 'package:collection/collection.dart';
 import 'package:mmt_mobile/api/api_repo/batch_api_repo.dart';
 import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
-import 'package:mmt_mobile/business%20logic/bloc/product/product_cubit.dart';
-import 'package:collection/collection.dart';
 import 'package:mmt_mobile/database/product_repo/product_db_repo.dart';
 import 'package:mmt_mobile/src/mmt_application.dart';
 
 import '../../../model/lot.dart';
-import '../../../model/product/product.dart';
+import '../../../model/product/product_product.dart';
 import '../../../model/product/uom_lines.dart';
 import '../../../model/stock_move.dart';
-import '../../../src/enum.dart';
 
 part 'stock_loading_state.dart';
 
@@ -34,7 +31,7 @@ class StockLoadingCubit extends Cubit<StockLoadingState> {
           await BatchApiRepo.instance.fetchBatchFromApi(name: barcode);
 
       List<StockMoveLine> stockMoveWithTotalQty = [];
-      List<Product> productList = await ProductDBRepo.instance.getProductList();
+      List<ProductProduct> productList = await ProductDBRepo.instance.getProductList();
 
       stockMoveList.forEach(
         (element) {
@@ -62,7 +59,7 @@ class StockLoadingCubit extends Cubit<StockLoadingState> {
 
       stockMoveWithTotalQty.forEachIndexed(
         (index, stockMove) {
-          Product? product = productList
+          ProductProduct? product = productList
               .firstWhereOrNull((element) => element.id == stockMove.productId);
           if (product != null) {
             MMTApplication.uomLongFormChanger(
@@ -108,7 +105,7 @@ class StockLoadingCubit extends Cubit<StockLoadingState> {
   uploadDoneQty(
       {required List<StockMoveLine> stockMoveList,
       required List<Lot> lotList,
-      required List<Product> productList}) async {
+      required List<ProductProduct> productList}) async {
     emit(state.copyWith(state: BlocCRUDProcessState.updating));
     // stockMoveList.forEach((element) => print("Cubit Stock Move : ${element.toJson()}"),);
     try {
@@ -141,7 +138,7 @@ class StockLoadingCubit extends Cubit<StockLoadingState> {
             // } else {
             //   stockMoveList.add(stockMove);
             // }
-            Product? product = productList.firstWhereOrNull(
+            ProductProduct? product = productList.firstWhereOrNull(
               (element) => element.id == stockMove.productId,
             );
             List<StockMoveLine> stockMoveLineListWithDifUom =
