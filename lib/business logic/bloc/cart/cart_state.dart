@@ -25,4 +25,9 @@ class CartState {
         focItemList: focItemList ?? this.focItemList,
         couponList: couponList ?? this.couponList);
   }
+
+  @override
+  String toString() {
+    return 'CartState{itemList: $itemList, focItemList: $focItemList, couponList: $couponList, state: $state}';
+  }
 }

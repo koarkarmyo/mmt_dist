@@ -7,7 +7,6 @@ import 'package:mmt_mobile/model/res_partner.dart';
 import 'package:mmt_mobile/model/sale_order/sale_order_6/sale_order.dart';
 import 'package:mmt_mobile/model/sale_order/sale_order_line.dart';
 import 'package:mmt_mobile/model/stock_location.dart';
-import 'package:sqflite/sqflite.dart';
 
 import '../../database/database_helper.dart';
 import '../../database/db_constant.dart';
@@ -18,7 +17,6 @@ import '../../model/dashboard.dart';
 import '../../model/price_list/price_list_item.dart';
 import '../../model/product/product_product.dart';
 import '../../model/route/route_plan.dart';
-import '../../model/sale_order/sale_order_header.dart';
 
 enum SyncProcess {
   Finished,
@@ -877,7 +875,7 @@ class SyncUtils {
         .toList();
 
     List<Map<String, dynamic>>? saleOrderLineJsonList =
-        orderLines.map((e) => e.toJson()).toList();
+        orderLines.map((e) => e.toJsonDB()).toList();
 
     // delete response row from database
     await _helper.deleteRows(
@@ -893,13 +891,18 @@ class SyncUtils {
     bool detailInsertSuccess = await _helper.insertDataListBath(
         DBConstant.saleOrderLineTable, saleOrderLineJsonList);
 
+    debugPrint('sssssssss:::${saleOrderLineJsonList.toString()}');
+
     bool hdrInsertSuccess = await _helper.insertDataListBath(
         DBConstant.saleOrderTable, saleOrderJsonList);
+
+    debugPrint('ffffffff::::hdr::$hdrInsertSuccess');
+    debugPrint('ffffffff::::bdy::$detailInsertSuccess');
 
     if (detailInsertSuccess && hdrInsertSuccess) {
       return await _insertOrUpdateLastWriteDate(
               actionName: actionName,
-              lastWriteDate: baseResponse.data!.last.writeDate!)
+              lastWriteDate: baseResponse.data!.last.writeDate ?? '')
           ? SyncProcess.Paginated
           : SyncProcess.Fail;
     }

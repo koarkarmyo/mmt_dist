@@ -26,7 +26,7 @@ class _DeliveryListPageState extends State<DeliveryListPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    context.read<CustomerCubit>().fetchAllCustomer();
+    context.read<CustomerCubit>().fetchCustomers();
   }
 
   @override

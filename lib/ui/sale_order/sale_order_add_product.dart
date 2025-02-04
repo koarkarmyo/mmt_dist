@@ -310,9 +310,9 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                           (deliveryItem?.uomLine?.uomId ??
                               product.uomLines?.firstOrNull?.uomId),
                     )?.fixedPrice ?? 0).roundTo(position: 1).toString()} K "),
-                Text((MMTApplication.currentUser?.useLooseBox ?? false)
-                    ? "23 PK / 6 PC"
-                    : "300 Units"),
+                // Text((MMTApplication.currentUser?.useLooseBox ?? false)
+                //     ? "23 PK / 6 PC"
+                //     : "300 Units"),
               ],
             ).expanded(flex: 6),
             Container(
@@ -328,16 +328,26 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                         ))
                     .toList(),
                 onChanged: (UomLine? newValue) {
-                  // Handle selection change
-                  _cartCubit.addCartSaleItem(
-                    saleItem: SaleOrderLine(
-                      productId: product.id,
-                      productName: product.name,
-                      pkQty: deliveryItem?.pkQty,
-                      productUomQty: deliveryItem?.productUomQty ?? 0.0,
-                      uomLine: newValue,
-                    ),
-                  );
+                  if (newValue != null) {
+                    //
+                    double price = (product.priceListItems
+                            ?.firstWhereOrNull(
+                              (element) => element.productUom == newValue.uomId,
+                            )
+                            ?.fixedPrice ??
+                        0);
+                    // Handle selection change
+                    _cartCubit.addCartSaleItem(
+                      saleItem: SaleOrderLine(
+                        productId: product.id,
+                        productName: product.name,
+                        pkQty: deliveryItem?.pkQty,
+                        singleItemPrice: price,
+                        productUomQty: deliveryItem?.productUomQty ?? 0.0,
+                        uomLine: newValue,
+                      ),
+                    );
+                  }
                 },
                 hint: const Text('uom'),
                 isDense: true,
@@ -352,13 +362,26 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                 FocusScope.of(context).unfocus();
               },
               onChanged: (value) {
+                //
+                double price = (product.priceListItems
+                        ?.firstWhereOrNull(
+                          (element) =>
+                              element.productUom ==
+                              (deliveryItem?.uomLine?.uomId ??
+                                  product.uomLines?.firstOrNull?.uomId),
+                        )
+                        ?.fixedPrice ??
+                    0);
+                //
                 _cartCubit.addCartSaleItem(
                   saleItem: SaleOrderLine(
                     productId: product.id,
                     productName: product.name,
                     pkQty: double.tryParse(value),
                     productUomQty: double.tryParse(value),
-                    uomLine: deliveryItem?.uomLine ?? product.uomLines?.firstOrNull,
+                    singleItemPrice: price,
+                    uomLine:
+                        deliveryItem?.uomLine ?? product.uomLines?.firstOrNull,
                   ),
                 );
               },

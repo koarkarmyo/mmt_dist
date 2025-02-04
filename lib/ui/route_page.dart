@@ -6,6 +6,7 @@ import 'package:mmt_mobile/business%20logic/bloc/customer/customer_cubit.dart';
 import 'package:mmt_mobile/route/route_list.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
+import 'package:mmt_mobile/src/mmt_application.dart';
 import 'package:mmt_mobile/ui/widgets/cust_mini_dialog.dart';
 import 'package:mmt_mobile/ui/widgets/customer_filter_widget.dart';
 import 'package:mmt_mobile/ui/widgets/date_picker_button.dart';
@@ -38,7 +39,7 @@ class _RoutePageState extends State<RoutePage> {
   late bool canReturnData = false;
 
   // late String _searchedCustomer = '%';
-  late CustomerFilterType _customerFilterType = CustomerFilterType.MISSED;
+  late CustomerFilterType _customerFilterType = CustomerFilterType.ALL;
   late CustomerCubit _customerCubit;
 
   // late String _selectedCustType = '%';
@@ -60,7 +61,7 @@ class _RoutePageState extends State<RoutePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _customerCubit = context.read<CustomerCubit>()..fetchAllCustomer();
+    _customerCubit = context.read<CustomerCubit>()..fetchCustomers();
   }
 
   @override
@@ -86,7 +87,7 @@ class _RoutePageState extends State<RoutePage> {
               ),
               onChanged: (value) {
                 // _searchedCustomer = value.trim().isEmpty ? '%' : value;
-                // _filteredCalled(context);
+                _filteredCalled(context);
                 // _customerBloc.add(CustomerFilterByNameEvent(name: value));
               },
             )),
@@ -188,7 +189,7 @@ class _RoutePageState extends State<RoutePage> {
             state.customerList.length.toString()
           ],
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20),
+          style: const TextStyle(fontSize: 20),
         ),
       ),
     );
@@ -232,6 +233,7 @@ class _RoutePageState extends State<RoutePage> {
                     child: BlocConsumer<CustVisitCubit, CustVisitState>(
                       listener: (context, state) {
                         if (state.state == BlocCRUDProcessState.createSuccess) {
+                          MMTApplication.currentCustomer = selectedCustomer;
                           Navigator.pushNamed(
                               context, RouteList.customerDashboardPage,
                               arguments: {'customer': selectedCustomer});
@@ -296,9 +298,10 @@ class _RoutePageState extends State<RoutePage> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(selectedCustomer.name ?? '',
@@ -307,12 +310,14 @@ class _RoutePageState extends State<RoutePage> {
                     const SizedBox(
                       height: 5,
                     ),
-                    Text(selectedCustomer.phone ?? '',
-                        style: const TextStyle(fontSize: 14)),
-                    Text(
-                      selectedCustomer.street ?? '',
-                      style: const TextStyle(fontSize: 14),
-                    ),
+                    if (selectedCustomer.phone != null)
+                      Text(selectedCustomer.phone ?? '',
+                          style: const TextStyle(fontSize: 14)),
+                    if (selectedCustomer.street != null)
+                      Text(
+                        selectedCustomer.street ?? '',
+                        style: const TextStyle(fontSize: 14),
+                      ),
                     const SizedBox(
                       height: 5,
                     ),
@@ -342,7 +347,8 @@ class _RoutePageState extends State<RoutePage> {
   }
 
   void _filteredCalled(BuildContext context) {
-    final date = DateTimeUtils.yMmDd.format(_selectedDate);
+    _customerCubit.fetchCustomers(name: _searchController.text);
+    // final date = DateTimeUtils.yMmDd.format(_selectedDate);
     // _customerBloc.add(CustomerFilterByRouteEvent(
     //     searchName: _searchedCustomer,
     //     customerTypeId: _customerFilterType,

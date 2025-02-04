@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mmt_mobile/database/db_repo/sale_order_db_repo.dart';
 import 'package:mmt_mobile/model/sale_order/sale_order_6/sale_order.dart';
@@ -140,13 +141,13 @@ class MainSyncProcess {
     if (_autoSyncProcess.isNotEmpty) {
       actionName = _autoSyncProcess.first.name ?? '';
       limit = _autoSyncProcess.first.syncLimit ?? 100;
-      print('xxFFxx::${_autoSyncProcess.first.description}');
+      debugPrint('xxFFxx::${_autoSyncProcess.first.description}');
       _sendToView(_syncResponse(
         name: actionName,
         isFinished: _autoSyncProcess.isEmpty,
       ));
     } else {
-      print("Auto Sync is empty : ${_autoSyncProcess.isEmpty}");
+      debugPrint("Auto Sync is empty : ${_autoSyncProcess.isEmpty}");
       _syncProcessIsRunning = false;
       _sendToView(_syncResponse(
         name: actionName,
@@ -155,7 +156,7 @@ class MainSyncProcess {
       return;
     }
 
-    try {
+    // try {
       /// don't write like this, should be use [completer]
       /// api call
       ///
@@ -190,25 +191,25 @@ class MainSyncProcess {
         ),
       );
       //
-    } on DioException catch (e) {
-      _syncProcessIsRunning = false;
-      _stopAutoSync = false;
-      _sendToView(_syncResponse(
-          name: actionName,
-          error: ApiErrorHandler.createError(e).values.first,
-          message: failMessage,
-          isFinished: true));
-      return;
-    } catch (e) {
-      _syncProcessIsRunning = false;
-      _stopAutoSync = false;
-      _sendToView(_syncResponse(
-          name: actionName,
-          error: e.toString(),
-          message: failMessage,
-          isFinished: true));
-      return;
-    }
+    // } on DioException catch (e) {
+    //   _syncProcessIsRunning = false;
+    //   _stopAutoSync = false;
+    //   _sendToView(_syncResponse(
+    //       name: actionName,
+    //       error: ApiErrorHandler.createError(e).values.first,
+    //       message: failMessage,
+    //       isFinished: true));
+    //   return;
+    // } catch (e) {
+    //   _syncProcessIsRunning = false;
+    //   _stopAutoSync = false;
+    //   _sendToView(_syncResponse(
+    //       name: actionName,
+    //       error: e.toString(),
+    //       message: failMessage,
+    //       isFinished: true));
+    //   return;
+    // }
     // assign auto sync is running or not
     _syncProcessIsRunning = _autoSyncProcess.isNotEmpty;
 
@@ -373,7 +374,7 @@ class MainSyncProcess {
   }
 
   Future<bool> _checkNeedToUpload(SyncResponse syncResponse) async {
-    if (syncResponse.name == 'get_stock_picking' &&
+    if (syncResponse.name == 'get_sale_order' &&
         (syncResponse.isUpload ?? false)) {
       List<Map<String, dynamic>> list =
           await DatabaseHelper.instance.readDataByWhereArgs(
@@ -531,11 +532,12 @@ class MainSyncProcess {
       CustVisit custVisit = CustVisit(
           docDate: DateTimeUtils.yMmDdHMS.format(DateTime.now()),
           docType: CustVisitTypes.gps,
-          employeeId: MMTApplication.loginResponse?.id ?? 0,
+          employeeId: MMTApplication.currentUser?.id ?? 0,
           customerId: 0,
           docNo: 'GPS${DateTime.now().millisecondsSinceEpoch}',
-          vehicleId: MMTApplication.loginResponse?.currentLocationId ?? 0,
-          deviceId: MMTApplication.loginResponse?.deviceId?.id ?? 0,
+          vehicleId: MMTApplication.currentUser?.defaultLocationId ?? 0,
+          deviceId: 0,
+          // deviceId: MMTApplication.loginResponse?.deviceId?.id ?? 0,
           latitude: position.latitude,
           longitude: position.longitude,
           isUpload: 0);
@@ -543,12 +545,13 @@ class MainSyncProcess {
       // I commented this line because this is giving me an error. So PLEASE BE FUCKING SURE to uncomment if you have all the necessary data to save
       // bool dbInsertSuccess = await _custVisitDBRepo.saveCustVisit(custVisit);
     } catch (e) {
-      print('location_error : $e');
+      debugPrint('location_error : $e');
     }
   }
 
-  _uploadSaleOrder() async {
-    List<SaleOrder> list = await SaleOrderDBRepo().fetchSaleOrder(isUpload: false);
+  Future<void> _uploadSaleOrder() async {
+    List<SaleOrder> list =
+        await SaleOrderDBRepo().fetchSaleOrder(isUpload: false);
     bool needToPost = true;
     do {
       needToPost = list.isNotEmpty;
@@ -558,15 +561,17 @@ class MainSyncProcess {
 
       await SaleOrderApiRepo().sendApiCall(list.first);
       //
-      // await stockPickingDBRepo.setUpload(
-      //     DBConstant.stockPickingTable, list.first.localId);
+      await SaleOrderDBRepo().setUpload(DBConstant.saleOrderTable,
+          '${DBConstant.name} =? ', [list.first.name]);
 
       list.removeAt(0);
       //
       needToPost = list.isNotEmpty;
     } while (needToPost);
   }
+}
 
+///
 //
 //   static Future<bool> _sendCustVisit() async {
 // // await SyncUtils.saveCustVisit();
@@ -616,7 +621,6 @@ class MainSyncProcess {
 //   // }
 //   return syncProcess;
 // }
-}
 
 // don't write like this, should be use [completer]
 // await Future.delayed(const Duration(milliseconds: 1000));
@@ -652,3 +656,4 @@ class MainSyncProcess {
 //   }
 //   voidCallback?.call(_autoSyncProcess.isEmpty);
 // }
+///

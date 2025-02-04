@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/rendering.dart';
 import 'package:mmt_mobile/database/db_repo/price_list_db_repo.dart';
 import 'package:mmt_mobile/src/enum.dart';
 
@@ -26,7 +27,7 @@ class CartCubit extends Cubit<CartState> {
       _priceListItems = await PriceListDbRepo.instance.getAllPriceList();
     }
 
-    print("Cart Add : ${saleItem.toJson()}");
+    debugPrint("Cart Add : ${saleItem.toJson()}");
 
     int index = state.itemList.indexWhere(
       (element) => element.productId == saleItem.productId,
@@ -41,11 +42,11 @@ class CartCubit extends Cubit<CartState> {
       state.itemList.add(saleItem);
     }
 
-    print("Add Sale Item");
+    debugPrint("Add Sale Item");
 
     emit(state.copyWith(
       itemList: state.itemList,
-      state: BlocCRUDProcessState.createSuccess,
+      state: BlocCRUDProcessState.updateSuccess,
     ));
   }
 
@@ -63,7 +64,7 @@ class CartCubit extends Cubit<CartState> {
 
   void addCartFocItem(
       {required SaleOrderLine focItem, LooseBoxType? looseBoxType}) async {
-    print("FOC Item : ${focItem.toJson()}");
+    debugPrint("FOC Item : ${focItem.toJson()}");
 
     int index = state.focItemList.indexWhere(
       (element) => element.productId == focItem.productId,
@@ -82,7 +83,7 @@ class CartCubit extends Cubit<CartState> {
       state.focItemList.add(focItem);
     }
 
-    print("Add Foc Item");
+    debugPrint("Add Foc Item");
 
     emit(state.copyWith(focItemList: state.focItemList));
   }
@@ -167,9 +168,10 @@ class CartCubit extends Cubit<CartState> {
                 (element.productTmplId == orderLine.productId),
           )
           .firstOrNull;
+      //
       orderLine.singleItemPrice = price?.fixedPrice ?? 0;
-
-      print(
+      //
+      debugPrint(
           "Single Item Price : ${orderLine.singleItemPrice} : Price List : ${_priceListItems.length} ");
 
       // orderLine.subTotal =
@@ -179,6 +181,7 @@ class CartCubit extends Cubit<CartState> {
     double singleItemPriceWithDisc = (orderLine.singleItemPrice ?? 0) -
         ((orderLine.singleItemPrice ?? 0) *
             ((orderLine.discountPercent ?? 0) / 100));
+    orderLine.singleItemPrice = singleItemPriceWithDisc;
 
     orderLine.subTotal =
         (orderLine.pkQty ?? 0) * (orderLine.singlePKPrice ?? 0) +
@@ -193,19 +196,22 @@ class CartCubit extends Cubit<CartState> {
   Future<void> saveSaleOrder({required SaleOrder saleOrder}) async {
     emit(state.copyWith(state: BlocCRUDProcessState.creating));
     List<SaleOrderLine> saleOrderLineList = [];
-    saleOrderLineList.addAll(state.itemList);
-    // saleOrderLineList.addAll(state.focItemList);
-    // saleOrderLineList.addAll(state.couponList);
+    //
     state.itemList.forEach(
       (element) {
         if ((element.pcQty ?? 0) > 0) {
           SaleOrderLine saleOrderLine = element.copyWith(
-              productUomQty: element.pcQty, uomLine: element.pcUomLine);
+            productUomQty: element.pcQty,
+            singleItemPrice: element.singleItemPrice,
+            uomLine: element.pcUomLine,
+          );
           saleOrderLineList.add(saleOrderLine);
         }
         if ((element.pkQty ?? 0) > 0) {
           SaleOrderLine saleOrderLine = element.copyWith(
-              productUomQty: element.pkQty, uomLine: element.pkUomLine);
+              singleItemPrice: element.singleItemPrice,
+              productUomQty: element.pkQty,
+              uomLine: element.pkUomLine);
           saleOrderLineList.add(saleOrderLine);
         }
       },
@@ -214,12 +220,16 @@ class CartCubit extends Cubit<CartState> {
       (element) {
         if ((element.pcQty ?? 0) > 0) {
           SaleOrderLine saleOrderLine = element.copyWith(
-              productUomQty: element.pcQty, uomLine: element.pcUomLine);
+              singleItemPrice: element.singleItemPrice,
+              productUomQty: element.pcQty,
+              uomLine: element.pcUomLine);
           saleOrderLineList.add(saleOrderLine);
         }
         if ((element.pkQty ?? 0) > 0) {
           SaleOrderLine saleOrderLine = element.copyWith(
-              productUomQty: element.pkQty, uomLine: element.pkUomLine);
+              singleItemPrice: element.singleItemPrice,
+              productUomQty: element.pkQty,
+              uomLine: element.pkUomLine);
           saleOrderLineList.add(saleOrderLine);
         }
       },
@@ -229,16 +239,21 @@ class CartCubit extends Cubit<CartState> {
       (element) {
         if ((element.pcQty ?? 0) > 0) {
           SaleOrderLine saleOrderLine = element.copyWith(
-              productUomQty: element.pcQty, uomLine: element.pcUomLine);
+              singleItemPrice: element.singleItemPrice,
+              productUomQty: element.pcQty,
+              uomLine: element.pcUomLine);
           saleOrderLineList.add(saleOrderLine);
         }
         if ((element.pkQty ?? 0) > 0) {
           SaleOrderLine saleOrderLine = element.copyWith(
-              productUomQty: element.pkQty, uomLine: element.pkUomLine);
+              singleItemPrice: element.singleItemPrice,
+              productUomQty: element.pkQty,
+              uomLine: element.pkUomLine);
           saleOrderLineList.add(saleOrderLine);
         }
       },
     );
+
     bool success = await SaleOrderDBRepo.instance.saveSaleOrder(
         saleOrder: saleOrder, saleOrderLineList: saleOrderLineList);
 

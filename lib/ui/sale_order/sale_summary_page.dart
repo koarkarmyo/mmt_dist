@@ -4,6 +4,7 @@ import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
 import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/sale_order/sale_order_cubit.dart';
 import 'package:mmt_mobile/model/sale_order/sale_order_line.dart';
+import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/src/mmt_application.dart';
@@ -12,6 +13,7 @@ import '../../model/sale_order/sale_order_6/sale_order.dart';
 import '../../src/const_string.dart';
 import '../../src/enum.dart';
 import '../../src/style/app_color.dart';
+import '../../sync/sync_utils/main_sync_process.dart';
 
 class SaleSummaryPage extends StatefulWidget {
   const SaleSummaryPage({super.key});
@@ -45,14 +47,28 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
         title: const Text(ConstString.summaryPage),
       ),
       persistentFooterButtons: [
-        BlocBuilder<CartCubit, CartState>(
+        BlocConsumer<CartCubit, CartState>(
+          listener: (BuildContext context, CartState state) {
+            if (state.state == BlocCRUDProcessState.createSuccess) {
+              context.showSuccessDialog(ConstString.successMM).then((value) {
+                context.rootPop();
+                //
+                MainSyncProcess.instance.startManualSyncWithSyncGroup("SALE");
+              });
+            }
+          },
           builder: (context, state) {
             return GestureDetector(
               onTap: () {
                 SaleOrder saleOrder = SaleOrder(
-                  name: 'S0234',
+                  partnerId: MMTApplication.currentCustomer?.id,
+                  partnerName: MMTApplication.currentCustomer?.name,
                   amountTotal: _total - _discountAmount,
+                  warehouseId: MMTApplication.currentUser?.defaultWarehouseId,
+                  warehouseName:
+                      MMTApplication.currentUser?.defaultWarehouseName,
                   createDate: DateTime.now().toString(),
+                  isUpload: false,
                 );
                 _cartCubit.saveSaleOrder(saleOrder: saleOrder);
               },

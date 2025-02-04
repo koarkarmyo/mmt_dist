@@ -6,7 +6,6 @@ import '../model/number_series.dart';
 import '../model/stock_picking/stock_picking_model.dart';
 import '../src/enum.dart';
 import '../src/mmt_application.dart';
-import '../utils/date_time_utils.dart';
 
 class ApiRequest {
   static Map<String, dynamic> createRequest(
@@ -36,7 +35,7 @@ class ApiRequest {
     NumberSeries? numberSeries = MMTApplication.generatedNoSeries;
 
     numberSeries ??= await DataObject.instance
-          .getNumberSeries(moduleName: NoSeriesDocType.delivery.name);
+        .getNumberSeries(moduleName: NoSeriesDocType.delivery.name);
 
     return {
       "token": '${DateTime.now().millisecondsSinceEpoch}',
@@ -45,7 +44,7 @@ class ApiRequest {
         {
           "name": "device_id",
           "value": {
-            "name": MMTApplication.loginResponse?.deviceId?.id,
+            // "name": MMTApplication.loginResponse?.deviceId?.id,
             "numberseries_name": numberSeries?.name,
             "number_last": numberSeries?.numberLast,
             "year_last": numberSeries?.yearLast,
@@ -53,7 +52,7 @@ class ApiRequest {
             "day_last": numberSeries?.dayLast
           }
         },
-        {"name": "employee_id", "value": MMTApplication.loginResponse?.id},
+        {"name": "employee_id", "value": MMTApplication.currentUser?.id},
         {"name": "company_id", "value": MMTApplication.selectedCompany?.id},
         {
           "name": "data",
@@ -96,38 +95,16 @@ class ApiRequest {
     if (fromDirectSale) action = 'create_direct_sale';
 
     return {
-      "token": '${DateTime.now().millisecondsSinceEpoch}',
-      "name": action,
-      "args": [
-        {
-          "name": "sale_order",
-          "value": {
-            "id": orderId,
-            "name": orderNo,
-            "partner_id": partnerId,
-            "sale_person": salePerson,
-            "remark": note,
-            "pricelist_id": MMTApplication.currentUser?.defaultPricelistId,
-            if (action == 'create_order_promo') "state": "draft",
-            "sale_order_type_id": saleOrderTypeId,
-            "delivery_location": vehicleId,
-            "date_order": DateTimeUtils.changeToUtc(dateOrder),
-            "order_line": orderLinejson
-          }
-        },
-        {'name': 'company_id', 'value': MMTApplication.selectedCompany?.id},
-        // {
-        //   "name": "device_id",
-        //   "value": {
-        //     "name": MMTApplication.loginResponse!.deviceId!.id!,
-        //     "numberseries_name": numberSeries.name,
-        //     "number_last": numberSeries.numberLast,
-        //     "year_last": numberSeries.yearLast,
-        //     "month_last": numberSeries.monthLast,
-        //     "day_last": numberSeries.dayLast
-        //   }
-        // }
-      ]
+      "name": "save_sale_order",
+      "args": {
+        "employee_id": MMTApplication.currentUser?.id,
+        "company_id": MMTApplication.currentUser?.companyId,
+        "partner_id": partnerId,
+        "warehouse_id": MMTApplication.currentUser?.defaultWarehouseId,
+        "pricelist_id": MMTApplication.currentUser?.defaultPricelistId,
+        "name": orderNo,
+        "product_list": orderLinejson
+      }
     };
   }
 

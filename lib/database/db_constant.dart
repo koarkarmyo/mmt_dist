@@ -342,6 +342,7 @@ class DBConstant {
   static const String customerId = 'customer_id';
 
   static const String salePerson = 'sale_person';
+  static const String employeeId = 'employee_id';
   static const String dateOrder = 'date_order';
   static const String orderLine = 'order_line';
 
@@ -401,7 +402,6 @@ class DBConstant {
 // "remarks": ""
   static const String docDate = 'doc_date';
   static const String docType = 'doc_type';
-  static const String employeeId = 'employee_id';
   static const String employeeName = 'employee_name';
   static const String requestLocationName = 'request_location_name';
   static const String requestLocationId = 'request_location_id';

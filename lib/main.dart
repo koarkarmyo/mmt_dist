@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/database/database_helper.dart';
 import 'package:mmt_mobile/route/route_generate.dart';
-import 'package:mmt_mobile/ui/dashboard_page.dart';
+import 'package:mmt_mobile/src/const_string.dart';
+import 'package:mmt_mobile/ui/app_bloc_observer.dart';
 
-void main() {
+void main() async {
+  Bloc.observer = const AppBlocObserver();
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
   runApp(const MyApp());
 }
 
@@ -15,7 +23,7 @@ class MyApp extends StatelessWidget {
     DatabaseHelper.instance.database;
 
     return MaterialApp(
-      title: 'MMT',
+      title: ConstString.appName,
       debugShowCheckedModeBanner: false,
       onGenerateRoute: generateRoute,
       theme: ThemeData(
@@ -25,4 +33,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

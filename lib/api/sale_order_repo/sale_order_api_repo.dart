@@ -80,13 +80,13 @@ class SaleOrderApiRepo extends BaseApiRepo {
   // }
 
   Future<BaseSingleApiResponse> sendApiCall(SaleOrder saleOrder,
-      {String action = 'create_order'}) async {
+      {String action = 'save_sale_order'}) async {
     // cant delete read only error
     // https://github.com/tekartik/sqflite/issues/140#issuecomment-451881301
     List<Map<String, dynamic>> saleOrderLineJsonTemp = [];
     // remove local hdr id for api
     (saleOrder.orderLines ?? []).forEach((element) {
-      Map<String, dynamic> map = Map<String, dynamic>.from(element.toJsonDB());
+      Map<String, dynamic> map = Map<String, dynamic>.from(element.toJsonForSaleOrderApi());
       map.remove('order_no');
       saleOrderLineJsonTemp.add(map);
     });
@@ -100,7 +100,7 @@ class SaleOrderApiRepo extends BaseApiRepo {
     //     .getNumberSeries(moduleName: NoSeriesDocType.order.name);
 
     Response orderResponse = await postApiMethodCall(
-      additionalPath: '/post/',
+      additionalPath: '/api/sync/',
       params: ApiRequest.crateOrderReq(
         action: action,
         orderNo: saleOrder.name!,
@@ -112,8 +112,8 @@ class SaleOrderApiRepo extends BaseApiRepo {
         orderLinejson: saleOrderLineJsonTemp,
         partnerId: saleOrder.partnerId!,
         fromDirectSale: false,
-        salePerson: MMTApplication.loginResponse!.id!,
-        vehicleId: MMTApplication.loginResponse!.currentLocationId,
+        salePerson: MMTApplication.currentUser!.id!,
+        vehicleId: MMTApplication.currentUser!.defaultLocationId,
         saleOrderTypeId: 0,
         saleOrderTypeName: '',
         // cashCollect: cashCollect,

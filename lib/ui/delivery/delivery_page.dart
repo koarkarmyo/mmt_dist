@@ -42,7 +42,7 @@ class _DeliveryPageState extends State<DeliveryPage> {
     print("Route data : $data");
     if (data != null) {
       _saleOrder = data['sale_order'];
-      print(_saleOrder?.toJson());
+      print(_saleOrder?.toJsonDB());
     }
   }
 

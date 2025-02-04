@@ -25,10 +25,10 @@ class ConstantWidgets {
         style: GoogleFonts.gabriela(
             fontWeight: FontWeight.bold, letterSpacing: 5, fontSize: 16),
       ),
-      Text(
-        '(${MMTApplication.loginResponse?.deviceId?.name ?? ' '})',
-        style: TextStyle(fontSize: 16),
-      ),
+      // Text(
+      //   '(${MMTApplication.loginResponse?.deviceId?.name ?? ' '})',
+      //   style: TextStyle(fontSize: 16),
+      // ),
     ],
   );
 

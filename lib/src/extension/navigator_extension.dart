@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../common_widget/alert_dialog.dart';
+
 extension NavigatorExtension on BuildContext {
   Future<T?> pushTo<T>({required String route, Map<String, dynamic>? args}) {
-    return Navigator.pushNamed<T>(this, route,arguments: args);
+    return Navigator.pushNamed<T>(this, route, arguments: args);
   }
 
   Future<T?> push<T>({required Route<T> route}) {
@@ -16,6 +18,10 @@ extension NavigatorExtension on BuildContext {
 
   void pop<T>([T? result]) {
     return Navigator.pop<T>(this, result);
+  }
+
+  void rootPop<T>([T? result]) {
+    return Navigator.of(this, rootNavigator: true).pop<T>();
   }
 
   Future<bool> mayBePop<T>([T? result]) {
@@ -44,5 +50,25 @@ extension SnackBarCustom on BuildContext {
       margin: const EdgeInsets.all(5),
     );
     ScaffoldMessenger.of(this).showSnackBar(snackBar);
+  }
+
+  Future<void> showSuccessDialog(String message) {
+    return showDialog(
+      context: this,
+      builder: (context) {
+        return CustomAlertDialog(
+            dialogType: AlertDialogType.success, title: message);
+      },
+    );
+  }
+
+  Future<void> showErrorDialog(String message) {
+    return showDialog(
+      context: this,
+      builder: (context) {
+        return CustomAlertDialog(
+            dialogType: AlertDialogType.fail, title: message);
+      },
+    );
   }
 }

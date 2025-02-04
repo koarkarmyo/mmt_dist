@@ -11,11 +11,11 @@ class CustomerCubit extends Cubit<CustomerState> {
       : super(CustomerState(
             customerList: [], state: BlocCRUDProcessState.initial));
 
-  fetchAllCustomer() async {
+  fetchCustomers({String? name}) async {
     emit(state.copyWith(state: BlocCRUDProcessState.fetching));
     try {
       List<ResPartner> customerList =
-          await ResPartnerRepo.instance.getResPartner();
+          await ResPartnerRepo.instance.getResPartner(name: name);
       emit(state.copyWith(
           state: BlocCRUDProcessState.fetchSuccess,
           customerList: customerList));

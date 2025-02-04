@@ -12,6 +12,8 @@ class Employee {
   String? email;
   int? defaultLocationId;
   String? defaultLocationName;
+  int? defaultWarehouseId;
+  String? defaultWarehouseName;
   int? defaultPricelistId;
   String? defaultPricelistName;
   int? companyId;
@@ -34,6 +36,8 @@ class Employee {
     this.numberSeriesList,
     this.defaultPricelistId,
     this.defaultPricelistName,
+    this.defaultWarehouseName,
+    this.defaultWarehouseId,
   });
 
   Employee.fromJson(Map<String, dynamic> json) {
@@ -43,6 +47,8 @@ class Employee {
     phone = json['email'];
     defaultLocationId = json['default_location_id'];
     defaultLocationName = json['default_location_name'];
+    defaultWarehouseId = json['default_warehouse_id'];
+    defaultWarehouseName = json['default_warehouse_name'];
     defaultPricelistId = json['default_pricelist_id'];
     defaultPricelistName = json['default_pricelist_name'];
     companyId = json['company_id'];
@@ -79,6 +85,8 @@ class Employee {
     map['email'] = email;
     map['default_location_id'] = defaultLocationId;
     map['default_location_name'] = defaultLocationName;
+    map['default_warehouse_id'] = defaultWarehouseId;
+    map['default_warehouse_name'] = defaultWarehouseName;
     map['company_id'] = companyId;
     map['sync_action'] = syncActionList;
     map['use_loose_box'] = useLooseBox;

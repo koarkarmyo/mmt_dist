@@ -56,11 +56,11 @@ class _AccountPaymentPageState extends State<AccountPaymentPage> {
                             value: AccountPaymentTypes.outbound,
                             groupValue: paymentType,
                             onChanged: (v) {
-                              if (MMTApplication.loginResponse?.allowCashOut ??
-                                  false)
-                                innerState(() {
-                                  paymentType = AccountPaymentTypes.outbound;
-                                });
+                              // if (MMTApplication.loginResponse?.allowCashOut ??
+                              //     false)
+                              //   innerState(() {
+                              //     paymentType = AccountPaymentTypes.outbound;
+                              //   });
                             },
                             dense: true,
                             // tileColor:
@@ -74,11 +74,11 @@ class _AccountPaymentPageState extends State<AccountPaymentPage> {
                             value: AccountPaymentTypes.inbound,
                             groupValue: paymentType,
                             onChanged: (v) {
-                              if (MMTApplication.loginResponse?.allowCashIn ??
-                                  false)
-                                innerState(() {
-                                  paymentType = AccountPaymentTypes.inbound;
-                                });
+                              // if (MMTApplication.loginResponse?.allowCashIn ??
+                              //     false)
+                              //   innerState(() {
+                              //     paymentType = AccountPaymentTypes.inbound;
+                              //   });
                             },
                             dense: true,
                             // tileColor:

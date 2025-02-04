@@ -162,7 +162,7 @@ enum PurchaseOrderFilterStates {
 
 extension FirstLetterCapital on String {
   String toFirstLetterCapital() {
-    return "${this[0].toUpperCase()}${this.substring(1).toLowerCase()}";
+    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
   }
 }
 
@@ -202,7 +202,7 @@ extension DeliveryStatesToValue on DeliveryStates {
     if (this == DeliveryStates.order_cancel) {
       return 'Order cancel';
     }
-    return this.name.toFirstLetterCapital();
+    return name.toFirstLetterCapital();
   }
 }
 
@@ -256,7 +256,7 @@ enum PaymentTypes { cash, bank }
 
 extension PaymentTypesValue on PaymentTypes {
   String getConstValue() {
-    return this.name.toFirstLetterCapital();
+    return name.toFirstLetterCapital();
   }
 }
 
@@ -273,7 +273,7 @@ extension DiscountTypesValue on DiscountTypes {
 
 extension DeliveryFilterTypesValue on DeliveryFilterTypes {
   String getConstValue() {
-    return this.name.toFirstLetterCapital();
+    return name.toFirstLetterCapital();
   }
 }
 
@@ -283,7 +283,7 @@ abstract class EnumUtils<T extends Enum> extends Iterable<T> {
   // }
 
   T getEnum(String value) {
-    return this.byName(value);
+    return byName(value);
   }
 }
 
@@ -304,7 +304,7 @@ extension ServiceProductTypeValue on ServiceProductType {
     if (ServiceProductType.per_disc == this) {
       return 'Percent Disc';
     }
-    return this.name.toFirstLetterCapital();
+    return name.toFirstLetterCapital();
   }
 }
 
@@ -335,7 +335,7 @@ enum PaymentTransferStates { draft, posted, cancel }
 // cos dart sdk version < 2.16
 extension PaymentTransferStatesToValue on PaymentTransferStates {
   String get getConstValue {
-    return this.name.toFirstLetterCapital();
+    return name.toFirstLetterCapital();
   }
 
   Color get getColor {
@@ -377,32 +377,32 @@ extension DateTimeExtension on DateTime {
 
 extension DurationToString on Duration {
   int get inYears {
-    if (this.inDays < 1) return 0;
+    if (inDays < 1) return 0;
 
-    return this.inDays ~/ 365;
+    return inDays ~/ 365;
   }
 
   int get inMonth {
-    if (this.inDays < 1) return 0;
+    if (inDays < 1) return 0;
 
-    int month = this.inDays ~/ 31;
+    int month = inDays ~/ 31;
 
-    if (this.inDays > 365) {
-      month = (this.inDays.remainder(365) ~/ 31);
+    if (inDays > 365) {
+      month = (inDays.remainder(365) ~/ 31);
     }
     return month;
   }
 
   int get inCDays {
-    int day = this.inDays;
+    int day = inDays;
     int month = 0;
 
-    if (this.inDays > 365) {
-      month = this.inDays.remainder(365) ~/ 31;
+    if (inDays > 365) {
+      month = inDays.remainder(365) ~/ 31;
     }
 
-    if (this.inDays >= 31) {
-      day = this.inDays - ((month * 31) + (this.inYears * 365));
+    if (inDays >= 31) {
+      day = inDays - ((month * 31) + (inYears * 365));
     }
 
     return day;
@@ -410,8 +410,8 @@ extension DurationToString on Duration {
 
   String get durationString {
     String string = '';
-    if (this.inYears > 0) {
-      string = '${this.inYears} year';
+    if (inYears > 0) {
+      string = '${inYears} year';
     }
 
     if (inMonth > 0) {
@@ -420,7 +420,7 @@ extension DurationToString on Duration {
     }
 
     if (string.isNotEmpty) string = '$string/ ';
-    if (this.inDays == 1) {
+    if (inDays == 1) {
       string = 'Yesterday';
     } else if (inDays == 0) {
       string = 'Today';
@@ -451,11 +451,12 @@ enum CashCollectTypes {
 
 extension ChangeDoubleToString on double {
   String toQty([int? digit]) {
-    return this.toStringAsFixed(digit ?? MMTApplication.qtyDigit);
+    // MMTApplication.qtyDigit
+    return toStringAsFixed(digit ?? 0);
   }
 
   String toPrice([int? digit]) {
-    return this.toStringAsFixed(digit ?? MMTApplication.priceDigit);
+    return toStringAsFixed(digit ?? 0);
   }
 }
 
@@ -482,7 +483,7 @@ extension JournalTypesValue on JournalTypes {
       case JournalTypes.general:
         return 'Miscellaneous';
       default:
-        return this.name.toFirstLetterCapital();
+        return name.toFirstLetterCapital();
     }
   }
 
@@ -504,9 +505,9 @@ extension AccountPaymentTypesValue on AccountPaymentTypes {
       case AccountPaymentTypes.outbound:
         return 'Sent';
       default:
-        return this.name.toFirstLetterCapital();
+        return name.toFirstLetterCapital();
     }
-    return this.name.toFirstLetterCapital();
+    return name.toFirstLetterCapital();
   }
 
   Color get getColor {
@@ -521,7 +522,7 @@ enum AccountPaymentState { draft, posted, cancel }
 
 extension AccountPaymentStateValue on AccountPaymentState {
   String getConstValue() {
-    return this.name.toFirstLetterCapital();
+    return name.toFirstLetterCapital();
   }
 
   Color getColorValue() {

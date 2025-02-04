@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:mmt_mobile/database/db_repo/res_partner_repo.dart';
 import 'package:mmt_mobile/model/sale_order/sale_order_line.dart';
 
 import '../../../src/enum.dart';
@@ -9,7 +10,9 @@ class SaleOrder {
   String? createDate;
   int? partnerId;
   String? partnerName;
-  int? salePerson;
+  int? warehouseId;
+  String? warehouseName;
+  int? employeeId;
   double? amountTotal;
   OrderStates? state;
   DeliveryStates? deliveryStatus;
@@ -24,7 +27,7 @@ class SaleOrder {
     this.createDate,
     this.partnerId,
     this.partnerName,
-    this.salePerson,
+    this.employeeId,
     this.amountTotal,
     this.state,
     this.deliveryStatus,
@@ -32,24 +35,28 @@ class SaleOrder {
     this.isUpload,
     this.writeDate,
     this.note,
+    this.warehouseId,
+    this.warehouseName,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'createDate': createDate,
-      'partnerId': partnerId,
-      'partnerName': partnerName,
-      'salePerson': salePerson,
-      'amountTotal': amountTotal,
-      'state': state,
-      'delivery_status': deliveryStatus,
-      'is_upload': isUpload,
-      'write_date': writeDate,
-      'note': note,
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'id': id,
+  //     'name': name,
+  //     'createDate': createDate,
+  //     'partnerId': partnerId,
+  //     'partnerName': partnerName,
+  //     'salePerson': employeeId,
+  //     'amountTotal': amountTotal,
+  //     'state': state,
+  //     'delivery_status': deliveryStatus,
+  //     'is_upload': isUpload,
+  //     'write_date': writeDate,
+  //     'note': note,
+  //     'warehouse_id': warehouseId,
+  //     'warehouse_name': warehouseName,
+  //   };
+  // }
 
   Map<String, dynamic> toJsonDB() {
     return {
@@ -57,23 +64,23 @@ class SaleOrder {
       'name': name,
       'partner_id': partnerId,
       'partner_name': partnerName,
-      'sale_person': salePerson,
+      'employee_id': employeeId,
       'amount_total': amountTotal,
-      'state': state,
+      'state': state?.name,
       'delivery_status': deliveryStatus,
       'is_upload': isUpload,
       'write_date': writeDate,
+      'warehouse_id': warehouseId,
+      'warehouse_name': warehouseName,
       'note': note
     };
   }
 
   SaleOrder.fromJsonDB(Map<String, dynamic> map) {
-    partnerId = map['name'];
     name = map['name'];
     partnerName = map['partner_name'];
     partnerId = map['partner_id'];
-    salePerson = map['sale_person'];
-    state = map['sale_person'];
+    employeeId = map['employee_id'];
     state = OrderStates.values
         .firstWhereOrNull((element) => element.name == map['state']);
     deliveryStatus = DeliveryStates.values
@@ -81,25 +88,35 @@ class SaleOrder {
     isUpload = map['is_upload'] == 1;
     amountTotal = map['amount_total'];
     writeDate = map['write_date'];
+    warehouseId = map['warehouse_id'];
+    warehouseName = map['warehouse_name'];
     note = map['note'];
   }
 
   factory SaleOrder.fromJson(Map<String, dynamic> map) {
+    List<SaleOrderLine> lines = [];
+    if (map['order_line'] != null) {
+      map['order_line'].forEach((e) {
+        lines.add(SaleOrderLine.fromJson(e));
+      });
+    }
     return SaleOrder(
-      id: map['id'],
-      name: map['name'],
-      createDate: map['create_date'],
-      partnerId: map['partner_id'],
-      partnerName: map['partner_name'],
-      salePerson: map['sale_person'],
-      amountTotal: map['amount_total'],
-      writeDate: map['write_date'],
-      state: OrderStates.values
-          .firstWhereOrNull((element) => element.name == map['state']),
-      deliveryStatus: DeliveryStates.values.firstWhereOrNull(
-          (element) => element.name == map['delivery_status']),
-      note: map['note']
-    );
+        id: map['id'],
+        name: map['name'],
+        createDate: map['create_date'],
+        partnerId: map['partner_id'],
+        partnerName: map['partner_name'],
+        employeeId: map['employee_id'],
+        amountTotal: map['amount_total'],
+        warehouseId: map['warehouse_id'],
+        warehouseName: map['warehouse_name'],
+        orderLines: lines,
+        writeDate: map['write_date'],
+        state: OrderStates.values
+            .firstWhereOrNull((element) => element.name == map['state']),
+        deliveryStatus: DeliveryStates.values.firstWhereOrNull(
+            (element) => element.name == map['delivery_status']),
+        note: map['note']);
   }
 
   SaleOrder copyWith({
@@ -108,6 +125,8 @@ class SaleOrder {
     String? createDate,
     int? partnerId,
     String? partnerName,
+    int? warehouseId,
+    String? warehouseName,
     int? salePerson,
     double? amountTotal,
     OrderStates? state,
@@ -123,7 +142,9 @@ class SaleOrder {
       createDate: createDate ?? this.createDate,
       partnerId: partnerId ?? this.partnerId,
       partnerName: partnerName ?? this.partnerName,
-      salePerson: salePerson ?? this.salePerson,
+      warehouseId: warehouseId ?? this.warehouseId,
+      warehouseName: warehouseName ?? this.warehouseName,
+      employeeId: salePerson ?? this.employeeId,
       amountTotal: amountTotal ?? this.amountTotal,
       state: state ?? this.state,
       deliveryStatus: deliveryStatus ?? this.deliveryStatus,

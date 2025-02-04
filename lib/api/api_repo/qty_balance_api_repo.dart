@@ -15,7 +15,7 @@ class QtyBalanceApiRepo extends BaseApiRepo {
       "args": [
         {
           "name": "location_id",
-          "value": MMTApplication.loginResponse?.warehouseStockLocationId
+          "value": MMTApplication.currentUser?.defaultLocationId
         },
         {"name": "ids", "value": productIds},
       ]

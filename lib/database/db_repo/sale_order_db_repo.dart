@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:mmt_mobile/src/enum.dart';
 import 'package:mmt_mobile/src/extension/nullable_extension.dart';
 import 'package:mmt_mobile/utils/number_series_generator.dart';
@@ -23,10 +24,13 @@ class SaleOrderDBRepo extends BaseDBRepo {
       String vrNo = await NoSeriesGenerator.generateNoSeries(
           docType: NoSeriesDocType.order);
       saleOrder.name = vrNo;
+      //
       int? id = await helper.insertData(
-          table: DBConstant.saleOrderTable, values: saleOrder.toJsonDB());
+        table: DBConstant.saleOrderTable,
+        values: saleOrder.toJsonDB(),
+      );
       List<Map<String, dynamic>> saleOrderLineMapList = [];
-
+      //
       saleOrderLineList.forEach(
         (element) {
           Map<String, dynamic> jsonData = element.toJsonDB();
@@ -38,7 +42,7 @@ class SaleOrderDBRepo extends BaseDBRepo {
       bool saveSaleOrderLineSuccess = await helper.insertDataListBath(
           DBConstant.saleOrderLineTable, saleOrderLineMapList);
 
-      return saveSaleOrderLineSuccess;
+      return true;
     } on Exception {
       return Future.value(false);
     }
@@ -50,10 +54,11 @@ class SaleOrderDBRepo extends BaseDBRepo {
     List whereArgs = [];
 
     if (isUpload.isNotNull) {
-      query += addAnd('${DBConstant.isUpload} ? ');
+      query += '${addAnd(query)} ${DBConstant.isUpload} =? ';
       whereArgs.add((isUpload ?? true) ? 1 : 0);
     }
 
+    //
     List<Map<String, dynamic>> soList = await helper.readDataByWhereArgs(
         tableName: DBConstant.saleOrderTable,
         where: query,
@@ -63,6 +68,26 @@ class SaleOrderDBRepo extends BaseDBRepo {
       saleOrderList.add(SaleOrder.fromJsonDB(element));
     });
 
-    return saleOrderList;
+    List<Map<String, dynamic>> lineList = await helper.readDataByWhereArgs(
+        tableName: DBConstant.saleOrderLineTable,
+        where:
+            '${DBConstant.orderNo} IN (${List.filled(saleOrderList.length, '?').join(',')})',
+        whereArgs: saleOrderList.map((e) => e.name ?? '').toList());
+
+    List<SaleOrderLine> lines = [];
+
+    lineList.forEach((e) {
+      lines.add(SaleOrderLine.fromJson(e));
+    });
+
+    List<SaleOrder> tmp = [];
+
+    saleOrderList.forEach((so) {
+      so.orderLines =
+          lines.where((element) => element.orderNo == so.name).toList();
+      tmp.add(so);
+    });
+
+    return tmp;
   }
 }

@@ -11,6 +11,7 @@ import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/src/mmt_application.dart';
+import 'package:mmt_mobile/utils/location_utils.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
 import '../business logic/bloc/dashboard/dashboard_cubit.dart';
@@ -83,6 +84,8 @@ class _DashboardPageState extends State<DashboardPage> {
     _scrollController = AutoScrollController();
     _scrollController.addListener(_onScroll);
     context.read<SyncActionCubit>().getSyncAction(isManualSync: true);
+    //
+    LocationUtils.requestPermission();
 
     super.initState();
     _dashboardCubit = context.read<DashboardCubit>();

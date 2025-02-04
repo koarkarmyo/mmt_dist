@@ -20,27 +20,27 @@ class LocationUtils {
     return _instance;
   }
 
-  static loc.Location _location = new loc.Location();
+  static final loc.Location _location = new loc.Location();
 
   static Future<bool> requestPermission() async {
-    bool _serviceEnabled;
-    loc.PermissionStatus _permissionGranted;
+    bool serviceEnabled;
+    loc.PermissionStatus permissionGranted;
 
-    _serviceEnabled = await _location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await _location.requestService();
-      if (!_serviceEnabled) {
+    serviceEnabled = await _location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await _location.requestService();
+      if (!serviceEnabled) {
         getCurrentLocation();
       }
     }
-    _permissionGranted = await _location.hasPermission();
-    if (_permissionGranted == loc.PermissionStatus.denied) {
-      _permissionGranted = await _location.requestPermission();
-      if (_permissionGranted != loc.PermissionStatus.granted) {
+    permissionGranted = await _location.hasPermission();
+    if (permissionGranted == loc.PermissionStatus.denied) {
+      permissionGranted = await _location.requestPermission();
+      if (permissionGranted != loc.PermissionStatus.granted) {
         await _location.requestPermission();
       }
     }
-    return _permissionGranted == loc.PermissionStatus.granted;
+    return permissionGranted == loc.PermissionStatus.granted;
   }
 
   static listenLocation() async {
@@ -50,7 +50,7 @@ class LocationUtils {
   }
 
   static Future<loc.LocationData> getCurrentLocation() async {
-    loc.LocationData _locationData;
+    loc.LocationData locationData;
     bool isGranted = await requestPermission();
     if (!isGranted) {
       getCurrentLocation();
@@ -58,12 +58,12 @@ class LocationUtils {
 
     _location.changeSettings(accuracy: loc.LocationAccuracy.high);
 
-    _locationData = await _location.getLocation();
+    locationData = await _location.getLocation();
 
-    if (_locationData.latitude == 0.0 && _locationData.longitude == 0.0) {
+    if (locationData.latitude == 0.0 && locationData.longitude == 0.0) {
       getCurrentLocation();
     }
-    return _locationData;
+    return locationData;
   }
 
   static Future<Position> determinePosition() async {

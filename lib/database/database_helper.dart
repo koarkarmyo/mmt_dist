@@ -95,7 +95,7 @@ class DatabaseHelper {
     Database db = await database;
     List<Map<String, dynamic>> maps = await db.query(tableName,
         columns: columns,
-        where: '$where',
+        where: where,
         whereArgs: whereArgs,
         limit: limit,
         orderBy: orderBy);
@@ -193,8 +193,10 @@ class DatabaseHelper {
         '${DBConstant.name} TEXT,'
         '${DBConstant.partnerId} INTEGER,'
         '${DBConstant.partnerName} TEXT,'
-        '${DBConstant.salePerson} INTEGER,'
+        '${DBConstant.employeeId} INTEGER,'
         '${DBConstant.vehicleId} INTEGER,'
+        '${DBConstant.warehouseId} INTEGER,'
+        '${DBConstant.warehouseName} TEXT,'
         '${DBConstant.isUpload} INTEGER,'
         '${DBConstant.amountTotal} DOUBLE,'
         '${DBConstant.dateOrder} TEXT,'
