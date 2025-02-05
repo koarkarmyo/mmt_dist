@@ -33,7 +33,7 @@ class _TodayDeliveryPageState extends State<TodayDeliveryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(ConstString.saleOrder),
+          title: const Text(ConstString.saleOrder),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -244,7 +244,7 @@ class _TodayDeliveryPageState extends State<TodayDeliveryPage> {
             borderRadius: BorderRadius.circular(5),
             border: Border.all(color: Colors.white),
           ),
-          child: Icon(Icons.tune),
+          child: const Icon(Icons.tune),
         ),
       );
     });

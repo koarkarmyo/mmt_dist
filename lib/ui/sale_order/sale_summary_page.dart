@@ -45,12 +45,16 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(ConstString.summaryPage),
+        leading: BackButton(onPressed: () => context.rootPop()),
       ),
       persistentFooterButtons: [
         BlocConsumer<CartCubit, CartState>(
           listener: (BuildContext context, CartState state) {
             if (state.state == BlocCRUDProcessState.createSuccess) {
-              context.showSuccessDialog(ConstString.successMM).then((value) {
+              context
+                  .showSuccessDialog(ConstString.successMM,
+                      title: ConstString.createSaleOrder)
+                  .then((value) {
                 context.rootPop();
                 //
                 MainSyncProcess.instance.startManualSyncWithSyncGroup("SALE");
@@ -60,6 +64,14 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
           builder: (context, state) {
             return GestureDetector(
               onTap: () {
+                if (state.itemList
+                    .where((element) => (element.pkQty ?? 0) > 0)
+                    .toList()
+                    .isEmpty) {
+                  context.showErrorDialog('Product ထည့်ပါ');
+                  return;
+                }
+                //
                 SaleOrder saleOrder = SaleOrder(
                   partnerId: MMTApplication.currentCustomer?.id,
                   partnerName: MMTApplication.currentCustomer?.name,
@@ -83,7 +95,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
                   child: (state.state == BlocCRUDProcessState.creating)
                       ? const CircularProgressIndicator()
                       : const Text(
-                          "Confirm",
+                          ConstString.confirm,
                           style: TextStyle(color: Colors.white),
                         ),
                 ),
@@ -126,9 +138,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ).padding(padding: 16.horizontalPadding),
           _focProductInCartWidget(),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
           Divider(
             color: Colors.grey.shade200,
             thickness: 16,
@@ -282,7 +292,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, state) {
         List<Widget> columnItem = [];
-        state.focItemList.forEach(
+        state.itemList.where((element) => (element.pkQty ?? 0) > 0).forEach(
           (item) {
             columnItem.add(_notChargeItemWidget(item: item));
           },
@@ -338,7 +348,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, state) {
         List<Widget> columnItem = [];
-        state.itemList.forEach(
+        state.itemList.where((element) => (element.pkQty ?? 0) > 0).forEach(
           (item) {
             columnItem
                 .add(_itemListTileWidget(item: item, type: SaleItemType.sale));

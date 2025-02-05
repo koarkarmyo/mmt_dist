@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:mmt_mobile/src/enum.dart';
 import 'package:mmt_mobile/src/extension/nullable_extension.dart';
 import 'package:mmt_mobile/utils/number_series_generator.dart';
@@ -48,14 +47,40 @@ class SaleOrderDBRepo extends BaseDBRepo {
     }
   }
 
-  Future<List<SaleOrder>> fetchSaleOrder({bool? isUpload}) async {
+  Future<List<SaleOrder>> fetchSaleOrder(
+      {bool? isUpload,
+      String? customer,
+      String? so,
+      List<String>? fromToDate}) async {
     List<SaleOrder> saleOrderList = [];
     String query = '';
     List whereArgs = [];
+    //
+    if (so.isNull) {
+      query += '${addAnd(query)} ${DBConstant.name} LIKE ? ';
+      whereArgs.add('%%');
+    }
 
     if (isUpload.isNotNull) {
       query += '${addAnd(query)} ${DBConstant.isUpload} =? ';
       whereArgs.add((isUpload ?? true) ? 1 : 0);
+    }
+
+    if (customer.isNotNull && customer!.isNotEmpty) {
+      query += '${addAnd(query)} ${DBConstant.partnerName} LIKE ? ';
+      whereArgs.add('%$customer%');
+    }
+    //
+    if (so.isNotNull) {
+      query += '${addAnd(query)} ${DBConstant.name} LIKE ? ';
+      whereArgs.add('%$so%');
+    }
+
+    if (fromToDate.isNotNull && fromToDate!.length > 1) {
+      // ${fromToDate[1]}
+      query += '${addAnd(query)} ${DBConstant.date} (BETWEEN ? AND ?)';
+      whereArgs.add(fromToDate[0]);
+      whereArgs.add(fromToDate[1]);
     }
 
     //

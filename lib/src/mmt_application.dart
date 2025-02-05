@@ -58,30 +58,34 @@ class MMTApplication {
       {bool goNextLine = false}) {
     uomLines.sort((a, b) => b.ratio!.compareTo(a.ratio!));
     StringBuffer stringBuffer = StringBuffer();
-    if (refTotalQty == 0)
+    if (refTotalQty == 0) {
       return '0 ${uomLines.isEmpty ? 'UOM' : uomLines.first.uomName}';
+    }
     for (UomLine uomLine in uomLines) {
       // print(uomLine.uomName);
       if (uomLine.uomType == 'bigger') {
         final currentUomQty = (refTotalQty / uomLine.ratio!).floor();
         // final changed = tempQty / currentUomQty;
         refTotalQty = (refTotalQty % uomLine.ratio!).roundToDouble();
-        if (currentUomQty > 0)
+        if (currentUomQty > 0) {
           stringBuffer.write(
-              '${_spacerAdd(stringBuffer, goNextLine)}${currentUomQty} ${uomLine.uomName}');
+              '${_spacerAdd(stringBuffer, goNextLine)}$currentUomQty ${uomLine.uomName}');
+        }
       } else if (uomLine.uomType == 'smaller') {
         final currentUomQty = (refTotalQty * uomLine.ratio!).floor();
         // final changed = tempQty * currentUomQty;
         refTotalQty = (refTotalQty % uomLine.ratio!).roundToDouble();
-        if (currentUomQty > 0)
+        if (currentUomQty > 0) {
           stringBuffer.write(
-              '${_spacerAdd(stringBuffer, goNextLine)}${currentUomQty} ${uomLine.uomName}');
+              '${_spacerAdd(stringBuffer, goNextLine)}$currentUomQty ${uomLine.uomName}');
+        }
       } else if (uomLine.uomType == 'reference') {
         final currentUomQty = (refTotalQty / uomLine.ratio!).floor();
         refTotalQty = (refTotalQty % uomLine.ratio!).roundToDouble();
-        if (currentUomQty > 0)
+        if (currentUomQty > 0) {
           stringBuffer.write(
-              '${_spacerAdd(stringBuffer, goNextLine)}${currentUomQty} ${uomLine.uomName}');
+              '${_spacerAdd(stringBuffer, goNextLine)}$currentUomQty ${uomLine.uomName}');
+        }
       }
     }
     return stringBuffer.toString();

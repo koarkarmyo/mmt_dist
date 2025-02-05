@@ -3,7 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
 import 'package:mmt_mobile/business%20logic/bloc/cust_visit/cust_visit_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/customer/customer_cubit.dart';
+import 'package:mmt_mobile/common_widget/bottom_choice_sheet_widget.dart';
+import 'package:mmt_mobile/model/cust_visit.dart';
 import 'package:mmt_mobile/route/route_list.dart';
+import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/src/mmt_application.dart';
@@ -197,82 +200,15 @@ class _RoutePageState extends State<RoutePage> {
 
   Widget _customerCardItem({required ResPartner selectedCustomer}) {
     return GestureDetector(
-      onTap: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return BlocProvider(
-              create: (context) => CustVisitCubit(),
-              child: AlertDialog(
-                icon: const Icon(
-                  Icons.account_box_rounded,
-                  size: 80,
-                ),
-                title: const TextWidget(
-                  ConstString.clockIn,
-                  style: TextStyle(fontSize: 24),
-                ),
-                content: const Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextWidget(
-                      ConstString.clockInConfirm,
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Icon(
-                      Icons.camera_alt_outlined,
-                      size: 80,
-                    )
-                  ],
-                ),
-                actions: [
-                  Center(
-                    child: BlocConsumer<CustVisitCubit, CustVisitState>(
-                      listener: (context, state) {
-                        if (state.state == BlocCRUDProcessState.createSuccess) {
-                          MMTApplication.currentCustomer = selectedCustomer;
-                          Navigator.pushNamed(
-                              context, RouteList.customerDashboardPage,
-                              arguments: {'customer': selectedCustomer});
-                        }
-                      },
-                      builder: (context, state) {
-                        if (state.state == BlocCRUDProcessState.initial ||
-                            state.state == BlocCRUDProcessState.createFail) {
-                          return SizedBox(
-                            width: double.infinity,
-                            child: TextButton(
-                              style: TextButton.styleFrom(
-                                  backgroundColor: AppColors.primaryColor,
-                                  foregroundColor: Colors.white),
-                              onPressed: () {
-                                context
-                                    .read<CustVisitCubit>()
-                                    .saveCustVisit(customer: selectedCustomer);
-                              },
-                              child: const Text(ConstString.clockIn),
-                            ),
-                          );
-                        } else if (state.state ==
-                            BlocCRUDProcessState.creating) {
-                          return const SizedBox(
-                              height: 50,
-                              width: 50,
-                              child: CircularProgressIndicator());
-                        } else {
-                          return Container();
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
+      onTap: () async {
+        MMTApplication.currentCustomer = selectedCustomer;
+        bool? isOk = await context.showClockInOutDialog(
+            custVisitType: CustVisitTypes.clock_in);
+
+        if (isOk ?? false) {
+          Navigator.pushNamed(context, RouteList.customerDashboardPage,
+              arguments: {'customer': selectedCustomer});
+        }
       },
       child: Card(
         shadowColor: Colors.grey,

@@ -1,6 +1,6 @@
 class ConstString {
   static const String appName = 'MMT Distribution';
-  static const String version = '1.0.0';
+  static const String version = '1.0.00001';
   static const String welcome = 'Welcome';
   static const String history = 'History';
   static const String stockRequestPage = 'Stock request page';
@@ -132,7 +132,9 @@ class ConstString {
   static const String lastOrderAmount = 'Last order amount';
   static const String amountDue = 'Amount due';
   static const String clockIn = "Clock in";
+  static const String clockOut = "Clock out";
   static const String clockInConfirm = "Are you sure to clock in?";
+  static const String clockOutConfirm = "Are you sure to clock out?";
   static const String totalOrdered = "Total ordered";
   static const String totalInvoiced = "Total invoiced";
   static const String totalDue = "Total due";

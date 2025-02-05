@@ -96,8 +96,8 @@ class SaleOrderApiRepo extends BaseApiRepo {
 
     // NumberSeries? noSeries = MMTApplication.generatedNoSeries;
 
-    // noSeries ??= await DataObject.instance
-    //     .getNumberSeries(moduleName: NoSeriesDocType.order.name);
+    NumberSeries? noSeries = await DataObject.instance
+        .getNumberSeries(moduleName: NoSeriesDocType.order.name);
 
     Response orderResponse = await postApiMethodCall(
       additionalPath: '/api/sync/',
@@ -107,7 +107,7 @@ class SaleOrderApiRepo extends BaseApiRepo {
         orderId: saleOrder.id,
         // saleOrder.dateOrder ??
         dateOrder: DateTime.now().toString(),
-        // numberSeries: noSeries,
+        numberSeries: noSeries,
         note: saleOrder.note,
         orderLinejson: saleOrderLineJsonTemp,
         partnerId: saleOrder.partnerId!,

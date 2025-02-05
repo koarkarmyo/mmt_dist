@@ -45,7 +45,7 @@ class CustomAlertDialog extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
+                const SizedBox(
                   height: ConstantDimens.sizedBoxS,
                 ),
                 Icon(
@@ -53,11 +53,11 @@ class CustomAlertDialog extends StatelessWidget {
                   size: 40,
                   color: _getIconColor(),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: ConstantDimens.sizedBoxS,
                 ),
                 Text(_getTitle(),
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.black,
                         fontSize: 18,
                         fontWeight: FontWeight.bold),
@@ -65,8 +65,8 @@ class CustomAlertDialog extends StatelessWidget {
                 const Divider(),
                 Text(content,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black)),
-                SizedBox(
+                    style: const TextStyle(color: Colors.black)),
+                const SizedBox(
                   height: ConstantDimens.sizedBoxL,
                 ),
                 isRequest
@@ -76,10 +76,10 @@ class CustomAlertDialog extends StatelessWidget {
                             () {
                               Navigator.pop(context);
                             },
-                        child: const Text('OK',
-                            style: TextStyle(color: Colors.green)),
                         style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Colors.black))),
+                            side: const BorderSide(color: Colors.black)),
+                        child: const Text('OK',
+                            style: TextStyle(color: Colors.green))),
                 ConstantWidgets.SizedBoxHeight
               ],
             ),
@@ -125,20 +125,20 @@ class CustomAlertDialog extends StatelessWidget {
     }
   }
 
-  _getTitle() {
+  String _getTitle() {
     switch (dialogType) {
       case AlertDialogType.success:
-        return "$title Successful";
+        return title;
       case AlertDialogType.fail:
-        return "Fail $title";
+        return title;
       case AlertDialogType.question:
         return "Are you sure $title?";
       case AlertDialogType.error:
-        return "$title";
+        return title;
       case AlertDialogType.info:
-        return "$title";
+        return title;
       case AlertDialogType.warning:
-        return "$title";
+        return title;
       default:
         return "Default Title";
     }
@@ -149,6 +149,10 @@ class CustomAlertDialog extends StatelessWidget {
       children: [
         Expanded(
           child: Container(
+            decoration: const BoxDecoration(
+                border: Border(
+                    top: BorderSide(color: Colors.grey),
+                    right: BorderSide(color: Colors.grey))),
             child: TextButton(
                 style: const ButtonStyle(),
                 child: const Text(
@@ -156,19 +160,15 @@ class CustomAlertDialog extends StatelessWidget {
                   style: TextStyle(color: Colors.red),
                 ),
                 onPressed: () => Navigator.pop(context, false)),
-            decoration: const BoxDecoration(
-                border: Border(
-                    top: BorderSide(color: Colors.grey),
-                    right: BorderSide(color: Colors.grey))),
           ),
         ),
         Expanded(
           child: Container(
+            decoration: const BoxDecoration(
+                border: Border(top: BorderSide(color: Colors.grey))),
             child: TextButton(
                 child: const Text('OK', style: TextStyle(color: Colors.green)),
                 onPressed: () => Navigator.pop(context, true)),
-            decoration: const BoxDecoration(
-                border: Border(top: BorderSide(color: Colors.grey))),
           ),
         ),
       ],

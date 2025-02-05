@@ -50,13 +50,14 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
       body: PopScope(
         canPop: true, // Indicate that this page can be popped
         onPopInvokedWithResult: (didPop, result) {
-          if (_controller.index == 0) {
-            Future.delayed(const Duration(milliseconds: 50), () {
-              if (Navigator.of(context).canPop()) {
-                context.pop(result); // Perform the pop action with a delay
-              }
-            });
-          }
+          // if (_controller.index == 0) {
+          //   Future.delayed(const Duration(milliseconds: 50), () {
+          //     // if (Navigator.of(context).canPop()) {
+          //     //   context.pop(result); // Perform the pop action with a delay
+          //     // }
+          //     context.rootPop();
+          //   });
+          // }
         },
         child: PersistentTabView(
           context,

@@ -40,6 +40,7 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
     return Scaffold(
       appBar: AppBar(
         title: const TextWidget(ConstString.saleItem),
+        leading: BackButton(onPressed: () => context.rootPop()),
       ),
       persistentFooterButtons: [
         BlocBuilder<CartCubit, CartState>(
@@ -135,10 +136,10 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
 
   Widget _tableItem(String text, {Alignment align = Alignment.centerRight}) {
     return Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       child: Align(
         alignment: align,
-        child: Text(text, style: TextStyle(fontWeight: FontWeight.bold)),
+        child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold)),
       ),
     );
   }
@@ -338,6 +339,10 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                                       saleItem: SaleOrderLine(
                                           productId: product.id,
                                           productName: product.name,
+                                          pkQty: (_qtyController.text != '')
+                                              ? double.tryParse(
+                                                  _qtyController.text)
+                                              : 0,
                                           productUomQty:
                                               (_qtyController.text != '')
                                                   ? double.tryParse(
@@ -371,6 +376,10 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                                       saleItem: SaleOrderLine(
                                           productId: product.id,
                                           productName: product.name,
+                                          pkQty: (_qtyController.text != '')
+                                              ? double.tryParse(
+                                                  _qtyController.text)
+                                              : 0,
                                           productUomQty:
                                               (_qtyController.text != '')
                                                   ? double.tryParse(

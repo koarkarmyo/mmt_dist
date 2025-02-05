@@ -51,6 +51,7 @@ class _FocItemPageState extends State<FocItemPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(ConstString.focItem),
+        leading: BackButton(onPressed: () => context.rootPop()),
         actions: [
           IconButton(
               onPressed: () {

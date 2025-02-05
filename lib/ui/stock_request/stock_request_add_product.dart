@@ -173,7 +173,7 @@ class _StockRequestAddProductState extends State<StockRequestAddProduct> {
           TextField(
             controller: _searchProduct,
             onChanged: (value) {
-              if (value != '') {
+              if (value.isNotEmpty) {
                 _productCubit.searchProduct(
                     text: value, categoryName: _filterProductCategory);
               } else {

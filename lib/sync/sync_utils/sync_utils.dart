@@ -610,38 +610,38 @@ class SyncUtils {
     // delete dashboards from database
     Map<String, dynamic> res = response.data!;
     //
-    // BaseApiResponse<Dashboard> baseResponse =
-    //     BaseApiResponse.fromJson(res, fromJson: Dashboard.fromJson);
-    // if (baseResponse.data!.isEmpty) {
-    //   return SyncProcess.Finished;
-    // }
-    List<Dashboard> dashboards = [
-      Dashboard(
-        id: 1,
-        priority: 1,
-        actionUrl: '/route',
-        dashboardName: 'Route',
-        isFolder: false,
-        dashboardGroupName: "Sale",
-        writeDate: '${DateTime.now().microsecondsSinceEpoch}',
-      ),
-      Dashboard(
-        id: 2,
-        priority: 2,
-        actionUrl: '/today_order_route',
-        dashboardName: 'Today order route',
-        isFolder: false,
-        writeDate: '${DateTime.now().microsecondsSinceEpoch}',
-      ),
-      Dashboard(
-        id: 3,
-        priority: 3,
-        actionUrl: '/today_order_report_route',
-        dashboardName: 'Today order report',
-        isFolder: false,
-        writeDate: '${DateTime.now().microsecondsSinceEpoch}',
-      ),
-    ];
+    BaseApiResponse<Dashboard> baseResponse =
+        BaseApiResponse.fromJson(res, fromJson: Dashboard.fromJson);
+    if (baseResponse.data!.isEmpty) {
+      return SyncProcess.Finished;
+    }
+    // List<Dashboard> dashboards = [
+    //   Dashboard(
+    //     id: 1,
+    //     priority: 1,
+    //     actionUrl: '/route',
+    //     dashboardName: 'Route',
+    //     isFolder: false,
+    //     dashboardGroupName: "Sale",
+    //     writeDate: '${DateTime.now().microsecondsSinceEpoch}',
+    //   ),
+    //   Dashboard(
+    //     id: 2,
+    //     priority: 2,
+    //     actionUrl: '/today_order_route',
+    //     dashboardName: 'Today order route',
+    //     isFolder: false,
+    //     writeDate: '${DateTime.now().microsecondsSinceEpoch}',
+    //   ),
+    //   Dashboard(
+    //     id: 3,
+    //     priority: 3,
+    //     actionUrl: '/today_order_report_route',
+    //     dashboardName: 'Today order report',
+    //     isFolder: false,
+    //     writeDate: '${DateTime.now().microsecondsSinceEpoch}',
+    //   ),
+    // ];
 
     // delete process
     // await DatabaseHelper.instance
@@ -649,11 +649,11 @@ class SyncUtils {
     await DatabaseHelper.instance.deleteRows(
         tableName: DBConstant.dashboardTable,
         where: DBConstant.id,
-        wantDeleteRow: dashboards.map((e) => e.id).toList());
+        wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
 
     // change to json to insert database
     List<Map<String, dynamic>>? dataList =
-        dashboards.map((e) => e.toJsonDB()).toList();
+        baseResponse.data!.map((e) => e.toJsonDB()).toList();
     // insert dashboard list to database
     final success = await DatabaseHelper.instance
         .insertDataListBath(DBConstant.dashboardTable, dataList);
@@ -793,7 +793,7 @@ class SyncUtils {
 
     List<PriceListItem> priceListItemList = baseResponse.data ?? [];
 
-    print("Price List : ${priceListItemList.length}");
+    debugPrint("Price List : ${priceListItemList.length}");
 
     await DatabaseHelper.instance.deleteRows(
         tableName: DBConstant.priceListItemTable,

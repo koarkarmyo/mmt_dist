@@ -89,7 +89,7 @@ class ApiRequest {
     required int? saleOrderTypeId,
     required String? saleOrderTypeName,
     String? note,
-    // required NumberSeries numberSeries,
+    NumberSeries? numberSeries,
     CashCollect? cashCollect,
   }) {
     if (fromDirectSale) action = 'create_direct_sale';
@@ -103,7 +103,8 @@ class ApiRequest {
         "warehouse_id": MMTApplication.currentUser?.defaultWarehouseId,
         "pricelist_id": MMTApplication.currentUser?.defaultPricelistId,
         "name": orderNo,
-        "product_list": orderLinejson
+        "product_list": orderLinejson,
+        "number_series": numberSeries?.toJson(),
       }
     };
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mmt_mobile/business%20logic/bloc/login/login_bloc.dart';
 import 'package:mmt_mobile/common_widget/constant_widgets.dart';
+import 'package:mmt_mobile/model/cust_visit.dart';
 import 'package:mmt_mobile/model/res_partner.dart';
 import 'package:mmt_mobile/src/const_string.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
@@ -9,7 +9,6 @@ import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 
 import '../route/route_list.dart';
-import '../src/mmt_application.dart';
 
 class CustomerDashboardPage extends StatefulWidget {
   const CustomerDashboardPage({super.key});
@@ -43,61 +42,73 @@ class _CustomerDashboardPageState extends State<CustomerDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          bool? isOk = await context.showClockInOutDialog(
+              custVisitType: CustVisitTypes.clock_out);
+          if (isOk ?? false) {
+            context.pop();
+          }
+        }
+      },
+      child: Scaffold(
         backgroundColor: Colors.white,
-        title: const Text(ConstString.customerDashboard),
-      ),
-      // backgroundColor: Colors.blue.shade50,
-      body: Column(
-        children: [
-          _customerInfoWidget(),
-          const SizedBox(
-            height: 16,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: GridView.builder(
-              itemCount: items.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisExtent: 150,
-                crossAxisSpacing: 10,
-              ),
-              shrinkWrap: true,
-              itemBuilder: (BuildContext context, int index) {
-                return GestureDetector(
-                  onTap: () {
-                    context.pushTo(
-                        route: RouteList.saleOrderPage,
-                        args: {'customer': _customer});
-                  },
-                  child: Card(
-                    color: Colors.white,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          FontAwesomeIcons.tasks,
-                          size: 35,
-                        ).padding(padding: 8.verticalPadding),
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            items[index],
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        ).padding(padding: 8.horizontalPadding),
-                      ],
-                    ),
-                  ),
-                );
-              },
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          title: const Text(ConstString.customerDashboard),
+        ),
+        // backgroundColor: Colors.blue.shade50,
+        body: Column(
+          children: [
+            _customerInfoWidget(),
+            const SizedBox(
+              height: 16,
             ),
-          )
-        ],
-      ).padding(padding: 16.allPadding),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: GridView.builder(
+                itemCount: items.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisExtent: 150,
+                  crossAxisSpacing: 10,
+                ),
+                shrinkWrap: true,
+                itemBuilder: (BuildContext context, int index) {
+                  return GestureDetector(
+                    onTap: () {
+                      context.pushTo(
+                          route: RouteList.saleOrderPage,
+                          args: {'customer': _customer});
+                    },
+                    child: Card(
+                      color: Colors.white,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            FontAwesomeIcons.tasks,
+                            size: 35,
+                          ).padding(padding: 8.verticalPadding),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              items[index],
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ).padding(padding: 8.horizontalPadding),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            )
+          ],
+        ).padding(padding: 16.allPadding),
+      ),
     );
   }
 

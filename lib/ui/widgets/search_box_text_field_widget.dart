@@ -32,30 +32,30 @@ class _SearchBoxTextFieldState extends State<SearchBoxTextField> {
     return TextFormField(
       controller: _controller,
       onChanged: (value) {
-        // setState(() {
-        //   _showHideClearIcon = value.isNotEmpty && value.length > 0;
-        // });
-        // widget.onChanged?.call(value);
+        setState(() {
+          _showHideClearIcon = value.isNotEmpty && value.isNotEmpty;
+        });
+        widget.onChanged?.call(value);
       },
       autofocus: false,
       onFieldSubmitted: widget.onTextFieldSubmitted,
       decoration: InputDecoration(
         isDense: true,
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-        prefixIcon: Icon(Icons.search_outlined),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+        prefixIcon: const Icon(Icons.search_outlined),
         hintText: widget.hintText,
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.green),
+          borderSide: const BorderSide(color: Colors.green),
           borderRadius: BorderRadius.circular(ConstantDimens.smallPadding),
         ),
         border: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
+          borderSide: const BorderSide(color: Colors.white),
           borderRadius: BorderRadius.circular(ConstantDimens.smallPadding),
         ),
         suffixIcon: Visibility(
           visible: _showHideClearIcon,
           child: GestureDetector(
-            child: Icon(Icons.cancel_outlined),
+            child: const Icon(Icons.cancel_outlined),
             onTap: () {
               widget.clearBtnClicked?.call();
               _controller.clear();

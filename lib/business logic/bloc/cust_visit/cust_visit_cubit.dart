@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/rendering.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mmt_mobile/database/db_repo/cust_visit_db_repo.dart';
 import 'package:mmt_mobile/model/res_partner.dart';
@@ -13,7 +14,8 @@ part 'cust_visit_state.dart';
 class CustVisitCubit extends Cubit<CustVisitState> {
   CustVisitCubit() : super(CustVisitState(state: BlocCRUDProcessState.initial));
 
-  saveCustVisit({required ResPartner customer}) async {
+  saveCustVisit(
+      {required ResPartner customer, required CustVisitTypes type}) async {
     emit(state.copyWith(state: BlocCRUDProcessState.creating));
     try {
       Position position = await Geolocator.getCurrentPosition(
@@ -22,12 +24,12 @@ class CustVisitCubit extends Cubit<CustVisitState> {
         distanceFilter: 100,
       ));
 
-      print("Position : ${position.latitude} : ${position.longitude}");
+      debugPrint("Position : ${position.latitude} : ${position.longitude}");
 
       CustVisit custVisit = CustVisit(
           customerId: customer.id,
           docDate: DateTimeUtils.yMmDdHMS.format(DateTime.now()),
-          docType: CustVisitTypes.clock_in,
+          docType: type,
           employeeId: MMTApplication.currentUser?.id ?? 0,
           vehicleId: MMTApplication.currentUser?.defaultLocationId ?? 0,
           remarks: '',

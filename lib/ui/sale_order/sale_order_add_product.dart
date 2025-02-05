@@ -4,10 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/product/product_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/product_category/product_category_cubit.dart';
+import 'package:mmt_mobile/common_widget/bottom_choice_sheet_widget.dart';
 import 'package:mmt_mobile/common_widget/constant_widgets.dart';
 import 'package:mmt_mobile/model/product/uom_lines.dart';
 import 'package:mmt_mobile/model/res_partner.dart';
 import 'package:mmt_mobile/src/enum.dart';
+import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/src/mmt_application.dart';
@@ -36,6 +38,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
   ResPartner? _customer;
   final List<TextEditingController> _pk = [];
   final List<TextEditingController> _pc = [];
+  final List<FocusNode> _focusNodeList = [];
 
   @override
   void initState() {
@@ -66,7 +69,10 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        appBar: AppBar(title: Text(widget.customer?.name ?? 'Customer 01')),
+        appBar: AppBar(
+          title: Text(widget.customer?.name ?? 'Customer 01'),
+          leading: BackButton(onPressed: () => context.rootPop()),
+        ),
         persistentFooterButtons: [
           BlocBuilder<ProductCubit, ProductState>(
             builder: (context, state) {
@@ -156,7 +162,10 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
             if (!(MMTApplication.selectedCompany?.useLooseUom ?? true)) {
               _pc.add(TextEditingController());
             }
+            //
             _pk.add(TextEditingController());
+            //
+            _focusNodeList.add(FocusNode());
             //
             return (MMTApplication.currentUser?.useLooseBox ?? false)
                 ? _productRowWithPKPC(
@@ -282,7 +291,11 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
   Widget _productRow({required ProductProduct product, required int position}) {
     return BlocBuilder<CartCubit, CartState>(builder: (context, state) {
       SaleOrderLine? deliveryItem = state.itemList
-          .where((element) => element.productId == product.id)
+          .where(
+            (element) =>
+                element.productId == product.id &&
+                element.uomLine?.uomId == product.uomId,
+          )
           .firstOrNull;
 
       _pk[position].text = deliveryItem?.pkQty?.toQty() ?? '';
@@ -320,6 +333,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
               width: 200,
               child: DropdownButton<UomLine>(
                 isExpanded: true,
+                autofocus: false,
                 value: deliveryItem?.uomLine ?? product.uomLines?.firstOrNull,
                 items: product.uomLines
                     ?.map((UomLine value) => DropdownMenuItem<UomLine>(
@@ -354,6 +368,14 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
               ),
             ).expanded(flex: 4),
             TextField(
+              focusNode: _focusNodeList[position],
+              onEditingComplete: () {
+                if (position < _focusNodeList.length) {
+                  FocusScope.of(context)
+                      .requestFocus(_focusNodeList[position + 1]);
+                }
+              },
+              textInputAction: TextInputAction.next,
               onTap: () {
                 _pk[position].selection = TextSelection(
                     baseOffset: 0, extentOffset: _pk[position].text.length);
@@ -426,7 +448,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
             controller: _searchProduct,
             // keyboardType: TextInputType.number,
             onChanged: (value) {
-              if (value != '') {
+              if (value.isNotEmpty) {
                 _productCubit.searchProduct(
                     text: value, categoryName: _filterProductCategory);
               } else {
