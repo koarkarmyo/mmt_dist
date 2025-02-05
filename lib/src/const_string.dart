@@ -1,6 +1,6 @@
 class ConstString {
   static const String appName = 'MMT Distribution';
-  static const String version = '1.0.00001';
+  static const String version = '1.0.00002';
   static const String welcome = 'Welcome';
   static const String history = 'History';
   static const String stockRequestPage = 'Stock request page';

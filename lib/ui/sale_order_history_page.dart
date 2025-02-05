@@ -193,11 +193,7 @@ class _SaleOrderHistoryPageState extends State<SaleOrderHistoryPage> {
                                             textAlign: TextAlign.center)),
                                     SizedBox(
                                       width: col3Width,
-                                      child: Text(
-                                          so.createDate?.format(
-                                                  format: DateTimeUtils
-                                                      .ddMmYYYFormat) ??
-                                              '',
+                                      child: Text(so.dateOrder ?? '',
                                           textAlign: TextAlign.center),
                                     ),
                                   ],

@@ -379,6 +379,7 @@ class DBConstant {
   static const String moveDate = 'date';
   static const String remarks = 'remarks';
   static const String reference = 'reference';
+  static const String isQuotation = 'is_quotation';
   static const String soNo = 'so_no';
   static const String batchNo = 'batch_no';
   static const String transferNo = 'doc_no';

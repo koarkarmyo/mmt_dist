@@ -20,6 +20,7 @@ class SaleOrder {
   bool? isUpload;
   String? writeDate;
   String? note;
+  String? dateOrder;
 
   SaleOrder({
     this.id,
@@ -37,6 +38,7 @@ class SaleOrder {
     this.note,
     this.warehouseId,
     this.warehouseName,
+    this.dateOrder,
   });
 
   // Map<String, dynamic> toJson() {
@@ -72,7 +74,8 @@ class SaleOrder {
       'write_date': writeDate,
       'warehouse_id': warehouseId,
       'warehouse_name': warehouseName,
-      'note': note
+      'note': note,
+      'date_order': dateOrder
     };
   }
 
@@ -90,6 +93,7 @@ class SaleOrder {
     writeDate = map['write_date'];
     warehouseId = map['warehouse_id'];
     warehouseName = map['warehouse_name'];
+    dateOrder = map['date_order'];
     note = map['note'];
   }
 
@@ -112,6 +116,7 @@ class SaleOrder {
         warehouseName: map['warehouse_name'],
         orderLines: lines,
         writeDate: map['write_date'],
+        dateOrder: map['date_order'],
         state: OrderStates.values
             .firstWhereOrNull((element) => element.name == map['state']),
         deliveryStatus: DeliveryStates.values.firstWhereOrNull(
@@ -135,6 +140,7 @@ class SaleOrder {
     bool? isUpload,
     String? writeDate,
     String? note,
+    String? dateOrder,
   }) {
     return SaleOrder(
       id: id ?? this.id,
@@ -152,6 +158,7 @@ class SaleOrder {
       isUpload: isUpload ?? this.isUpload,
       writeDate: writeDate ?? this.writeDate,
       note: note ?? this.note,
+      dateOrder: dateOrder ?? this.dateOrder,
     );
   }
 }

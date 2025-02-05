@@ -156,7 +156,7 @@ class MainSyncProcess {
       return;
     }
 
-    // try {
+    try {
       /// don't write like this, should be use [completer]
       /// api call
       ///
@@ -191,25 +191,25 @@ class MainSyncProcess {
         ),
       );
       //
-    // } on DioException catch (e) {
-    //   _syncProcessIsRunning = false;
-    //   _stopAutoSync = false;
-    //   _sendToView(_syncResponse(
-    //       name: actionName,
-    //       error: ApiErrorHandler.createError(e).values.first,
-    //       message: failMessage,
-    //       isFinished: true));
-    //   return;
-    // } catch (e) {
-    //   _syncProcessIsRunning = false;
-    //   _stopAutoSync = false;
-    //   _sendToView(_syncResponse(
-    //       name: actionName,
-    //       error: e.toString(),
-    //       message: failMessage,
-    //       isFinished: true));
-    //   return;
-    // }
+    } on DioException catch (e) {
+      _syncProcessIsRunning = false;
+      _stopAutoSync = false;
+      _sendToView(_syncResponse(
+          name: actionName,
+          error: ApiErrorHandler.createError(e).values.first,
+          message: failMessage,
+          isFinished: true));
+      return;
+    } catch (e) {
+      _syncProcessIsRunning = false;
+      _stopAutoSync = false;
+      _sendToView(_syncResponse(
+          name: actionName,
+          error: e.toString(),
+          message: failMessage,
+          isFinished: true));
+      return;
+    }
     // assign auto sync is running or not
     _syncProcessIsRunning = _autoSyncProcess.isNotEmpty;
 
@@ -285,55 +285,55 @@ class MainSyncProcess {
       _sendToView(_syncResponse(name: actionDescription, progress: progress));
     }
 
-    // try {
-    SyncProcess syncProcess = await _sendApiRequest(actionList.first,
-        limit: actionList.first.syncLimit);
+    try {
+      SyncProcess syncProcess = await _sendApiRequest(actionList.first,
+          limit: actionList.first.syncLimit);
 
-    if (syncProcess == SyncProcess.Paginated) {
-      await _startManualSync(actionList);
-    } else if (syncProcess == SyncProcess.Fail) {
+      if (syncProcess == SyncProcess.Paginated) {
+        await _startManualSync(actionList);
+      } else if (syncProcess == SyncProcess.Fail) {
+        _sendToView(
+          _syncResponse(
+              name: actionDescription,
+              error: failMessage,
+              message: failMessage,
+              isFinished: true),
+        );
+        return;
+      }
+
+      if (actionList.isEmpty) {
+        return;
+      }
+      actionList.removeAt(0);
+
+      // send
+      _sendToView(_syncResponse(
+        name: actionDescription,
+        progress: actionList.isEmpty ? 1.0 : progress,
+        isFinished: actionList.isEmpty,
+      ));
+    } on DioError catch (e) {
+      _syncProcessIsRunning = false;
+      _stopAutoSync = false;
       _sendToView(
         _syncResponse(
             name: actionDescription,
-            error: failMessage,
+            error: ApiErrorHandler.createError(e).values.first,
             message: failMessage,
             isFinished: true),
       );
       return;
-    }
-
-    if (actionList.isEmpty) {
+    } catch (e) {
+      _syncProcessIsRunning = false;
+      _stopAutoSync = false;
+      _sendToView(_syncResponse(
+          name: actionDescription,
+          error: e.toString(),
+          message: failMessage,
+          isFinished: true));
       return;
     }
-    actionList.removeAt(0);
-
-    // send
-    _sendToView(_syncResponse(
-      name: actionDescription,
-      progress: actionList.isEmpty ? 1.0 : progress,
-      isFinished: actionList.isEmpty,
-    ));
-    // } on DioError catch (e) {
-    //   _syncProcessIsRunning = false;
-    //   _stopAutoSync = false;
-    //   _sendToView(
-    //     _syncResponse(
-    //         name: actionDescription,
-    //         error: ApiErrorHandler.createError(e).values.first,
-    //         message: failMessage,
-    //         isFinished: true),
-    //   );
-    //   return;
-    // } catch (e) {
-    //   _syncProcessIsRunning = false;
-    //   _stopAutoSync = false;
-    //   _sendToView(_syncResponse(
-    //       name: actionDescription,
-    //       error: e.toString(),
-    //       message: failMessage,
-    //       isFinished: true));
-    //   return;
-    // }
     // assign auto sync is running or not
     _syncProcessIsRunning = actionList.isNotEmpty;
 
