@@ -875,7 +875,7 @@ class SyncUtils {
         .toList();
 
     List<Map<String, dynamic>>? saleOrderLineJsonList =
-        orderLines.map((e) => e.toJsonDB()).toList();
+        orderLines.map((e) => e.toJson()).toList();
 
     // delete response row from database
     await _helper.deleteRows(
@@ -900,11 +900,11 @@ class SyncUtils {
     debugPrint('ffffffff::::bdy::$detailInsertSuccess');
 
     if (detailInsertSuccess && hdrInsertSuccess) {
-      return await _insertOrUpdateLastWriteDate(
-              actionName: actionName,
-              lastWriteDate: baseResponse.data!.last.writeDate ?? '')
-          ? SyncProcess.Paginated
-          : SyncProcess.Fail;
+      // return await _insertOrUpdateLastWriteDate(
+      //         actionName: actionName,
+      //         lastWriteDate: baseResponse.data!.last.writeDate ?? '')
+      //     ? SyncProcess.Paginated
+      //     : SyncProcess.Fail;
     }
 
     return detailInsertSuccess && hdrInsertSuccess

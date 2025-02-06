@@ -8,6 +8,7 @@ import 'package:mmt_mobile/common_widget/bottom_choice_sheet_widget.dart';
 import 'package:mmt_mobile/common_widget/constant_widgets.dart';
 import 'package:mmt_mobile/model/product/uom_lines.dart';
 import 'package:mmt_mobile/model/res_partner.dart';
+import 'package:mmt_mobile/model/sale_order/sale_order_6/sale_order.dart';
 import 'package:mmt_mobile/src/enum.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
@@ -21,9 +22,10 @@ import '../../src/const_string.dart';
 import '../../src/style/app_color.dart';
 
 class SaleOrderAddProductPage extends StatefulWidget {
-  const SaleOrderAddProductPage({super.key, this.customer});
-
+  final SaleOrder? saleOrder;
   final ResPartner? customer;
+
+  const SaleOrderAddProductPage({super.key, this.customer, this.saleOrder});
 
   @override
   State<SaleOrderAddProductPage> createState() =>
@@ -356,7 +358,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                         productId: product.id,
                         productName: product.name,
                         pkQty: deliveryItem?.pkQty,
-                        singleItemPrice: price,
+                        priceUnit: price,
                         productUomQty: deliveryItem?.productUomQty ?? 0.0,
                         uomLine: newValue,
                       ),
@@ -401,7 +403,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                     productName: product.name,
                     pkQty: double.tryParse(value),
                     productUomQty: double.tryParse(value),
-                    singleItemPrice: price,
+                    priceUnit: price,
                     uomLine:
                         deliveryItem?.uomLine ?? product.uomLines?.firstOrNull,
                   ),

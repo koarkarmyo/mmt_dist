@@ -8,6 +8,7 @@ import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/src/mmt_application.dart';
+import 'package:mmt_mobile/utils/date_time_utils.dart';
 
 import '../../model/sale_order/sale_order_6/sale_order.dart';
 import '../../src/const_string.dart';
@@ -16,7 +17,9 @@ import '../../src/style/app_color.dart';
 import '../../sync/sync_utils/main_sync_process.dart';
 
 class SaleSummaryPage extends StatefulWidget {
-  const SaleSummaryPage({super.key});
+  final SaleOrder? saleOrder;
+
+  const SaleSummaryPage({super.key, this.saleOrder});
 
   @override
   State<SaleSummaryPage> createState() => _SaleSummaryPageState();
@@ -159,7 +162,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
           //   thickness: 16,
           // ),
           _discountWidget(),
-          _noteWidget(),
+          // _noteWidget(),
           _totalWidget()
         ],
       ),
@@ -337,7 +340,9 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
         child: Row(
           children: [
             const Icon(Icons.date_range).padding(padding: 8.horizontalPadding),
-            Text(_deliveryDate.value.toString()),
+            Text(_deliveryDate.value != null
+                ? DateTimeUtils.ddMmYYYHMSsFormat.format(_deliveryDate.value!)
+                : ''),
           ],
         ),
       ),
@@ -406,7 +411,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
             (MMTApplication.currentUser?.useLooseBox ?? false)
                 ? Text(itemPrice)
                 : Text(
-                    "${item.productUomQty.toString()} ${item.uomLine?.uomName}  x ${item.singleItemPrice ?? 0} K"),
+                    "${item.productUomQty.toString()} ${item.uomLine?.uomName}  x ${item.priceUnit ?? 0} K"),
             Text(
               "Discount ${item.discountPercent ?? 0} %",
               style: TextStyle(color: AppColors.dangerColor),

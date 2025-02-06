@@ -16,7 +16,7 @@ class SaleOrderLine {
   UomLine? pcUomLine;
   double? pkQty;
   double? pcQty;
-  double? singleItemPrice;
+  double? priceUnit;
   double? subTotal;
   double? singlePKPrice;
   double? singlePCPrice;
@@ -37,7 +37,7 @@ class SaleOrderLine {
     this.pcUomLine,
     this.pkQty,
     this.pcQty,
-    this.singleItemPrice,
+    this.priceUnit,
     this.subTotal,
     this.singlePCPrice,
     this.singlePKPrice,
@@ -60,7 +60,7 @@ class SaleOrderLine {
     productUomQty = json['product_uom_qty'];
     productUom = json['product_uom'];
     productUomName = json['product_uom_name'];
-    singleItemPrice = json['price_unit'];
+    priceUnit = json['price_unit'];
   }
 
   SaleOrderLine.fromJsonDB(Map<String, dynamic> json) {
@@ -72,12 +72,13 @@ class SaleOrderLine {
     saleType = SaleType.values.firstWhereOrNull(
             (element) => element.name.toLowerCase() == json['sale_type']) ??
         SaleType.sale;
+    pkQty = json['product_uom_qty'];
     // saleType =
     //     json['sale_type'] == SaleType.sale.name ? SaleType.sale : SaleType.foc;
     productUomQty = json['product_uom_qty'];
     productUom = json['product_uom'];
     productUomName = json['product_uom_name'];
-    singleItemPrice = json['price_unit'];
+    priceUnit = json['price_unit'];
   }
 
   Map<String, dynamic> toJson() {
@@ -89,11 +90,9 @@ class SaleOrderLine {
     data['product_name'] = productName;
     data['sale_type'] = saleType?.name;
     data['product_uom_qty'] = productUomQty;
-    data['pk_qty'] = pkQty;
-    data['pc_qty'] = pcQty;
-    data['pc_uomline'] = pcUomLine?.toJson();
-    data['pk_uomLine'] = pkUomLine?.toJson();
-    data['price_unit'] = singleItemPrice;
+    // data['pk_qty'] = pkQty;
+    // data['pc_qty'] = pcQty;
+    data['price_unit'] = priceUnit;
     data['product_uom'] = productUom;
     data['product_uom_name'] = productUomName;
     return data;
@@ -115,6 +114,7 @@ class SaleOrderLine {
   // '${DBConstant.discount} DOUBLE,'
   // '${DBConstant.priceSubtotal} DOUBLE'
 
+
   Map<String, dynamic> toJsonDB() {
     Map<String, dynamic> data = {};
     data['product_id'] = productId;
@@ -124,7 +124,7 @@ class SaleOrderLine {
     data[DBConstant.productUomQty] = productUomQty;
     data[DBConstant.productUom] = uomLine?.uomId;
     data[DBConstant.productUomName] = uomLine?.uomName;
-    data[DBConstant.priceUnit] = singleItemPrice;
+    data[DBConstant.priceUnit] = priceUnit;
     // '${DBConstant.priceUnit} DOUBLE,'
     // '${DBConstant.discount} DOUBLE,'
     // '${DBConstant.priceSubtotal} DOUBLE'
@@ -141,7 +141,7 @@ class SaleOrderLine {
     map['name'] = productName;
     // map['state'] = state;
     map['product_uom_qty'] = productUomQty;
-    map['price_unit'] = singleItemPrice;
+    map['price_unit'] = priceUnit;
     map['product_uom'] = productUom;
     map['product_uom_name'] = productUomName;
     return map;
@@ -160,7 +160,7 @@ class SaleOrderLine {
     UomLine? pcUomLine,
     double? pkQty,
     double? pcQty,
-    double? singleItemPrice,
+    double? priceUnit,
     double? subTotal,
     double? singlePKPrice,
     double? singlePCPrice,
@@ -177,7 +177,7 @@ class SaleOrderLine {
         pcQty: pcQty ?? this.pcQty,
         pkQty: pkQty ?? this.pkQty,
         productUomQty: productUomQty ?? this.productUomQty,
-        singleItemPrice: singleItemPrice ?? this.singlePCPrice,
+        priceUnit: priceUnit ?? this.priceUnit,
         singlePCPrice: singlePCPrice ?? this.singlePCPrice,
         singlePKPrice: singlePKPrice ?? this.singlePKPrice,
         subTotal: subTotal ?? this.subTotal,
@@ -186,6 +186,6 @@ class SaleOrderLine {
 
   @override
   String toString() {
-    return 'SaleOrderLine{id: $id, orderNo: $orderNo, orderId: $orderId, productId: $productId, productName: $productName, saleType: $saleType, productUomQty: $productUomQty, uomLine: $uomLine, pkUomLine: $pkUomLine, pcUomLine: $pcUomLine, pkQty: $pkQty, pcQty: $pcQty, singleItemPrice: $singleItemPrice, subTotal: $subTotal, singlePKPrice: $singlePKPrice, singlePCPrice: $singlePCPrice, discountPercent: $discountPercent}';
+    return 'SaleOrderLine{id: $id, orderNo: $orderNo, orderId: $orderId, productId: $productId, productName: $productName, saleType: $saleType, productUomQty: $productUomQty, uomLine: $uomLine, pkUomLine: $pkUomLine, pcUomLine: $pcUomLine, pkQty: $pkQty, pcQty: $pcQty, singleItemPrice: $priceUnit, subTotal: $subTotal, singlePKPrice: $singlePKPrice, singlePCPrice: $singlePCPrice, discountPercent: $discountPercent}';
   }
 }

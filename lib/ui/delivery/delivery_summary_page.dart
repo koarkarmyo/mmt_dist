@@ -369,14 +369,14 @@ class _DeliverySummaryPageState extends State<DeliverySummaryPage> {
       subtitle: (MMTApplication.currentUser?.useLooseBox ?? false)
           ? Text(itemPrice)
           : Text(
-              "${item.productUomQty.toString()} ${item.uomLine?.uomName}  x ${item.singleItemPrice ?? 0} K"),
+              "${item.productUomQty.toString()} ${item.uomLine?.uomName}  x ${item.priceUnit ?? 0} K"),
       trailing: (MMTApplication.currentUser?.useLooseBox ?? false)
           ? Text(
               " ${item.subTotal.toString()} K",
               style: const TextStyle(fontSize: 18),
             )
           : Text(
-              "${(item.productUomQty ?? 0) * (item.singleItemPrice ?? 0)} K",
+              "${(item.productUomQty ?? 0) * (item.priceUnit ?? 0)} K",
               style: const TextStyle(fontSize: 18),
             ).padding(padding: 8.horizontalPadding),
     );

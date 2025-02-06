@@ -42,7 +42,33 @@ class CartCubit extends Cubit<CartState> {
       state.itemList.add(saleItem);
     }
 
-    debugPrint("Add Sale Item");
+    emit(state.copyWith(
+      itemList: state.itemList,
+      state: BlocCRUDProcessState.updateSuccess,
+    ));
+  }
+
+  void addProductList(
+      {required List<SaleOrderLine> list, LooseBoxType? looseBoxType}) async {
+    if (_priceListItems.isEmpty) {
+      _priceListItems = await PriceListDbRepo.instance.getAllPriceList();
+    }
+
+    list.forEach((saleItem) {
+      debugPrint("Cart Add : ${saleItem.toJson()}");
+      int index = state.itemList.indexWhere(
+        (element) => element.productId == saleItem.productId,
+      );
+      saleItem =
+          _calculatePrice(orderLine: saleItem, looseBoxType: looseBoxType);
+      saleItem.saleType = SaleType.sale;
+
+      if (index > -1) {
+        state.itemList[index] = saleItem;
+      } else {
+        state.itemList.add(saleItem);
+      }
+    });
 
     emit(state.copyWith(
       itemList: state.itemList,
@@ -169,19 +195,19 @@ class CartCubit extends Cubit<CartState> {
           )
           .firstOrNull;
       //
-      orderLine.singleItemPrice = price?.fixedPrice ?? 0;
+      orderLine.priceUnit = price?.fixedPrice ?? 0;
       //
       debugPrint(
-          "Single Item Price : ${orderLine.singleItemPrice} : Price List : ${_priceListItems.length} ");
+          "Single Item Price : ${orderLine.priceUnit} : Price List : ${_priceListItems.length} ");
 
       // orderLine.subTotal =
       //     (orderLine.productUomQty ?? 0) * (orderLine.singleItemPrice ?? 0);
     }
 
-    double singleItemPriceWithDisc = (orderLine.singleItemPrice ?? 0) -
-        ((orderLine.singleItemPrice ?? 0) *
+    double singleItemPriceWithDisc = (orderLine.priceUnit ?? 0) -
+        ((orderLine.priceUnit ?? 0) *
             ((orderLine.discountPercent ?? 0) / 100));
-    orderLine.singleItemPrice = singleItemPriceWithDisc;
+    orderLine.priceUnit = singleItemPriceWithDisc;
 
     orderLine.subTotal =
         (orderLine.pkQty ?? 0) * (orderLine.singlePKPrice ?? 0) +
@@ -202,14 +228,14 @@ class CartCubit extends Cubit<CartState> {
         if ((element.pcQty ?? 0) > 0) {
           SaleOrderLine saleOrderLine = element.copyWith(
             productUomQty: element.pcQty,
-            singleItemPrice: element.singleItemPrice,
+            priceUnit: element.priceUnit,
             uomLine: element.pcUomLine,
           );
           saleOrderLineList.add(saleOrderLine);
         }
         if ((element.pkQty ?? 0) > 0) {
           SaleOrderLine saleOrderLine = element.copyWith(
-              singleItemPrice: element.singleItemPrice,
+              priceUnit: element.priceUnit,
               productUomQty: element.pkQty,
               uomLine: element.pkUomLine);
           saleOrderLineList.add(saleOrderLine);
@@ -220,14 +246,14 @@ class CartCubit extends Cubit<CartState> {
       (element) {
         if ((element.pcQty ?? 0) > 0) {
           SaleOrderLine saleOrderLine = element.copyWith(
-              singleItemPrice: element.singleItemPrice,
+              priceUnit: element.priceUnit,
               productUomQty: element.pcQty,
               uomLine: element.pcUomLine);
           saleOrderLineList.add(saleOrderLine);
         }
         if ((element.pkQty ?? 0) > 0) {
           SaleOrderLine saleOrderLine = element.copyWith(
-              singleItemPrice: element.singleItemPrice,
+              priceUnit: element.priceUnit,
               productUomQty: element.pkQty,
               uomLine: element.pkUomLine);
           saleOrderLineList.add(saleOrderLine);
@@ -239,14 +265,14 @@ class CartCubit extends Cubit<CartState> {
       (element) {
         if ((element.pcQty ?? 0) > 0) {
           SaleOrderLine saleOrderLine = element.copyWith(
-              singleItemPrice: element.singleItemPrice,
+              priceUnit: element.priceUnit,
               productUomQty: element.pcQty,
               uomLine: element.pcUomLine);
           saleOrderLineList.add(saleOrderLine);
         }
         if ((element.pkQty ?? 0) > 0) {
           SaleOrderLine saleOrderLine = element.copyWith(
-              singleItemPrice: element.singleItemPrice,
+              priceUnit: element.priceUnit,
               productUomQty: element.pkQty,
               uomLine: element.pkUomLine);
           saleOrderLineList.add(saleOrderLine);

@@ -74,9 +74,9 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
     double productUomQty = 0;
     saleOrderLineList.forEach(
       (element) {
-        singleItemPrice = element.singleItemPrice ?? 0;
+        singleItemPrice = element.priceUnit ?? 0;
         discountPercent = element.discountPercent ?? 0;
-        productUomQty = element.productUomQty ?? 0;
+        productUomQty = element.pkQty ?? 0;
         subtotal +=
             (singleItemPrice - (singleItemPrice * (discountPercent / 100))) *
                 productUomQty;

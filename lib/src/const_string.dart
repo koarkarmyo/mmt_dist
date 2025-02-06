@@ -143,5 +143,5 @@ class ConstString {
   static const String stockRequestDate = "Stock request date";
   static const String stockOrderSummary = "Stock order summary";
   static const String requiredStar = "*";
-
+  static const String areYouSureToExit = "Are you sure to exit!";
 }

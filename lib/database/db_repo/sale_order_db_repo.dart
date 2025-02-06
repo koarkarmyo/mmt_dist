@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:mmt_mobile/model/product/uom_lines.dart';
 import 'package:mmt_mobile/src/enum.dart';
 import 'package:mmt_mobile/src/extension/nullable_extension.dart';
 import 'package:mmt_mobile/utils/number_series_generator.dart';
@@ -6,6 +8,7 @@ import '../../model/sale_order/sale_order_6/sale_order.dart';
 import '../../model/sale_order/sale_order_line.dart';
 import '../base_db_repo.dart';
 import '../db_constant.dart';
+import 'package:collection/collection.dart';
 
 class SaleOrderDBRepo extends BaseDBRepo {
   static final SaleOrderDBRepo instance = SaleOrderDBRepo._();
@@ -38,7 +41,7 @@ class SaleOrderDBRepo extends BaseDBRepo {
         },
       );
 
-      bool saveSaleOrderLineSuccess = await helper.insertDataListBath(
+      await helper.insertDataListBath(
           DBConstant.saleOrderLineTable, saleOrderLineMapList);
 
       return true;
@@ -52,6 +55,15 @@ class SaleOrderDBRepo extends BaseDBRepo {
       String? customer,
       String? so,
       List<String>? fromToDate}) async {
+    List<Map<String, dynamic>> uomJsonList =
+        await helper.readAllData(tableName: DBConstant.productUomTable);
+    //
+    List<UomLine> uomLines = [];
+    uomJsonList.forEach((element) {
+      debugPrint('xxxxxxxx:::${element.toString()}');
+      uomLines.add(UomLine.fromJsonDB(element));
+    });
+    //
     List<SaleOrder> saleOrderList = [];
     String query = '';
     List whereArgs = [];
@@ -78,7 +90,7 @@ class SaleOrderDBRepo extends BaseDBRepo {
 
     if (fromToDate.isNotNull && fromToDate!.length > 1) {
       // ${fromToDate[1]}
-      query += '${addAnd(query)} ${DBConstant.date} (BETWEEN ? AND ?)';
+      query += '${addAnd(query)} ${DBConstant.dateOrder} BETWEEN ? AND ? ';
       whereArgs.add(fromToDate[0]);
       whereArgs.add(fromToDate[1]);
     }
@@ -102,7 +114,10 @@ class SaleOrderDBRepo extends BaseDBRepo {
     List<SaleOrderLine> lines = [];
 
     lineList.forEach((e) {
-      lines.add(SaleOrderLine.fromJson(e));
+      SaleOrderLine line = SaleOrderLine.fromJson(e);
+      line.uomLine =
+          uomLines.firstWhereOrNull((e) => e.uomId == line.productUom);
+      lines.add(line);
     });
 
     List<SaleOrder> tmp = [];

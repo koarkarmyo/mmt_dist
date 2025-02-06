@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:mmt_mobile/business%20logic/bloc/sale_order/sale_order_history/sale_order_history_cubit.dart';
+import 'package:mmt_mobile/common_widget/bottom_choice_sheet_widget.dart';
 import 'package:mmt_mobile/common_widget/constant_widgets.dart';
+import 'package:mmt_mobile/model/res_partner.dart';
+import 'package:mmt_mobile/route/route_list.dart';
 import 'package:mmt_mobile/src/const_string.dart';
+import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
+import 'package:mmt_mobile/src/mmt_application.dart';
 import 'package:mmt_mobile/src/style/app_color.dart';
 import 'package:mmt_mobile/ui/widgets/date_range_picker_dialog.dart';
 import 'package:mmt_mobile/ui/widgets/search_box_text_field_widget.dart';
@@ -41,7 +46,7 @@ class _SaleOrderHistoryPageState extends State<SaleOrderHistoryPage> {
 
   @override
   void initState() {
-    callFilter();
+    // callFilter();
     super.initState();
   }
 
@@ -166,37 +171,56 @@ class _SaleOrderHistoryPageState extends State<SaleOrderHistoryPage> {
                             itemCount: state.saleOrderList.length,
                             itemBuilder: (context, index) {
                               SaleOrder so = state.saleOrderList[index];
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8),
-                                      width: col1Width,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(so.name ?? ''),
-                                          Text(so.partnerName ?? ''),
-                                        ],
+                              return GestureDetector(
+                                onTap: () {
+                                  MMTApplication.currentCustomer = ResPartner(
+                                    id: so.partnerId,
+                                    name: so.partnerName,
+                                  );
+                                  //
+                                  so.orderLines?.forEach((element) {
+                                    debugPrint(element.toJson().toString());
+                                  });
+                                  context.pushTo(
+                                      route: RouteList.saleOrderPage,
+                                      args: {
+                                        'customer':
+                                            MMTApplication.currentCustomer,
+                                        'sale_order': so,
+                                      });
+                                },
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8),
+                                        width: col1Width,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(so.name ?? ''),
+                                            Text(so.partnerName ?? ''),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(
-                                        width: col2Width,
-                                        child: Text(
-                                            so.state?.name
-                                                    .toFirstLetterCapital() ??
-                                                '',
-                                            textAlign: TextAlign.center)),
-                                    SizedBox(
-                                      width: col3Width,
-                                      child: Text(so.dateOrder ?? '',
-                                          textAlign: TextAlign.center),
-                                    ),
-                                  ],
+                                      SizedBox(
+                                          width: col2Width,
+                                          child: Text(
+                                              so.state?.name
+                                                      .toFirstLetterCapital() ??
+                                                  '',
+                                              textAlign: TextAlign.center)),
+                                      SizedBox(
+                                        width: col3Width,
+                                        child: Text(so.dateOrder ?? '',
+                                            textAlign: TextAlign.center),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               );
                             },
@@ -232,96 +256,109 @@ class _SaleOrderHistoryPageState extends State<SaleOrderHistoryPage> {
     //   );
   }
 
-  _createDeliveryFilterWidget() {
-    return StatefulBuilder(builder: (context, innerState) {
-      return PopupMenuButton<DeliveryFilterTypes>(
-        color: Colors.blue,
-        onSelected: (value) {},
-        itemBuilder: (context) {
-          return [
-            for (final filterType in DeliveryFilterTypes.values)
-              PopupMenuItem(
-                onTap: () {
-                  if (filterType == DeliveryFilterTypes.all) {
-                    filterList.clear();
-                    filterList.add(filterType);
-                  } else {
-                    if (filterList.contains(DeliveryFilterTypes.all)) {
-                      filterList.remove(DeliveryFilterTypes.all);
-                    }
-
-                    if (filterList.contains(filterType)) {
-                      filterList.remove(filterType);
-                    } else {
-                      filterList.add(filterType);
-                    }
-                    if (filterList.isEmpty) {
-                      filterList.add(DeliveryFilterTypes.all);
-                    }
-                  }
-                  innerState(() {});
-                  callFilter();
-                },
-                value: filterType,
-                child: Row(
-                  children: [
-                    Icon(filterList.contains(filterType)
-                        ? Icons.check_box
-                        : Icons.check_box_outline_blank_rounded),
-                    ConstantWidgets.SizedBoxWidthL,
-                    Text('${filterType.getConstValue()}')
-                  ],
-                ),
-              ),
-          ];
-        },
-        child: Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(color: Colors.white),
-          ),
-          child: const Icon(Icons.tune),
-        ),
-      );
-    });
-  }
+  // _createDeliveryFilterWidget() {
+  //   return StatefulBuilder(builder: (context, innerState) {
+  //     return PopupMenuButton<DeliveryFilterTypes>(
+  //       color: Colors.blue,
+  //       onSelected: (value) {},
+  //       itemBuilder: (context) {
+  //         return [
+  //           for (final filterType in DeliveryFilterTypes.values)
+  //             PopupMenuItem(
+  //               onTap: () {
+  //                 if (filterType == DeliveryFilterTypes.all) {
+  //                   filterList.clear();
+  //                   filterList.add(filterType);
+  //                 } else {
+  //                   if (filterList.contains(DeliveryFilterTypes.all)) {
+  //                     filterList.remove(DeliveryFilterTypes.all);
+  //                   }
+  //
+  //                   if (filterList.contains(filterType)) {
+  //                     filterList.remove(filterType);
+  //                   } else {
+  //                     filterList.add(filterType);
+  //                   }
+  //                   if (filterList.isEmpty) {
+  //                     filterList.add(DeliveryFilterTypes.all);
+  //                   }
+  //                 }
+  //                 innerState(() {});
+  //                 callFilter();
+  //               },
+  //               value: filterType,
+  //               child: Row(
+  //                 children: [
+  //                   Icon(filterList.contains(filterType)
+  //                       ? Icons.check_box
+  //                       : Icons.check_box_outline_blank_rounded),
+  //                   ConstantWidgets.SizedBoxWidthL,
+  //                   Text('${filterType.getConstValue()}')
+  //                 ],
+  //               ),
+  //             ),
+  //         ];
+  //       },
+  //       child: Container(
+  //         width: 50,
+  //         height: 50,
+  //         decoration: BoxDecoration(
+  //           borderRadius: BorderRadius.circular(5),
+  //           border: Border.all(color: Colors.white),
+  //         ),
+  //         child: const Icon(Icons.tune),
+  //       ),
+  //     );
+  //   });
+  // }
 
   void callFilter() {
-    context.read<SaleOrderHistoryCubit>().fetch(so: _name, customer: _customer);
-
+    String? start;
+    String? end;
     if (dateRange.isNotEmpty) {
       DateTime startDate = DateTime(
-          dateRange.last.year, dateRange.last.month, dateRange.last.day);
+          dateRange.first.year, dateRange.first.month, dateRange.first.day);
+      start = DateTimeUtils.ddMmYYYFormatSlug.format(startDate);
       DateTime endDate = DateTime(
           dateRange.last.year, dateRange.last.month, dateRange.last.day);
-      // context.read<SaleOrderHistoryCubit>().fetch();
-      // Fluttertoast.showToast(
-      //     msg: "${dateRange.first.toString()} \n${endDate.toString()}",
-      //     toastLength: Toast.LENGTH_SHORT,
-      //     gravity: ToastGravity.BOTTOM,
-      //     timeInSecForIosWeb: 1,
-      //     textColor: Colors.white);
-
-      //   _orderHistoryBloc.add(OrderHistoryCustFetchByDateRangeEvent(
-      //       soNo: name,
-      //       customerName: customerName,
-      //       startDate: dateRange.first.toString(),
-      //       endDate: endDate.toString(),
-      //       custId: -1,
-      //       saleOrderReqType: saleOrderReqTypes,
-      //       deliveryStatus: DeliveryStatus.assigned,
-      //       deliveryFilterType: _deliveryFilterTypes,
-      //       filterList: filterList));
-      // } else {
-      //   _orderHistoryBloc.add(OrderHistoryCustFetchByDateRangeEvent(
-      //       deliveryStatus: DeliveryStatus.assigned,
-      //       soNo: name,
-      //       custId: -1,
-      //       saleOrderReqType: saleOrderReqTypes,
-      //       deliveryFilterType: _deliveryFilterTypes,
-      //       filterList: filterList));
+      end = DateTimeUtils.ddMmYYYFormatSlug.format(endDate);
     }
+    context.read<SaleOrderHistoryCubit>().fetch(
+        so: _name,
+        customer: _customer,
+        fromToDate: start != null && end != null ? [start, end] : null);
+
+    // if (dateRange.isNotEmpty) {
+    //   DateTime startDate = DateTime(
+    //       dateRange.last.year, dateRange.last.month, dateRange.last.day);
+    //   DateTime endDate = DateTime(
+    //       dateRange.last.year, dateRange.last.month, dateRange.last.day);
+    // context.read<SaleOrderHistoryCubit>().fetch();
+    // Fluttertoast.showToast(
+    //     msg: "${dateRange.first.toString()} \n${endDate.toString()}",
+    //     toastLength: Toast.LENGTH_SHORT,
+    //     gravity: ToastGravity.BOTTOM,
+    //     timeInSecForIosWeb: 1,
+    //     textColor: Colors.white);
+
+    //   _orderHistoryBloc.add(OrderHistoryCustFetchByDateRangeEvent(
+    //       soNo: name,
+    //       customerName: customerName,
+    //       startDate: dateRange.first.toString(),
+    //       endDate: endDate.toString(),
+    //       custId: -1,
+    //       saleOrderReqType: saleOrderReqTypes,
+    //       deliveryStatus: DeliveryStatus.assigned,
+    //       deliveryFilterType: _deliveryFilterTypes,
+    //       filterList: filterList));
+    // } else {
+    //   _orderHistoryBloc.add(OrderHistoryCustFetchByDateRangeEvent(
+    //       deliveryStatus: DeliveryStatus.assigned,
+    //       soNo: name,
+    //       custId: -1,
+    //       saleOrderReqType: saleOrderReqTypes,
+    //       deliveryFilterType: _deliveryFilterTypes,
+    //       filterList: filterList));
+    // }
   }
 }

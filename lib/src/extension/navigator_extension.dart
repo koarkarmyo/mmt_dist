@@ -8,6 +8,7 @@ import '../../business logic/bloc/bloc_crud_process_state.dart';
 import '../../business logic/bloc/cust_visit/cust_visit_cubit.dart';
 import '../../common_widget/alert_dialog.dart';
 import '../../common_widget/text_widget.dart';
+import '../../ui/widgets/confirm_dialog_widget.dart';
 import '../style/app_color.dart';
 
 extension NavigatorExtension on BuildContext {
@@ -83,6 +84,16 @@ extension SnackBarCustom on BuildContext {
     );
   }
 
+  Future<bool?> showConfirmDialog(
+      {required String confirmQuestion, required BuildContext context}) async {
+    return await showDialog(
+      context: context,
+      builder: (context) {
+        return ConfirmDialogWidget(confirmQuestion: confirmQuestion);
+      },
+    );
+  }
+
   /// [BuildContext]
   /// return success after clock out or not
   Future<bool?> showClockInOutDialog(
@@ -143,7 +154,8 @@ extension SnackBarCustom on BuildContext {
                           onPressed: () {
                             if (MMTApplication.currentCustomer != null) {
                               context.read<CustVisitCubit>().saveCustVisit(
-                                  customer: MMTApplication.currentCustomer!, type:custVisitType);
+                                  customer: MMTApplication.currentCustomer!,
+                                  type: custVisitType);
                             }
                           },
                           child: Text(
