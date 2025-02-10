@@ -242,6 +242,7 @@ class _SaleOrderHistoryPageState extends State<SaleOrderHistoryPage> {
   void _dateFilter() {
     _lQty = 0;
     _bQty = 0;
+  }
     // if (_filter == SaleOrderReportFilter.unsoldProduct) {
     //   _saleOrderReportBloc.add(
     //     FetchUnsoldProductReportEvent(
@@ -254,7 +255,7 @@ class _SaleOrderHistoryPageState extends State<SaleOrderHistoryPage> {
     //         startDate: dateRange.first.toString(),
     //         endDate: dateRange.last.toString()),
     //   );
-  }
+  // }
 
   // _createDeliveryFilterWidget() {
   //   return StatefulBuilder(builder: (context, innerState) {
