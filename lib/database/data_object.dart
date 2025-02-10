@@ -512,6 +512,30 @@ class DataObject {
     }
   }
 
+  Future<List<CustVisit>> getCustVisit(
+      {required String date, int? saleOrderTypeId}) async {
+    List<CustVisit> custVisits = [];
+    List args = ['$date%'];
+    String saleOrderTypeQuery = '';
+    if (saleOrderTypeId != null) {
+      saleOrderTypeQuery = 'AND ${DBConstant.saleOrderTypeId} =?';
+      args.add(1);
+    }
+    List<Map<String, dynamic>> jsonList =
+    await DatabaseHelper.instance.readDataByWhereArgs(
+      tableName: DBConstant.custVisitTable,
+      where: '${DBConstant.docDate} LIKE ? $saleOrderTypeQuery',
+      whereArgs: args,
+    );
+
+    for (Map<String, dynamic> jsonV in jsonList) {
+      CustVisit custVisit = CustVisit.fromJson(jsonV);
+      custVisits.add(custVisit);
+    }
+
+    return custVisits;
+  }
+
 // Future<void> updateVehicleInventory(
 //     List<VehicleInventoryModel> vehicleInventoryList) async {
 //   await Future.forEach<VehicleInventoryModel>(vehicleInventoryList,

@@ -1,7 +1,9 @@
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mmt_mobile/model/product/uom_lines.dart';
 import 'package:mmt_mobile/model/sale_order/sale_order_line.dart';
+import 'package:mmt_mobile/model/stock_picking/stock_picking_model.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
@@ -32,7 +34,7 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
 
   Function(int productId)? _removeItemFunction;
 
-  String? extraType;
+  SaleType? extraType;
 
   @override
   void initState() {
@@ -67,7 +69,7 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
     if (data != null) {
       extraType = data['extra_type'];
       _customer = data['customer'];
-      if (data['extra_type'] == 'foc') {
+      if (data['extra_type'] == SaleType.foc) {
         _addItemFunction =
             (deliveryItem) => _cartCubit.addCartFocItem(focItem: deliveryItem);
         _removeItemFunction =
@@ -101,7 +103,7 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
           }, icon: BlocBuilder<CartCubit, CartState>(
             builder: (context, state) {
               return Badge(
-                  label: Text((extraType == 'foc')
+                  label: Text((extraType == SaleType.foc)
                       ? state.focItemList.length.toString()
                       : state.couponList.length.toString()),
                   child: const Icon(Icons.shopping_cart));
@@ -231,14 +233,16 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, state) {
         List<SaleOrderLine> _itemList = [];
-        if (extraType == 'foc') {
+        if (extraType == SaleType.foc) {
           _itemList.addAll(state.focItemList);
-        } else if (extraType == 'coupon') {
+        } else if (extraType == SaleType.coupon) {
           _itemList.addAll(state.couponList);
         }
 
         int index = _itemList.indexWhere(
-          (element) => element.productId == product.id,
+          (element) =>
+              element.productId == product.id &&
+              element.saleType == SaleType.foc,
         );
 
         return ListTile(
@@ -248,6 +252,13 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
                 _addItemFunction!(SaleOrderLine(
                   productId: product.id,
                   productName: product.name,
+                  saleType: SaleType.foc,
+                  pkQty: 1,
+                  pkUomLine: product.uomLines?.firstOrNull,
+                  priceUnit: 1,
+                  singlePKPrice: 0,
+                  singlePCPrice: 0,
+                  uomLine: product.uomLines?.firstOrNull,
                 ));
               }
             } else {
@@ -261,7 +272,7 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
           subtitle:
               Text("Available Qty: ${((0).toString())} ${product.uomName}"),
           trailing: (index >= 0)
-              ? Icon(
+              ? const Icon(
                   Icons.check_circle,
                   color: AppColors.primaryColor,
                 )

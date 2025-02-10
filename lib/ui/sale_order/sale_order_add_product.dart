@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/product/product_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/product_category/product_category_cubit.dart';
-import 'package:mmt_mobile/common_widget/bottom_choice_sheet_widget.dart';
 import 'package:mmt_mobile/common_widget/constant_widgets.dart';
 import 'package:mmt_mobile/model/product/uom_lines.dart';
 import 'package:mmt_mobile/model/res_partner.dart';
@@ -73,7 +72,15 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.customer?.name ?? 'Customer 01'),
-          leading: BackButton(onPressed: () => context.rootPop()),
+          leading: BackButton(onPressed: () async {
+            // context.rootPop();
+            bool? isOk = await context.showConfirmDialog(
+                confirmQuestion: ConstString.areYouSureToExit,
+                context: context);
+            if (isOk ?? false) {
+              context.rootPop();
+            }
+          }),
         ),
         persistentFooterButtons: [
           BlocBuilder<ProductCubit, ProductState>(

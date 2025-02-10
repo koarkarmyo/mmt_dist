@@ -64,7 +64,9 @@ class _RoutePageState extends State<RoutePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _customerCubit = context.read<CustomerCubit>()..fetchCustomers();
+    final date = DateTimeUtils.ddMmYYYFormatSlug.format(_selectedDate);
+    _customerCubit = context.read<CustomerCubit>();
+    _filteredCalled(context);
   }
 
   @override
@@ -283,12 +285,12 @@ class _RoutePageState extends State<RoutePage> {
   }
 
   void _filteredCalled(BuildContext context) {
-    _customerCubit.fetchCustomers(name: _searchController.text);
-    // final date = DateTimeUtils.yMmDd.format(_selectedDate);
-    // _customerBloc.add(CustomerFilterByRouteEvent(
-    //     searchName: _searchedCustomer,
-    //     customerTypeId: _customerFilterType,
-    //     date: date));
+    final date = DateTimeUtils.ddMmYYYFormatSlug.format(_selectedDate);
+    _customerCubit.fetchCustomerByRoute(
+      customerTypeId: _customerFilterType,
+      searchName: _searchController.text,
+      date: date,
+    );
     // Navigator.pop(context);
   }
 

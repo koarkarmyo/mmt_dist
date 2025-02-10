@@ -60,7 +60,6 @@ class SaleOrderDBRepo extends BaseDBRepo {
     //
     List<UomLine> uomLines = [];
     uomJsonList.forEach((element) {
-      debugPrint('xxxxxxxx:::${element.toString()}');
       uomLines.add(UomLine.fromJsonDB(element));
     });
     //
@@ -97,9 +96,11 @@ class SaleOrderDBRepo extends BaseDBRepo {
 
     //
     List<Map<String, dynamic>> soList = await helper.readDataByWhereArgs(
-        tableName: DBConstant.saleOrderTable,
-        where: query,
-        whereArgs: whereArgs);
+      tableName: DBConstant.saleOrderTable,
+      where: query,
+      whereArgs: whereArgs,
+      orderBy: '${DBConstant.id} DESC'
+    );
 
     soList.forEach((element) {
       saleOrderList.add(SaleOrder.fromJsonDB(element));

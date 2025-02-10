@@ -29,6 +29,26 @@ enum ViewTypes { list, grid }
 
 enum OrderStates { draft, send, sale, done, cancel }
 
+extension OrderStatesExtension on OrderStates {
+  String get displayTitle {
+    switch (this) {
+      case OrderStates.draft:
+        return 'Quotation';
+      case OrderStates.send:
+        return 'Quotation sent';
+      case OrderStates.sale:
+        return 'Sale Order';
+      case OrderStates.done:
+        return 'Done';
+      case OrderStates.cancel:
+        return 'Cancel';
+
+      default:
+        return 'Draft';
+    }
+  }
+}
+
 enum SaleOrderReqTypes { quotation, sale, sale_delivery_and_invoice, wh_sale }
 
 enum StockMoveType { deli, load, unload, variant }

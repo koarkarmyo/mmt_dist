@@ -379,14 +379,17 @@ class SyncUtils {
       return SyncProcess.Finished;
     }
 
-    await DatabaseHelper.instance.deleteRows(
-        tableName: DBConstant.routeTable,
-        where: '${DBConstant.id}',
-        wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
-    await DatabaseHelper.instance.deleteRows(
-        tableName: DBConstant.routeLineTable,
-        where: '${DBConstant.routePlanId}',
-        wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+    // await DatabaseHelper.instance.deleteRows(
+    //     tableName: DBConstant.routeTable,
+    //     where: DBConstant.id,
+    //     wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+    // await DatabaseHelper.instance.deleteRows(
+    //     tableName: DBConstant.routeLineTable,
+    //     where: DBConstant.routePlanId,
+    //     wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+
+    await _helper.deleteAllRow(tableName: DBConstant.routeTable);
+    await _helper.deleteAllRow(tableName: DBConstant.routeLineTable);
 
     // change to json to insert database
     List<Map<String, dynamic>>? dataList =
@@ -401,18 +404,20 @@ class SyncUtils {
     List<Map<String, dynamic>>? lineList = [];
     for (RoutePlan plan in baseResponse.data!) {
       plan.lineIds?.forEach((element) {
-        lineList.add(element.toJson());
+        Map<String, dynamic> lineJson = element.toJson();
+        lineJson[DBConstant.routePlanId] = plan.id;
+        lineList.add(lineJson);
       });
     }
 
     final routeWithPartnerInsertSuccess = await DatabaseHelper.instance
         .insertDataListBath(DBConstant.routeLineTable, lineList);
-    if (routeWithPartnerInsertSuccess && routeInsertSuccess) {
-      bool isSuccess = await _insertOrUpdateLastWriteDate(
-          actionName: actionName,
-          lastWriteDate: baseResponse.data!.last.writeDate!);
-      return isSuccess ? SyncProcess.Paginated : SyncProcess.Fail;
-    }
+    // if (routeWithPartnerInsertSuccess && routeInsertSuccess) {
+    //   bool isSuccess = await _insertOrUpdateLastWriteDate(
+    //       actionName: actionName,
+    //       lastWriteDate: baseResponse.data!.last.writeDate!);
+    //   return isSuccess ? SyncProcess.Paginated : SyncProcess.Fail;
+    // }
 
     return SyncProcess.Finished;
   }
@@ -900,11 +905,11 @@ class SyncUtils {
     debugPrint('ffffffff::::bdy::$detailInsertSuccess');
 
     if (detailInsertSuccess && hdrInsertSuccess) {
-      // return await _insertOrUpdateLastWriteDate(
-      //         actionName: actionName,
-      //         lastWriteDate: baseResponse.data!.last.writeDate ?? '')
-      //     ? SyncProcess.Paginated
-      //     : SyncProcess.Fail;
+      return await _insertOrUpdateLastWriteDate(
+              actionName: actionName,
+              lastWriteDate: baseResponse.data!.last.writeDate ?? '')
+          ? SyncProcess.Paginated
+          : SyncProcess.Fail;
     }
 
     return detailInsertSuccess && hdrInsertSuccess

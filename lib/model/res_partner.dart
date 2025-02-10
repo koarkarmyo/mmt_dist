@@ -52,9 +52,11 @@ class ResPartner {
     this.zip,
     this.phone,
     this.mobile,
+    this.number,
     this.productPricelistId,
     this.productPricelistName,
     this.writeDate,
+    this.isVisited,
   });
 
   ResPartner.fromJson(dynamic json) {
@@ -112,11 +114,15 @@ class ResPartner {
   String? phone;
   String? mobile;
   int? productPricelistId;
+  int? number;
   String? productPricelistName;
+  bool? isVisited;
   String? writeDate;
 
   ResPartner copyWith({
+    bool? isVisited,
     int? id,
+    int? number,
     String? name,
     String? street2,
     String? street,
@@ -146,6 +152,7 @@ class ResPartner {
   }) =>
       ResPartner(
         id: id ?? this.id,
+        number: number ?? this.number,
         name: name ?? this.name,
         street2: street2 ?? this.street2,
         street: street ?? this.street,
@@ -169,6 +176,7 @@ class ResPartner {
         zip: zip ?? this.zip,
         phone: phone ?? this.phone,
         mobile: mobile ?? this.mobile,
+        isVisited: isVisited ?? this.isVisited,
         productPricelistId: productPricelistId ?? this.productPricelistId,
         productPricelistName: productPricelistName ?? this.productPricelistName,
         writeDate: writeDate ?? this.writeDate,

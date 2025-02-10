@@ -40,7 +40,15 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
     return Scaffold(
       appBar: AppBar(
         title: const TextWidget(ConstString.saleItem),
-        leading: BackButton(onPressed: () => context.rootPop()),
+        leading: BackButton(onPressed: () async {
+          // context.rootPop();
+          bool? isOk = await context.showConfirmDialog(
+              confirmQuestion: ConstString.areYouSureToExit,
+              context: context);
+          if (isOk ?? false) {
+            context.rootPop();
+          }
+        }),
       ),
       persistentFooterButtons: [
         BlocBuilder<CartCubit, CartState>(

@@ -114,8 +114,8 @@ class _SaleOrderHistoryPageState extends State<SaleOrderHistoryPage> {
               child: LayoutBuilder(
                 builder: (BuildContext context, BoxConstraints constraints) {
                   final double screenWidth = constraints.maxWidth;
-                  final double col1Width = screenWidth * 0.6;
-                  final double col2Width = screenWidth * 0.15;
+                  final double col1Width = screenWidth * 0.5;
+                  final double col2Width = screenWidth * 0.25;
                   final double col3Width = screenWidth * 0.25;
 
                   return BlocBuilder<SaleOrderHistoryCubit,
@@ -171,7 +171,7 @@ class _SaleOrderHistoryPageState extends State<SaleOrderHistoryPage> {
                             itemCount: state.saleOrderList.length,
                             itemBuilder: (context, index) {
                               SaleOrder so = state.saleOrderList[index];
-                              return GestureDetector(
+                              return InkWell(
                                 onTap: () {
                                   MMTApplication.currentCustomer = ResPartner(
                                     id: so.partnerId,
@@ -210,9 +210,7 @@ class _SaleOrderHistoryPageState extends State<SaleOrderHistoryPage> {
                                       SizedBox(
                                           width: col2Width,
                                           child: Text(
-                                              so.state?.name
-                                                      .toFirstLetterCapital() ??
-                                                  '',
+                                              so.state?.displayTitle ?? '',
                                               textAlign: TextAlign.center)),
                                       SizedBox(
                                         width: col3Width,
@@ -243,18 +241,19 @@ class _SaleOrderHistoryPageState extends State<SaleOrderHistoryPage> {
     _lQty = 0;
     _bQty = 0;
   }
-    // if (_filter == SaleOrderReportFilter.unsoldProduct) {
-    //   _saleOrderReportBloc.add(
-    //     FetchUnsoldProductReportEvent(
-    //         startDate: dateRange.first.toString(),
-    //         endDate: dateRange.last.toString()),
-    //   );
-    // } else {
-    //   _saleOrderReportBloc.add(
-    //     FetchSaleOrderReportEvent(
-    //         startDate: dateRange.first.toString(),
-    //         endDate: dateRange.last.toString()),
-    //   );
+
+  // if (_filter == SaleOrderReportFilter.unsoldProduct) {
+  //   _saleOrderReportBloc.add(
+  //     FetchUnsoldProductReportEvent(
+  //         startDate: dateRange.first.toString(),
+  //         endDate: dateRange.last.toString()),
+  //   );
+  // } else {
+  //   _saleOrderReportBloc.add(
+  //     FetchSaleOrderReportEvent(
+  //         startDate: dateRange.first.toString(),
+  //         endDate: dateRange.last.toString()),
+  //   );
   // }
 
   // _createDeliveryFilterWidget() {

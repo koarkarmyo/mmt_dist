@@ -1,6 +1,6 @@
 class ConstString {
-  static const String appName = 'MMT Distribution';
-  static const String version = '1.0.00002';
+  static const String appName = 'MDS';
+  static const String version = '1.0.00005';
   static const String welcome = 'Welcome';
   static const String history = 'History';
   static const String stockRequestPage = 'Stock request page';
@@ -59,7 +59,7 @@ class ConstString {
   static const String shopAddress = "စျေးဆိုင်လိပ်စာ";
   static const String pickUpAddress = "ကုန်သွားယူမည့် လိပ်စာ";
   static const String deliveryAddress = "ပို့ရမည့် လိပ်စာ";
-  static const String confirm = "confirm";
+  static const String confirm = "Confirm";
   static const String loading = "Loading";
   static const String stockLoadingHistory = "Stock loading history";
   static const String customerNameOrPhoneNo =

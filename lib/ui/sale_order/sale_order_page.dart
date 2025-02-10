@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
-import 'package:mmt_mobile/business%20logic/bloc/sale_order/sale_order_cubit.dart';
 import 'package:mmt_mobile/model/res_partner.dart';
 import 'package:mmt_mobile/src/const_string.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
@@ -59,7 +58,7 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
         saleOrder: _so,
       ),
       const SaleOrderSaleItemPage(),
-      FocItemPage(customer: _customer),
+      const FocItemPage(),
       // const CouponItemPage(),
       SaleSummaryPage(saleOrder: _so)
     ];

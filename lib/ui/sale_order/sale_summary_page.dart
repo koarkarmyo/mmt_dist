@@ -4,6 +4,7 @@ import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
 import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/sale_order/sale_order_cubit.dart';
 import 'package:mmt_mobile/model/sale_order/sale_order_line.dart';
+import 'package:mmt_mobile/model/stock_picking/stock_picking_model.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
@@ -48,7 +49,14 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(ConstString.summaryPage),
-        leading: BackButton(onPressed: () => context.rootPop()),
+        leading: BackButton(onPressed: () async {
+          // context.rootPop();
+          bool? isOk = await context.showConfirmDialog(
+              confirmQuestion: ConstString.areYouSureToExit, context: context);
+          if (isOk ?? false) {
+            context.rootPop();
+          }
+        }),
       ),
       persistentFooterButtons: [
         BlocConsumer<CartCubit, CartState>(
@@ -295,14 +303,15 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, state) {
         List<Widget> columnItem = [];
-        state.itemList.where((element) => (element.pkQty ?? 0) > 0).forEach(
+        state.focItemList
+            .where((element) =>
+                (element.pkQty ?? 0) > 0 && element.saleType == SaleType.foc)
+            .forEach(
           (item) {
             columnItem.add(_notChargeItemWidget(item: item));
           },
         );
-        return Column(
-          children: columnItem,
-        );
+        return Column(children: columnItem);
       },
     );
   }
@@ -329,7 +338,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
         DateTime now = DateTime.now();
         _deliveryDate.value = await showDatePicker(
             context: context,
-            firstDate: DateTime(now.year - 1),
+            firstDate: DateTime.now(),
             lastDate: DateTime(now.year + 1));
       },
       child: Container(
@@ -353,7 +362,10 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, state) {
         List<Widget> columnItem = [];
-        state.itemList.where((element) => (element.pkQty ?? 0) > 0).forEach(
+        state.itemList
+            .where((element) =>
+                (element.pkQty ?? 0) > 0 && element.saleType == SaleType.sale)
+            .forEach(
           (item) {
             columnItem
                 .add(_itemListTileWidget(item: item, type: SaleItemType.sale));
@@ -384,7 +396,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
       title: Text(item.productName ?? 'product'),
       subtitle: (MMTApplication.currentUser?.useLooseBox ?? false)
           ? Text(pkPcString)
-          : Text("${item.productUomQty ?? ''} ${item.uomLine?.uomName ?? ''}"),
+          : Text("${item.pkQty ?? ''} ${item.uomLine?.uomName ?? ''}"),
     );
   }
 
