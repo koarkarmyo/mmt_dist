@@ -1,7 +1,8 @@
+import 'package:collection/collection.dart';
+
 import '../../database/db_constant.dart';
 import '../product/uom_lines.dart';
 import '../stock_picking/stock_picking_model.dart';
-import 'package:collection/collection.dart';
 
 class SaleOrderLine {
   int? id;

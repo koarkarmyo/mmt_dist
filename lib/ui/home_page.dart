@@ -1,12 +1,12 @@
 // import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
-import 'package:collection/collection.dart';
 
 import '../common_widget/bottom_sheet_selection_widget.dart';
 import '../common_widget/sync_progress_dialog.dart';

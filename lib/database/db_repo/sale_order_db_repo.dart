@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:collection/collection.dart';
 import 'package:mmt_mobile/model/product/uom_lines.dart';
 import 'package:mmt_mobile/src/enum.dart';
 import 'package:mmt_mobile/src/extension/nullable_extension.dart';
@@ -8,7 +8,6 @@ import '../../model/sale_order/sale_order_6/sale_order.dart';
 import '../../model/sale_order/sale_order_line.dart';
 import '../base_db_repo.dart';
 import '../db_constant.dart';
-import 'package:collection/collection.dart';
 
 class SaleOrderDBRepo extends BaseDBRepo {
   static final SaleOrderDBRepo instance = SaleOrderDBRepo._();

@@ -1,13 +1,11 @@
 import 'package:bloc/bloc.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:collection/collection.dart';
 import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
 import 'package:mmt_mobile/database/database_helper.dart';
 import 'package:mmt_mobile/database/db_repo/res_partner_repo.dart';
-import 'package:collection/collection.dart';
 
 import '../../../database/data_object.dart';
 import '../../../model/cust_visit.dart';
-import '../../../model/partner.dart';
 import '../../../model/res_partner.dart';
 import '../../../model/route/route_plan.dart';
 import '../../../ui/widgets/customer_filter_widget.dart';

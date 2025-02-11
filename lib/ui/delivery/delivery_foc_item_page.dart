@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 
 import '../../business logic/bloc/cart/cart_cubit.dart';
 import '../../business logic/bloc/product/product_cubit.dart';
-import '../../common_widget/text_widget.dart';
 import '../../model/product/product_product.dart';
 import '../../model/product/uom_lines.dart';
 import '../../model/sale_order/sale_order_line.dart';
-import '../../route/route_list.dart';
-import '../../src/const_string.dart';
-import '../../src/enum.dart';
 import '../../src/mmt_application.dart';
 import '../../src/style/app_color.dart';
 

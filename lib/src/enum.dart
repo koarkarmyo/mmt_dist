@@ -2,8 +2,8 @@ import 'dart:ui';
 
 import 'package:intl/intl.dart';
 import 'package:mmt_mobile/src/style/app_color.dart';
+
 import '../utils/date_time_utils.dart';
-import 'mmt_application.dart';
 
 enum LocationTypes {
   supplier,

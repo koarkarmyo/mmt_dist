@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../model/price_list/product_price_list_item.dart';

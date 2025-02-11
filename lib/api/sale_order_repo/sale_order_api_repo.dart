@@ -1,17 +1,13 @@
 import 'package:dio/dio.dart';
-import 'package:mmt_mobile/api/sale_order_repo/sale_order_db_repo.dart';
 import 'package:mmt_mobile/model/sale_order/sale_order_6/sale_order.dart';
 
 import '../../database/data_object.dart';
 import '../../database/db_repo/sale_order_db_repo.dart';
 import '../../model/base_single_api_response.dart';
-import '../../model/cash_collect.dart';
 import '../../model/number_series.dart';
-import '../../model/sale_order/sale_order_header.dart';
 import '../../src/enum.dart';
 import '../../src/mmt_application.dart';
 import '../api_request.dart';
-import '../api_util.dart';
 import '../base_api_repo.dart';
 
 class SaleOrderApiRepo extends BaseApiRepo {

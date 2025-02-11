@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
 import 'package:mmt_mobile/model/tag.dart';
+
 import '../src/enum.dart';
 
 /// id : 3

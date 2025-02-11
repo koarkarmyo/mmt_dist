@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+
 import '../../src/enum.dart';
 import 'stock_move_line.dart';
 

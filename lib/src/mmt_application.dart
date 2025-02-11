@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mmt_mobile/model/company_id.dart';
 import 'package:mmt_mobile/model/language_model.dart';
-import 'package:mmt_mobile/model/login_response.dart';
 import 'package:mmt_mobile/model/res_partner.dart';
 import 'package:mmt_mobile/ui/widgets/confirm_dialog_widget.dart';
 import 'package:permission_handler/permission_handler.dart';

@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:mmt_mobile/database/db_repo/res_partner_repo.dart';
 import 'package:mmt_mobile/model/sale_order/sale_order_line.dart';
 
 import '../../../src/enum.dart';

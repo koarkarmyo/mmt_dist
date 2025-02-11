@@ -6,8 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
 import 'package:mmt_mobile/business%20logic/bloc/customer/customer_cubit.dart';
-import 'package:mmt_mobile/business%20logic/bloc/login/login_bloc.dart';
-import 'package:mmt_mobile/common_widget/alert_dialog.dart';
 import 'package:mmt_mobile/common_widget/bottom_choice_sheet_widget.dart';
 import 'package:mmt_mobile/model/res_partner.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';

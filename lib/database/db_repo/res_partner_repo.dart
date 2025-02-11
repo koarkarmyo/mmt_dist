@@ -1,8 +1,5 @@
 import 'package:mmt_mobile/database/database_helper.dart';
-import 'package:mmt_mobile/database/db_repo/sale_order_db_repo.dart';
-import 'package:mmt_mobile/src/const_string.dart';
 import 'package:mmt_mobile/src/extension/nullable_extension.dart';
-import 'package:sqflite/sqflite.dart';
 
 import '../../model/res_partner.dart';
 import '../base_db_repo.dart';

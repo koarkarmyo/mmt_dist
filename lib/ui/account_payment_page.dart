@@ -7,7 +7,6 @@ import 'package:mmt_mobile/ui/widgets/date_range_picker_dialog.dart';
 import '../common_widget/constant_widgets.dart';
 import '../src/const_dimen.dart';
 import '../src/enum.dart';
-import '../src/mmt_application.dart';
 
 class AccountPaymentPage extends StatefulWidget {
   const AccountPaymentPage({super.key});

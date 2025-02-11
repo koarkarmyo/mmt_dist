@@ -1,13 +1,9 @@
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mmt_mobile/src/const_string.dart';
 
 import '../src/const_dimen.dart';
-import '../src/mmt_application.dart';
 import 'alert_dialog.dart';
 
 class ConstantWidgets {

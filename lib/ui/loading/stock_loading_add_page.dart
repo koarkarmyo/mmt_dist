@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/business%20logic/bloc/batch/stock_loading_cubit.dart';
@@ -9,7 +10,6 @@ import 'package:mmt_mobile/common_widget/retry_widget.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/ui/loading/stock_loading_add_lot.dart';
-import 'package:collection/collection.dart';
 
 import '../../business logic/bloc/product/product_cubit.dart';
 import '../../common_widget/text_widget.dart';

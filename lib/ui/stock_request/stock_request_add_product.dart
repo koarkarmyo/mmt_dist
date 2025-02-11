@@ -2,13 +2,11 @@ import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/business%20logic/bloc/stock_order/stock_order_bloc.dart';
-import 'package:mmt_mobile/model/delivery/delivery_item.dart';
 import 'package:mmt_mobile/model/sale_order/sale_order_line.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 
-import '../../business logic/bloc/cart/cart_cubit.dart';
 import '../../business logic/bloc/product/product_cubit.dart';
 import '../../model/product/product_product.dart';
 import '../../model/res_partner.dart';

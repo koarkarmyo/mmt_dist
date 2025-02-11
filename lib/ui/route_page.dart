@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
-import 'package:mmt_mobile/business%20logic/bloc/cust_visit/cust_visit_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/customer/customer_cubit.dart';
-import 'package:mmt_mobile/common_widget/bottom_choice_sheet_widget.dart';
 import 'package:mmt_mobile/model/cust_visit.dart';
 import 'package:mmt_mobile/route/route_list.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
@@ -20,7 +18,6 @@ import '../model/res_partner.dart';
 import '../on_clicked_listener.dart';
 import '../src/const_dimen.dart';
 import '../src/const_string.dart';
-import '../src/style/app_color.dart';
 import '../utils/date_time_utils.dart';
 
 class RoutePage extends StatefulWidget {
@@ -42,7 +39,7 @@ class _RoutePageState extends State<RoutePage> {
   late bool canReturnData = false;
 
   // late String _searchedCustomer = '%';
-  late CustomerFilterType _customerFilterType = CustomerFilterType.ALL;
+  late CustomerFilterType _customerFilterType = CustomerFilterType.PLAN;
   late CustomerCubit _customerCubit;
 
   // late String _selectedCustType = '%';

@@ -1,7 +1,6 @@
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mmt_mobile/model/product/uom_lines.dart';
 import 'package:mmt_mobile/model/sale_order/sale_order_line.dart';
 import 'package:mmt_mobile/model/stock_picking/stock_picking_model.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
