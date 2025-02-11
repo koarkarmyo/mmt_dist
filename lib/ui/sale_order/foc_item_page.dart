@@ -49,16 +49,16 @@ class _FocItemPageState extends State<FocItemPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const TextWidget(ConstString.saleItem),
+        title: const TextWidget(ConstString.focItem),
         leading: BackButton(onPressed: () async {
           // context.rootPop();
           bool? isOk = await context.showConfirmDialog(
-              confirmQuestion: ConstString.areYouSureToExit,
-              context: context);
+              confirmQuestion: ConstString.areYouSureToExit, context: context);
           if (isOk ?? false) {
             context.rootPop();
           }
-        }),        actions: [
+        }),
+        actions: [
           IconButton(
               onPressed: () {
                 context.pushTo(route: RouteList.saleOrderAddExtraPage, args: {
@@ -72,15 +72,13 @@ class _FocItemPageState extends State<FocItemPage> {
       persistentFooterButtons: [
         BlocBuilder<CartCubit, CartState>(
           builder: (context, state) {
-            return Container(
-              padding: 4.allPadding,
-              width: double.infinity,
-              decoration: BoxDecoration(color: AppColors.successColor),
-              child: Align(
-                  alignment: Alignment.centerRight,
-                  child:
-                      Text("Subtotal : ${calculateSubtotal(state.itemList)}")),
-            );
+            return Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  "Item count : ${state.focItemList.length}",
+                  // "Subtotal : ${calculateSubtotal(state.itemList)}",
+                  style: const TextStyle(fontSize: 20),
+                ));
           },
         )
       ],
@@ -130,7 +128,7 @@ class _FocItemPageState extends State<FocItemPage> {
           border: TableBorder.all(),
           children: [
             TableRow(
-                decoration: BoxDecoration(color: Colors.grey[200]),
+                decoration: const BoxDecoration(color: AppColors.primaryColor),
                 children: (MMTApplication.currentUser?.useLooseBox ?? false)
                     ? [
                         _tableItem(ConstString.product,
@@ -166,7 +164,9 @@ class _FocItemPageState extends State<FocItemPage> {
       padding: const EdgeInsets.all(8.0),
       child: Align(
         alignment: align,
-        child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold)),
+        child: Text(text,
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.white)),
       ),
     );
   }
@@ -386,12 +386,12 @@ class _FocItemPageState extends State<FocItemPage> {
                                           productName: product.name,
                                           pkQty: (_pk[position].text != '')
                                               ? double.tryParse(
-                                              _pk[position].text)
+                                                  _pk[position].text)
                                               : 0,
                                           productUomQty:
                                               (_pk[position].text != '')
                                                   ? double.tryParse(
-                                                  _pk[position].text)
+                                                      _pk[position].text)
                                                   : 0,
                                           uomLine: newValue));
                                 },
@@ -423,12 +423,12 @@ class _FocItemPageState extends State<FocItemPage> {
                                           productName: product.name,
                                           pkQty: (_pk[position].text != '')
                                               ? double.tryParse(
-                                              _pk[position].text)
+                                                  _pk[position].text)
                                               : 0,
                                           productUomQty:
                                               (_pk[position].text != '')
                                                   ? double.tryParse(
-                                                  _pk[position].text)
+                                                      _pk[position].text)
                                                   : 0,
                                           uomLine: deliveryItem.uomLine ??
                                               product.uomLines?.first));

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:mmt_mobile/src/const_string.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
@@ -76,7 +77,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     repeatForever: true,
                     animatedTexts: [
                       TyperAnimatedText(
-                        'MMT',
+                        ConstString.appName,
                         textStyle: const TextStyle(
                           fontSize: 32.0,
                           fontWeight: FontWeight.bold,

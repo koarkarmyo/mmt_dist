@@ -92,7 +92,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                   ':',
                   state.productList.length.toString()
                 ],
-                style: const TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 20),
               );
             },
           )
@@ -332,9 +332,9 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                           (deliveryItem?.uomLine?.uomId ??
                               product.uomLines?.firstOrNull?.uomId),
                     )?.fixedPrice ?? 0).roundTo(position: 1).toString()} K "),
-                // Text((MMTApplication.currentUser?.useLooseBox ?? false)
-                //     ? "23 PK / 6 PC"
-                //     : "300 Units"),
+                Text((MMTApplication.currentUser?.useLooseBox ?? false)
+                    ? "23 PK / 6 PC"
+                    : "300 Units"),
               ],
             ).expanded(flex: 6),
             Container(
@@ -420,7 +420,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
               controller: _pk[position],
               textAlign: TextAlign.right,
               decoration: const InputDecoration(
-                  border: InputBorder.none, hintText: ConstString.qty),
+                  border: InputBorder.none, hintText: '0'),
             ).padding(padding: 8.horizontalPadding).expanded(flex: 3),
           ],
         ),

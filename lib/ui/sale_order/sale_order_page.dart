@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
 import 'package:mmt_mobile/model/res_partner.dart';
 import 'package:mmt_mobile/src/const_string.dart';
@@ -143,7 +144,7 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
           routeAndNavigatorSettings:
               const RouteAndNavigatorSettings(onGenerateRoute: generateRoute)),
       PersistentBottomNavBarItem(
-          icon: const Icon(CupertinoIcons.settings),
+          icon: const Icon(CupertinoIcons.tag),
           title: ("FOC"),
           activeColorPrimary: Colors.white,
           inactiveColorPrimary: CupertinoColors.systemGrey,

@@ -43,8 +43,7 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
         leading: BackButton(onPressed: () async {
           // context.rootPop();
           bool? isOk = await context.showConfirmDialog(
-              confirmQuestion: ConstString.areYouSureToExit,
-              context: context);
+              confirmQuestion: ConstString.areYouSureToExit, context: context);
           if (isOk ?? false) {
             context.rootPop();
           }
@@ -53,14 +52,12 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
       persistentFooterButtons: [
         BlocBuilder<CartCubit, CartState>(
           builder: (context, state) {
-            return Container(
-              padding: 4.allPadding,
-              width: double.infinity,
-              decoration: BoxDecoration(color: AppColors.successColor),
-              child: Align(
-                  alignment: Alignment.centerRight,
-                  child:
-                      Text("Subtotal : ${calculateSubtotal(state.itemList)}")),
+            return Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                "Subtotal : ${calculateSubtotal(state.itemList)}",
+                style: const TextStyle(fontSize: 20),
+              ),
             );
           },
         )
@@ -111,7 +108,7 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
           border: TableBorder.all(),
           children: [
             TableRow(
-                decoration: BoxDecoration(color: Colors.grey[200]),
+                decoration: const BoxDecoration(color: AppColors.primaryColor),
                 children: (MMTApplication.currentUser?.useLooseBox ?? false)
                     ? [
                         _tableItem(ConstString.product,
@@ -147,7 +144,11 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
       padding: const EdgeInsets.all(8.0),
       child: Align(
         alignment: align,
-        child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold)),
+        child: Text(text,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            )),
       ),
     );
   }

@@ -8,6 +8,7 @@ class SaleOrderLine {
   int? id;
   String? orderNo;
   int? orderId;
+  double? autoKey;
   int? productId;
   String? productName;
   SaleType? saleType;
@@ -45,6 +46,7 @@ class SaleOrderLine {
     this.productUom,
     this.productUomName,
     this.discountPercent,
+    this.autoKey,
   });
 
   SaleOrderLine.fromJson(Map<String, dynamic> json) {
@@ -166,6 +168,7 @@ class SaleOrderLine {
     double? singlePKPrice,
     double? singlePCPrice,
     double? discountPercent,
+    double? autoKey,
   }) {
     return SaleOrderLine(
         id: id ?? this.id,
@@ -182,6 +185,7 @@ class SaleOrderLine {
         singlePCPrice: singlePCPrice ?? this.singlePCPrice,
         singlePKPrice: singlePKPrice ?? this.singlePKPrice,
         subTotal: subTotal ?? this.subTotal,
+        autoKey: autoKey ?? this.autoKey,
         discountPercent: discountPercent ?? this.discountPercent);
   }
 
