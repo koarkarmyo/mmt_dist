@@ -176,126 +176,127 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
             //
             _focusNodeList.add(FocusNode());
             //
-            return (MMTApplication.currentUser?.useLooseBox ?? false)
-                ? _productRowWithPKPC(
-                    product: state.productList[index],
-                    position: index,
-                  )
-                : _productRow(
-                    product: state.productList[index], position: index);
+            // return (MMTApplication.currentUser?.useLooseBox ?? false)
+            //     ? _productRowWithPKPC(
+            //         product: state.productList[index],
+            //         position: index,
+            //       )
+            //     :
+            return _productRow(
+                product: state.productList[index], position: index);
           },
         ).expanded();
       },
     );
   }
 
-  Widget _productRowWithPKPC(
-      {required ProductProduct product, required int position}) {
-    return BlocBuilder<CartCubit, CartState>(builder: (context, state) {
-      SaleOrderLine? deliveryItem = state.itemList
-          .where(
-            (element) => element.productId == product.id,
-          )
-          .firstOrNull;
-
-      return Container(
-        padding: 8.allPadding,
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: Colors.grey.shade300),
-          ),
-        ),
-        child: Row(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(product.name ?? '').bold(),
-                const SizedBox(
-                  height: 8,
-                ),
-                const Text(
-                  "10000K",
-                  style: TextStyle(fontSize: 14),
-                ),
-                const Text("10 PK 5 PC", style: TextStyle(fontSize: 14))
-              ],
-            ).expanded(flex: 6),
-            TextField(
-              onTap: () {
-                _pk[position].selection = TextSelection(
-                    baseOffset: 0, extentOffset: _pk[position].text.length);
-              },
-              onTapOutside: (event) {
-                FocusScope.of(context).unfocus();
-              },
-              onChanged: (value) {
-                _cartCubit.addCartSaleItem(
-                    looseBoxType: LooseBoxType.pk,
-                    saleItem: deliveryItem?.copyWith(
-                          pkQty: (_pk[position].text != '')
-                              ? double.tryParse(_pk[position].text)
-                              : 0,
-                        ) ??
-                        SaleOrderLine(
-                            productId: product.id,
-                            productName: product.name,
-                            pkQty: (_pk[position].text != '')
-                                ? double.tryParse(_pk[position].text)
-                                : 0,
-                            pcUomLine: UomLine(
-                                uomId: product.looseUomId,
-                                uomName: product.looseUomName),
-                            pkUomLine: UomLine(
-                                uomId: product.boxUomId,
-                                uomName: product.boxUomName)));
-              },
-              keyboardType: TextInputType.number,
-              controller: _pk[position],
-              textAlign: TextAlign.right,
-              decoration: const InputDecoration(
-                  border: InputBorder.none, hintText: ConstString.qty),
-            ).padding(padding: 8.horizontalPadding).expanded(flex: 3),
-            TextField(
-              onTap: () {
-                _pc[position].selection = TextSelection(
-                    baseOffset: 0, extentOffset: _pc[position].text.length);
-              },
-              onTapOutside: (event) {
-                FocusScope.of(context).unfocus();
-              },
-              onChanged: (value) {
-                _cartCubit.addCartSaleItem(
-                    looseBoxType: LooseBoxType.pc,
-                    saleItem: deliveryItem?.copyWith(
-                          pcQty: (_pc[position].text != '')
-                              ? double.tryParse(_pc[position].text)
-                              : 0,
-                        ) ??
-                        SaleOrderLine(
-                            productId: product.id,
-                            productName: product.name,
-                            pcQty: (_pc[position].text != '')
-                                ? double.tryParse(_pc[position].text)
-                                : 0,
-                            pcUomLine: UomLine(
-                                uomId: product.looseUomId,
-                                uomName: product.looseUomName),
-                            pkUomLine: UomLine(
-                                uomId: product.boxUomId,
-                                uomName: product.boxUomName)));
-              },
-              keyboardType: TextInputType.number,
-              controller: _pc[position],
-              textAlign: TextAlign.right,
-              decoration: const InputDecoration(
-                  border: InputBorder.none, hintText: ConstString.qty),
-            ).padding(padding: 8.horizontalPadding).expanded(flex: 3),
-          ],
-        ),
-      );
-    });
-  }
+  // Widget _productRowWithPKPC(
+  //     {required ProductProduct product, required int position}) {
+  //   return BlocBuilder<CartCubit, CartState>(builder: (context, state) {
+  //     SaleOrderLine? deliveryItem = state.itemList
+  //         .where(
+  //           (element) => element.productId == product.id,
+  //         )
+  //         .firstOrNull;
+  //
+  //     return Container(
+  //       padding: 8.allPadding,
+  //       decoration: BoxDecoration(
+  //         border: Border(
+  //           bottom: BorderSide(color: Colors.grey.shade300),
+  //         ),
+  //       ),
+  //       child: Row(
+  //         children: [
+  //           Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(product.name ?? '').bold(),
+  //               const SizedBox(
+  //                 height: 8,
+  //               ),
+  //               const Text(
+  //                 "10000K",
+  //                 style: TextStyle(fontSize: 14),
+  //               ),
+  //               const Text("10 PK 5 PC", style: TextStyle(fontSize: 14))
+  //             ],
+  //           ).expanded(flex: 6),
+  //           TextField(
+  //             onTap: () {
+  //               _pk[position].selection = TextSelection(
+  //                   baseOffset: 0, extentOffset: _pk[position].text.length);
+  //             },
+  //             onTapOutside: (event) {
+  //               FocusScope.of(context).unfocus();
+  //             },
+  //             onChanged: (value) {
+  //               _cartCubit.addCartSaleItem(
+  //                   looseBoxType: LooseBoxType.pk,
+  //                   saleItem: deliveryItem?.copyWith(
+  //                         pkQty: (_pk[position].text != '')
+  //                             ? double.tryParse(_pk[position].text)
+  //                             : 0,
+  //                       ) ??
+  //                       SaleOrderLine(
+  //                           productId: product.id,
+  //                           productName: product.name,
+  //                           pkQty: (_pk[position].text != '')
+  //                               ? double.tryParse(_pk[position].text)
+  //                               : 0,
+  //                           pcUomLine: UomLine(
+  //                               uomId: product.looseUomId,
+  //                               uomName: product.looseUomName),
+  //                           pkUomLine: UomLine(
+  //                               uomId: product.boxUomId,
+  //                               uomName: product.boxUomName)));
+  //             },
+  //             keyboardType: TextInputType.number,
+  //             controller: _pk[position],
+  //             textAlign: TextAlign.right,
+  //             decoration: const InputDecoration(
+  //                 border: InputBorder.none, hintText: ConstString.qty),
+  //           ).padding(padding: 8.horizontalPadding).expanded(flex: 3),
+  //           TextField(
+  //             onTap: () {
+  //               _pc[position].selection = TextSelection(
+  //                   baseOffset: 0, extentOffset: _pc[position].text.length);
+  //             },
+  //             onTapOutside: (event) {
+  //               FocusScope.of(context).unfocus();
+  //             },
+  //             onChanged: (value) {
+  //               _cartCubit.addCartSaleItem(
+  //                   looseBoxType: LooseBoxType.pc,
+  //                   saleItem: deliveryItem?.copyWith(
+  //                         pcQty: (_pc[position].text != '')
+  //                             ? double.tryParse(_pc[position].text)
+  //                             : 0,
+  //                       ) ??
+  //                       SaleOrderLine(
+  //                           productId: product.id,
+  //                           productName: product.name,
+  //                           pcQty: (_pc[position].text != '')
+  //                               ? double.tryParse(_pc[position].text)
+  //                               : 0,
+  //                           pcUomLine: UomLine(
+  //                               uomId: product.looseUomId,
+  //                               uomName: product.looseUomName),
+  //                           pkUomLine: UomLine(
+  //                               uomId: product.boxUomId,
+  //                               uomName: product.boxUomName)));
+  //             },
+  //             keyboardType: TextInputType.number,
+  //             controller: _pc[position],
+  //             textAlign: TextAlign.right,
+  //             decoration: const InputDecoration(
+  //                 border: InputBorder.none, hintText: ConstString.qty),
+  //           ).padding(padding: 8.horizontalPadding).expanded(flex: 3),
+  //         ],
+  //       ),
+  //     );
+  //   });
+  // }
 
   Widget _productRow({required ProductProduct product, required int position}) {
     return BlocBuilder<CartCubit, CartState>(builder: (context, state) {
@@ -366,6 +367,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                         productName: product.name,
                         pkQty: deliveryItem?.pkQty,
                         priceUnit: price,
+                        autoKey: product.id?.toDouble(),
                         productUomQty: deliveryItem?.productUomQty ?? 0.0,
                         uomLine: newValue,
                       ),
@@ -407,6 +409,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                 _cartCubit.addCartSaleItem(
                   saleItem: SaleOrderLine(
                     productId: product.id,
+                    autoKey: product.id?.toDouble(),
                     productName: product.name,
                     pkQty: double.tryParse(value),
                     productUomQty: double.tryParse(value),

@@ -233,7 +233,7 @@ class _FocItemPageState extends State<FocItemPage> {
               SlidableAction(
                   backgroundColor: AppColors.dangerColor,
                   onPressed: (context) {
-                    _cartCubit.removeSaleItem(productId: product.id ?? 0);
+                    _cartCubit.removeSaleItem(productId: product.id ?? 0,autoKey: deliveryItem.autoKey);
                   },
                   label: ConstString.delete,
                   icon: Icons.delete)

@@ -27,11 +27,15 @@ class CartCubit extends Cubit<CartState> {
       _priceListItems = await PriceListDbRepo.instance.getAllPriceList();
     }
 
-    debugPrint("Cart Add : ${saleItem.toJson()}");
+    debugPrint("Cart Add : ${saleItem.toString()}");
 
     int index = state.itemList.indexWhere(
-      (element) => element.productId == saleItem.productId,
+      (element) =>
+          (element.productId == saleItem.productId) &&
+          (element.autoKey == saleItem.autoKey),
     );
+
+    debugPrint('Cart Position $index');
 
     saleItem = _calculatePrice(orderLine: saleItem, looseBoxType: looseBoxType);
     saleItem.saleType = SaleType.sale;
@@ -41,6 +45,8 @@ class CartCubit extends Cubit<CartState> {
     } else {
       state.itemList.add(saleItem);
     }
+
+    debugPrint('Cart Size ${state.itemList.length}');
 
     emit(state.copyWith(
       itemList: state.itemList,
@@ -76,9 +82,10 @@ class CartCubit extends Cubit<CartState> {
     ));
   }
 
-  void removeSaleItem({required int productId}) {
+  void removeSaleItem({required int productId, required double? autoKey}) {
     int index = state.itemList.indexWhere(
-      (element) => element.productId == productId,
+      (element) =>
+          (element.productId == productId) && (element.autoKey == autoKey),
     );
 
     if (index >= 0) {
@@ -114,9 +121,9 @@ class CartCubit extends Cubit<CartState> {
     emit(state.copyWith(focItemList: state.focItemList));
   }
 
-  void removeFocItem({required int productId}) {
+  void removeFocItem({required int productId, required double? autoKey}) {
     int index = state.focItemList.indexWhere(
-      (element) => element.productId == productId,
+      (element) => element.productId == productId && element.autoKey == autoKey,
     );
 
     if (index >= 0) {
@@ -205,8 +212,7 @@ class CartCubit extends Cubit<CartState> {
     }
 
     double singleItemPriceWithDisc = (orderLine.priceUnit ?? 0) -
-        ((orderLine.priceUnit ?? 0) *
-            ((orderLine.discountPercent ?? 0) / 100));
+        ((orderLine.priceUnit ?? 0) * ((orderLine.discountPercent ?? 0) / 100));
     orderLine.priceUnit = singleItemPriceWithDisc;
 
     orderLine.subTotal =

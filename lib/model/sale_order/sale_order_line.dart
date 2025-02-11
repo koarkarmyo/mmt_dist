@@ -117,7 +117,6 @@ class SaleOrderLine {
   // '${DBConstant.discount} DOUBLE,'
   // '${DBConstant.priceSubtotal} DOUBLE'
 
-
   Map<String, dynamic> toJsonDB() {
     Map<String, dynamic> data = {};
     data['product_id'] = productId;
@@ -191,6 +190,6 @@ class SaleOrderLine {
 
   @override
   String toString() {
-    return 'SaleOrderLine{id: $id, orderNo: $orderNo, orderId: $orderId, productId: $productId, productName: $productName, saleType: $saleType, productUomQty: $productUomQty, uomLine: $uomLine, pkUomLine: $pkUomLine, pcUomLine: $pcUomLine, pkQty: $pkQty, pcQty: $pcQty, singleItemPrice: $priceUnit, subTotal: $subTotal, singlePKPrice: $singlePKPrice, singlePCPrice: $singlePCPrice, discountPercent: $discountPercent}';
+    return 'SaleOrderLine{id: $id, orderNo: $orderNo, orderId: $orderId, autoKey: $autoKey, productId: $productId, productName: $productName, saleType: $saleType, productUomQty: $productUomQty, uomLine: $uomLine, pkUomLine: $pkUomLine, pcUomLine: $pcUomLine, pkQty: $pkQty, pcQty: $pcQty, priceUnit: $priceUnit, subTotal: $subTotal, singlePKPrice: $singlePKPrice, singlePCPrice: $singlePCPrice, discountPercent: $discountPercent, autoKey: $autoKey, productUom: $productUom, productUomName: $productUomName}';
   }
 }

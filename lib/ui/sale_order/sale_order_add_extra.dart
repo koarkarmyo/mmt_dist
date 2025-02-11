@@ -31,7 +31,7 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
   ResPartner? _customer;
   Function(SaleOrderLine deliveryItem)? _addItemFunction;
 
-  Function(int productId)? _removeItemFunction;
+  Function(int productId, double? autoKey)? _removeItemFunction;
 
   SaleType? extraType;
 
@@ -71,13 +71,15 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
       if (data['extra_type'] == SaleType.foc) {
         _addItemFunction =
             (deliveryItem) => _cartCubit.addCartFocItem(focItem: deliveryItem);
-        _removeItemFunction =
-            (productId) => _cartCubit.removeFocItem(productId: productId);
+        _removeItemFunction = (productId, autoKey) => _cartCubit.removeFocItem(
+              productId: productId,
+              autoKey: autoKey,
+            );
       } else if (data['extra_type'] == 'coupon') {
         _addItemFunction = (deliveryItem) =>
             _cartCubit.addCartCouponItem(coupon: deliveryItem);
-        _removeItemFunction =
-            (productId) => _cartCubit.removeCouponItem(productId: productId);
+        _removeItemFunction = (productId, autoKey) =>
+            _cartCubit.removeCouponItem(productId: productId);
       }
     }
   }
@@ -241,7 +243,8 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
         int index = _itemList.indexWhere(
           (element) =>
               element.productId == product.id &&
-              element.saleType == SaleType.foc,
+              element.saleType == SaleType.foc &&
+              element.autoKey == product.id,
         );
 
         return ListTile(
@@ -253,6 +256,7 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
                   productName: product.name,
                   saleType: SaleType.foc,
                   pkQty: 1,
+                  autoKey: product.id?.toDouble(),
                   pkUomLine: product.uomLines?.firstOrNull,
                   priceUnit: 1,
                   singlePKPrice: 0,
@@ -262,7 +266,7 @@ class _SaleOrderAddExtraState extends State<SaleOrderAddExtra> {
               }
             } else {
               if (_removeItemFunction != null) {
-                _removeItemFunction!(product.id ?? 0);
+                _removeItemFunction!(product.id ?? 0, _itemList[index].autoKey);
               }
               // _cartCubit.removeFocItem(productId: product.id ?? 0);
             }

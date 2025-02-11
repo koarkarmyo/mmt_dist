@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:collection/collection.dart';
@@ -66,7 +67,7 @@ class _DashboardPageState extends State<DashboardPage> {
       Object? obj = ModalRoute.of(context)?.settings.arguments;
       if (obj != null) {
         WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback(
-              (timeStamp) async {
+          (timeStamp) async {
             MainSyncProcess.instance.startManualSyncWithSyncGroup("MASTER");
             showDialog(
                 context: context,
@@ -136,10 +137,15 @@ class _DashboardPageState extends State<DashboardPage> {
         actions: [
           IconButton(
               onPressed: () async {
+                double dd = pow(10, 17).toDouble();
+                debugPrint(DateTime.now().microsecondsSinceEpoch.toString());
+                debugPrint(dd.toString());
+                double d = (DateTime.now().microsecondsSinceEpoch / dd);
+                // 1739270800670689
                 // PrinterUtils().printQRCode();
                 // context.pushTo(route: RouteList.stockQuantPackagePage);
                 // String barr = await MMTApplication.generateNoSeriesLot();
-                // debugPrint(barr);
+                debugPrint(d.toString());
               },
               icon: const Icon(
                 Icons.print,
@@ -181,8 +187,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                         ? AppColors.dangerColor
                                         : AppColors.primaryColor,
                                     valueColor:
-                                    const AlwaysStoppedAnimation<Color>(
-                                        Colors.white),
+                                        const AlwaysStoppedAnimation<Color>(
+                                            Colors.white),
                                     strokeWidth: 3),
                               ),
                             ).padding(padding: const EdgeInsets.only(right: 16))
@@ -196,23 +202,23 @@ class _DashboardPageState extends State<DashboardPage> {
                       onSelected: (String value) {
                         List<SyncResponse> syncList = state.actionList;
                         syncList.sort((a, b) =>
-                        a.priority?.compareTo(b.priority ?? 0) ?? -1);
+                            a.priority?.compareTo(b.priority ?? 0) ?? -1);
                         // Handle the selected value
                         _showSyncActionSelectWidget(
                             listTitle: value,
                             actionList: syncList
                                 .where(
                                   (element) => element.checkActionGroup(
-                                  groupName: value),
-                            )
+                                      groupName: value),
+                                )
                                 .toList());
                       },
                       itemBuilder: (BuildContext context) =>
                           state.actionGroupList
                               .map((item) => PopupMenuItem<String>(
-                            value: item.name,
-                            child: Text(item.name ?? ''),
-                          ))
+                                    value: item.name,
+                                    child: Text(item.name ?? ''),
+                                  ))
                               .toList(),
                       icon: const Icon(Icons.sync), // This is the IconButton
                     );
@@ -252,15 +258,15 @@ class _DashboardPageState extends State<DashboardPage> {
           if (state.dashboardList.isEmpty) {
             return const Center(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.numbers),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Text("Dashboard is empty"),
-                  ],
-                )).expanded();
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.numbers),
+                SizedBox(
+                  height: 20,
+                ),
+                Text("Dashboard is empty"),
+              ],
+            )).expanded();
           }
           return ValueListenableBuilder<int>(
             valueListenable: selectedTitleIndexNotifier,
@@ -270,7 +276,7 @@ class _DashboardPageState extends State<DashboardPage> {
               List<DashboardGroup> groupList = [];
 
               _dashboardList.forEach(
-                    (element) {
+                (element) {
                   if (!groupList
                       .map((e) => e.id)
                       .toList()
@@ -296,9 +302,9 @@ class _DashboardPageState extends State<DashboardPage> {
                         count: _dashboardList
                             .where(
                               (element) =>
-                          element.dashboardGroupId ==
-                              groupList[selectedTitleIndex].id,
-                        )
+                                  element.dashboardGroupId ==
+                                  groupList[selectedTitleIndex].id,
+                            )
                             .toList()
                             .length),
                     Expanded(
@@ -330,10 +336,10 @@ class _DashboardPageState extends State<DashboardPage> {
                                     Text(
                                       " ( Count : ${_dashboardList.where(
                                             (element) =>
-                                        element.dashboardGroupId ==
-                                            groupList[selectedTitleIndex]
-                                                .id,
-                                      ).toList().length} ) ",
+                                                element.dashboardGroupId ==
+                                                groupList[selectedTitleIndex]
+                                                    .id,
+                                          ).toList().length} ) ",
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
@@ -347,9 +353,9 @@ class _DashboardPageState extends State<DashboardPage> {
                                 buildProcessList(_dashboardList
                                     .where(
                                       (element) =>
-                                  element.dashboardGroupId ==
-                                      groupList[selectedTitleIndex].id,
-                                )
+                                          element.dashboardGroupId ==
+                                          groupList[selectedTitleIndex].id,
+                                    )
                                     .toList())
                               ],
                             ),
@@ -373,8 +379,8 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Widget buildTitleList(
       {required List<DashboardGroup> dashboardGroupList,
-        required int selectedTitleIndex,
-        required int count}) {
+      required int selectedTitleIndex,
+      required int count}) {
     return SingleChildScrollView(
       controller: _scrollController,
       scrollDirection: Axis.horizontal,
@@ -421,15 +427,15 @@ class _DashboardPageState extends State<DashboardPage> {
                                   height: 60,
                                   child: CachedNetworkImage(
                                     imageUrl:
-                                    "${MMTApplication.serverUrl}/web/image?model=dashboard.group&id=${dashboardGroupList[index].id}&field=icon&unique=17313080190333",
+                                        "${MMTApplication.serverUrl}/web/image?model=dashboard.group&id=${dashboardGroupList[index].id}&field=icon&unique=17313080190333",
                                     httpHeaders: {
                                       "Cookie":
-                                      "session_id=${MMTApplication.session?.sessionId}"
+                                          "session_id=${MMTApplication.session?.sessionId}"
                                     },
                                     placeholder: (context, url) =>
-                                    const CircularProgressIndicator(),
+                                        const CircularProgressIndicator(),
                                     errorWidget: (context, url, error) =>
-                                    const Icon(Icons.error),
+                                        const Icon(Icons.error),
                                   ),
                                 ),
                                 const SizedBox(height: 8),
@@ -440,7 +446,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize:
-                                    selectedTitleIndex == index ? 16 : 14,
+                                        selectedTitleIndex == index ? 16 : 14,
                                     fontWeight: selectedTitleIndex == index
                                         ? FontWeight.bold
                                         : null,
@@ -520,7 +526,7 @@ class _DashboardPageState extends State<DashboardPage> {
               borderOnForeground: true,
               child: Padding(
                 padding:
-                const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
+                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -532,15 +538,15 @@ class _DashboardPageState extends State<DashboardPage> {
                           width: 40,
                           child: CachedNetworkImage(
                             imageUrl:
-                            "${MMTApplication.serverUrl}/web/image?model=dashboard.setting&id=${process.id}&field=icon&unique=17313080190333",
+                                "${MMTApplication.serverUrl}/web/image?model=dashboard.setting&id=${process.id}&field=icon&unique=17313080190333",
                             httpHeaders: {
                               "Cookie":
-                              "session_id=${MMTApplication.session?.sessionId}"
+                                  "session_id=${MMTApplication.session?.sessionId}"
                             },
                             placeholder: (context, url) =>
-                            const CircularProgressIndicator(),
+                                const CircularProgressIndicator(),
                             errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
+                                const Icon(Icons.error),
                           ),
                         )
                       ],
@@ -574,7 +580,7 @@ class _DashboardPageState extends State<DashboardPage> {
       builder: (context) {
         List<String?> selectionList = [];
         actionList.forEach(
-              (element) => selectionList.add(element.description),
+          (element) => selectionList.add(element.description),
         );
         return BottomSheetSelectionWidget(
             listTitle: "$listTitle Sync Action",
@@ -582,7 +588,7 @@ class _DashboardPageState extends State<DashboardPage> {
             onTap: () {
               List<SyncResponse> syncList = [];
               actionList.forEachIndexed(
-                    (index, element) {
+                (index, element) {
                   if (selectActionList.value[index]) {
                     syncList.add(element);
                   }
@@ -670,7 +676,6 @@ class _DashboardPageState extends State<DashboardPage> {
 //   );
 // }
 }
-
 
 // import 'dart:async';
 // import 'dart:math';

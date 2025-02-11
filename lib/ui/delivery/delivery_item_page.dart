@@ -91,7 +91,10 @@ class _DeliveryItemPageState extends State<DeliveryItemPage> {
               SlidableAction(
                   backgroundColor: AppColors.dangerColor,
                   onPressed: (context) {
-                    _cartCubit.removeSaleItem(productId: product.id ?? 0);
+                    _cartCubit.removeSaleItem(
+                      productId: product.id ?? 0,
+                      autoKey: deliveryItem.autoKey,
+                    );
                   },
                   label: "Delete",
                   icon: Icons.delete)

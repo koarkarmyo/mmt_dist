@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:mmt_mobile/api/api_request.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
@@ -13,6 +14,7 @@ import '../../model/product/product_product.dart';
 import '../../model/product/uom_lines.dart';
 import '../../model/sale_order/sale_order_line.dart';
 import '../../src/const_string.dart';
+import 'package:mmt_mobile/src/enum.dart';
 import '../../src/mmt_application.dart';
 import '../../src/style/app_color.dart';
 
@@ -156,48 +158,93 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
   Widget _focItemListWidget() {
     return BlocBuilder<ProductCubit, ProductState>(
       builder: (context, state) {
-        return ListView.builder(
-          itemCount: state.productList.length,
-          itemBuilder: (context, index) {
-            ProductProduct product = state.productList[index];
-            return _productItem(product: product);
+        return BlocBuilder<CartCubit, CartState>(
+          builder: (context, cartState) {
+            return ListView.builder(
+              itemCount: cartState.itemList.length,
+              itemBuilder: (context, index) {
+                SaleOrderLine line = cartState.itemList[index];
+                ProductProduct product = state.productList
+                    .firstWhere((element) => element.id == line.productId);
+                return _productItem(product: product, orderLine: line);
+              },
+            );
           },
         ).expanded();
       },
     );
   }
 
-  Widget _productItem({required ProductProduct product}) {
-    TextEditingController _qtyController = TextEditingController();
-    TextEditingController _pkController = TextEditingController();
-    TextEditingController _pcController = TextEditingController();
+  Widget _productItem(
+      {required ProductProduct product, required SaleOrderLine orderLine}) {
+    // TextEditingController qtyController = TextEditingController();
+    TextEditingController pkController = TextEditingController();
+    TextEditingController pcController = TextEditingController();
 
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, state) {
-        int index = state.itemList.indexWhere(
-          (element) => element.productId == product.id,
-        );
+        int index = 10;
+        // int index = state.itemList
+        //     .indexWhere((element) => element.productId == product.id );
         if (index == -1) {
           return Container();
         } else {
-          SaleOrderLine? deliveryItem = state.itemList[index];
-          double number = deliveryItem.productUomQty ?? 0;
-          double pkNumber = deliveryItem.pkQty ?? 0;
-          double pcNumber = deliveryItem.pcQty ?? 0;
-          _qtyController.text =
-              (number % 1 == 0) ? number.toInt().toString() : number.toString();
-          _pkController.text = (pkNumber % 1 == 0)
-              ? pkNumber.toInt().toString()
-              : pkNumber.toString();
-          _pcController.text = (pcNumber % 1 == 0)
-              ? pcNumber.toInt().toString()
-              : pcNumber.toString();
+          SaleOrderLine? deliveryItem = orderLine;
+          // double number = deliveryItem.productUomQty ?? 0;
+          // double pkNumber = deliveryItem.pkQty ?? 0;
+          // double pcNumber = deliveryItem.pcQty ?? 0;
+          // qtyController.text =
+          //     (number % 1 == 0) ? number.toInt().toString() : number.toString();
+          // pkController.text = (pkNumber % 1 == 0)
+          //     ? pkNumber.toInt().toString()
+          //     : pkNumber.toString();
+          // pcController.text = (pcNumber % 1 == 0)
+          //     ? pcNumber.toInt().toString()
+          //     : pcNumber.toString();
+          debugPrint('xxxxxxxx:::${deliveryItem.pkQty}');
+          //
+          pkController.text = (deliveryItem.pkQty ?? 0).toQty();
+          pcController.text = (deliveryItem.pcQty ?? 0).toQty();
+
+          pkController.selection = TextSelection.fromPosition(TextPosition(offset: pkController.text.length));
           return Slidable(
+            startActionPane:
+                ActionPane(motion: const ScrollMotion(), children: [
+              SlidableAction(
+                  backgroundColor: AppColors.infoColor,
+                  onPressed: (context) {
+                    double dd = MMTApplication.genAutoKey(deliveryItem.autoKey);
+                    debugPrint('xxxxxx$dd');
+                    _cartCubit.addCartSaleItem(
+                      saleItem: deliveryItem.copyWith(
+                        autoKey: dd,
+                        pkQty: 0,
+                      ),
+                    );
+                  },
+                  label: ConstString.add,
+                  icon: Icons.add),
+              SlidableAction(
+                  backgroundColor: AppColors.successColor,
+                  onPressed: (context) {
+                    _cartCubit.addCartSaleItem(
+                      saleItem: deliveryItem.copyWith(
+                        autoKey:
+                            MMTApplication.genAutoKey(deliveryItem.autoKey),
+                        pkQty: 0,
+                      ),
+                    );
+                  },
+                  label: ConstString.delete,
+                  icon: Icons.delete),
+            ]),
             endActionPane: ActionPane(motion: const ScrollMotion(), children: [
               SlidableAction(
                   backgroundColor: AppColors.dangerColor,
                   onPressed: (context) {
-                    _cartCubit.removeSaleItem(productId: product.id ?? 0);
+                    _cartCubit.removeSaleItem(
+                        productId: product.id ?? 0,
+                        autoKey: deliveryItem.autoKey);
                   },
                   label: ConstString.delete,
                   icon: Icons.delete)
@@ -235,10 +282,14 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                             deliveryItem.discountPercent = discountAmount;
                             double subtotal = calculateSubtotal([deliveryItem]);
                             // print("Subtotal : $subtotal");
+
                             _cartCubit.addCartSaleItem(
-                                saleItem: deliveryItem.copyWith(
-                                    discountPercent: discountAmount,
-                                    subTotal: subtotal));
+                              saleItem: deliveryItem.copyWith(
+                                  autoKey: MMTApplication.genAutoKey(
+                                      deliveryItem.autoKey),
+                                  discountPercent: discountAmount,
+                                  subTotal: subtotal),
+                            );
                           }
                         },
                         child: Text(
@@ -254,77 +305,78 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     // Aligns widgets to the right
                     children: MMTApplication.currentUser?.useLooseBox ?? false
-                        ? [
-                            SizedBox(
-                              width: 80, // Set a fixed width for the TextField
-                              child: TextField(
-                                textAlign: TextAlign.right,
-                                keyboardType: TextInputType.number,
-                                onTap: () {
-                                  _pkController.selection = TextSelection(
-                                      baseOffset: 0,
-                                      extentOffset: _pkController.text.length);
-                                },
-                                onTapOutside: (event) {
-                                  // Unfocus when tapping anywhere outside the TextField
-                                  FocusScope.of(context).unfocus();
-                                },
-                                autofocus: false,
-                                controller: _pkController,
-                                onChanged: (value) {
-                                  _cartCubit.addCartSaleItem(
-                                      saleItem: deliveryItem.copyWith(
-                                    pkQty: (_pkController.text != '')
-                                        ? double.tryParse(_pkController.text)
-                                        : 0,
-                                  ));
-                                },
-                                decoration: const InputDecoration(
-                                    isDense: true,
-                                    // Reduces height of the TextField
-                                    contentPadding: EdgeInsets.symmetric(
-                                        vertical: 8, horizontal: 8),
-                                    border: OutlineInputBorder(),
-                                    hintText: 'PK',
-                                    label: Text("PK")),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            SizedBox(
-                              width: 80, // Set a fixed width for the TextField
-                              child: TextField(
-                                textAlign: TextAlign.right,
-                                keyboardType: TextInputType.number,
-                                onTap: () {
-                                  _pcController.selection = TextSelection(
-                                      baseOffset: 0,
-                                      extentOffset: _pcController.text.length);
-                                },
-                                onTapOutside: (event) {
-                                  // Unfocus when tapping anywhere outside the TextField
-                                  FocusScope.of(context).unfocus();
-                                },
-                                autofocus: false,
-                                controller: _pcController,
-                                onChanged: (value) {
-                                  _cartCubit.addCartSaleItem(
-                                      saleItem: deliveryItem.copyWith(
-                                    pcQty: (_pcController.text != '')
-                                        ? double.tryParse(_pcController.text)
-                                        : 0,
-                                  ));
-                                },
-                                decoration: const InputDecoration(
-                                    isDense: true,
-                                    // Reduces height of the TextField
-                                    contentPadding: EdgeInsets.symmetric(
-                                        vertical: 8, horizontal: 8),
-                                    border: OutlineInputBorder(),
-                                    hintText: 'PC',
-                                    label: Text("PC")),
-                              ),
-                            ),
-                          ]
+                        ? []
+                        // ? [
+                        //     SizedBox(
+                        //       width: 80, // Set a fixed width for the TextField
+                        //       child: TextField(
+                        //         textAlign: TextAlign.right,
+                        //         keyboardType: TextInputType.number,
+                        //         onTap: () {
+                        //           pkController.selection = TextSelection(
+                        //               baseOffset: 0,
+                        //               extentOffset: pkController.text.length);
+                        //         },
+                        //         onTapOutside: (event) {
+                        //           // Unfocus when tapping anywhere outside the TextField
+                        //           FocusScope.of(context).unfocus();
+                        //         },
+                        //         autofocus: false,
+                        //         controller: pkController,
+                        //         onChanged: (value) {
+                        //           _cartCubit.addCartSaleItem(
+                        //               saleItem: deliveryItem.copyWith(
+                        //             pkQty: (pkController.text != '')
+                        //                 ? double.tryParse(pkController.text)
+                        //                 : 0,
+                        //           ));
+                        //         },
+                        //         decoration: const InputDecoration(
+                        //             isDense: true,
+                        //             // Reduces height of the TextField
+                        //             contentPadding: EdgeInsets.symmetric(
+                        //                 vertical: 8, horizontal: 8),
+                        //             border: OutlineInputBorder(),
+                        //             hintText: 'PK',
+                        //             label: Text("PK")),
+                        //       ),
+                        //     ),
+                        //     const SizedBox(width: 8),
+                        //     SizedBox(
+                        //       width: 80, // Set a fixed width for the TextField
+                        //       child: TextField(
+                        //         textAlign: TextAlign.right,
+                        //         keyboardType: TextInputType.number,
+                        //         onTap: () {
+                        //           pcController.selection = TextSelection(
+                        //               baseOffset: 0,
+                        //               extentOffset: pcController.text.length);
+                        //         },
+                        //         onTapOutside: (event) {
+                        //           // Unfocus when tapping anywhere outside the TextField
+                        //           FocusScope.of(context).unfocus();
+                        //         },
+                        //         autofocus: false,
+                        //         controller: pcController,
+                        //         onChanged: (value) {
+                        //           _cartCubit.addCartSaleItem(
+                        //               saleItem: deliveryItem.copyWith(
+                        //             pcQty: (pcController.text != '')
+                        //                 ? double.tryParse(pcController.text)
+                        //                 : 0,
+                        //           ));
+                        //         },
+                        //         decoration: const InputDecoration(
+                        //             isDense: true,
+                        //             // Reduces height of the TextField
+                        //             contentPadding: EdgeInsets.symmetric(
+                        //                 vertical: 8, horizontal: 8),
+                        //             border: OutlineInputBorder(),
+                        //             hintText: 'PC',
+                        //             label: Text("PC")),
+                        //       ),
+                        //     ),
+                        //   ]
                         : [
                             // Spacing between TextField and Dropdown
                             Container(
@@ -347,15 +399,16 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                                   _cartCubit.addCartSaleItem(
                                       saleItem: SaleOrderLine(
                                           productId: product.id,
+                                          autoKey: deliveryItem.autoKey,
                                           productName: product.name,
-                                          pkQty: (_qtyController.text != '')
+                                          pkQty: (pkController.text != '')
                                               ? double.tryParse(
-                                                  _qtyController.text)
+                                                  pkController.text)
                                               : 0,
                                           productUomQty:
-                                              (_qtyController.text != '')
+                                              (pkController.text != '')
                                                   ? double.tryParse(
-                                                      _qtyController.text)
+                                                      pkController.text)
                                                   : 0,
                                           uomLine: newValue));
                                 },
@@ -370,29 +423,30 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                                 textAlign: TextAlign.right,
                                 keyboardType: TextInputType.number,
                                 onTap: () {
-                                  _qtyController.selection = TextSelection(
+                                  pkController.selection = TextSelection(
                                       baseOffset: 0,
-                                      extentOffset: _qtyController.text.length);
+                                      extentOffset: pkController.text.length);
                                 },
                                 onTapOutside: (event) {
                                   // Unfocus when tapping anywhere outside the TextField
                                   FocusScope.of(context).unfocus();
                                 },
                                 autofocus: false,
-                                controller: _qtyController,
+                                controller: pkController,
                                 onChanged: (value) {
                                   _cartCubit.addCartSaleItem(
                                       saleItem: SaleOrderLine(
+                                          autoKey: deliveryItem.autoKey,
                                           productId: product.id,
                                           productName: product.name,
-                                          pkQty: (_qtyController.text != '')
+                                          pkQty: (pkController.text != '')
                                               ? double.tryParse(
-                                                  _qtyController.text)
+                                                  pkController.text)
                                               : 0,
                                           productUomQty:
-                                              (_qtyController.text != '')
+                                              (pkController.text != '')
                                                   ? double.tryParse(
-                                                      _qtyController.text)
+                                                      pkController.text)
                                                   : 0,
                                           uomLine: deliveryItem.uomLine ??
                                               product.uomLines?.first));

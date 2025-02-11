@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mmt_mobile/model/company_id.dart';
@@ -19,6 +21,7 @@ class MMTApplication {
   // static const String serverUrl = 'http://217.15.166.234:8069';
 
   static String serverUrl = 'http://150.95.27.145';
+
   // static String serverUrl = 'http://150.95.27.145';
   static Employee? currentUser;
   static ResPartner? currentCustomer;
@@ -231,5 +234,10 @@ class MMTApplication {
     } else {
       return status;
     }
+  }
+
+  static double genAutoKey(double? autoKey) {
+    return (autoKey ?? 0.0) +
+        (DateTime.now().microsecondsSinceEpoch / pow(10, 17).toDouble());
   }
 }
