@@ -20,4 +20,9 @@ class StockLoadingState {
         stockMoveWithTotalList:
             stockMoveWithTotalList ?? this.stockMoveWithTotalList);
   }
+
+  @override
+  String toString() {
+    return 'StockLoadingState{state: ${state.name}, stockMoveList: $stockMoveList, stockMoveWithTotalList: $stockMoveWithTotalList}';
+  }
 }

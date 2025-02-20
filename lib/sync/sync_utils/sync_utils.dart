@@ -17,6 +17,8 @@ import '../../model/dashboard.dart';
 import '../../model/price_list/price_list_item.dart';
 import '../../model/product/product_product.dart';
 import '../../model/route/route_plan.dart';
+import '../../model/stock_quant.dart';
+import '../../src/mmt_application.dart';
 
 enum SyncProcess {
   Finished,

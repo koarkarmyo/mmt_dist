@@ -165,6 +165,11 @@ class StockMoveLine {
       isLot: isLot ?? this.isLot,
     );
   }
+
+  @override
+  String toString() {
+    return 'StockMoveLine{id: $id, batchNo: $batchNo, scheduledDate: $scheduledDate, pickingId: $pickingId, pickingName: $pickingName, productsAvailability: $productsAvailability, partnerId: $partnerId, partnerName: $partnerName, origin: $origin, locationId: $locationId, locationDestId: $locationDestId, moveId: $moveId, saleLineId: $saleLineId, productId: $productId, productName: $productName, productUomId: $productUomId, productUomName: $productUomName, productQty: $productQty, productUomQty: $productUomQty, qtyDone: $qtyDone, lotId: $lotId, lotName: $lotName, isChecked: $isChecked, lotList: $lotList, isLot: $isLot, data: $data, controller: $controller}';
+  }
 }
 
 class StockMoveData {

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:mmt_mobile/model/base_api_response.dart';
 
 import '../../model/stock_move.dart';
+import '../../src/mmt_application.dart';
 import '../base_api_repo.dart';
 
 class BatchApiRepo extends BaseApiRepo {
@@ -10,8 +11,14 @@ class BatchApiRepo extends BaseApiRepo {
   BatchApiRepo._();
 
   Future<List<StockMoveLine>> fetchBatchFromApi({required String name}) async {
-    Response response = await postMethodCall(
-        additionalPath: '/batch/', bodyData: {"name": name});
+    Response response =
+        await postApiMethodCall(additionalPath: '/api/sync/', params: {
+      "name": "loading_scan",
+      "args": {
+        "company_id": MMTApplication.selectedCompany?.id,
+        "name": name,
+      }
+    });
 
     BaseApiResponse<StockMoveLine> baseApiResponse =
         BaseApiResponse<StockMoveLine>.fromJson(response.data,

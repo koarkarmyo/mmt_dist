@@ -6,7 +6,9 @@ import 'package:mmt_mobile/business%20logic/bloc/bloc_crud_process_state.dart';
 import 'package:mmt_mobile/business%20logic/bloc/lot/lot_cubit.dart';
 import 'package:mmt_mobile/common_widget/alert_dialog.dart';
 import 'package:mmt_mobile/common_widget/animated_button.dart';
+import 'package:mmt_mobile/common_widget/bottom_choice_sheet_widget.dart';
 import 'package:mmt_mobile/common_widget/retry_widget.dart';
+import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/src/extension/number_extension.dart';
 import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/ui/loading/stock_loading_add_lot.dart';
@@ -40,7 +42,6 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
   // final ValueNotifier<List<StockMoveLine>> _stockMoveLineListNotifier =
   //     ValueNotifier([]);
   List<ProductProduct> _productList = [];
-  List<TextEditingController> _controllerList = [];
 
   // TextEditingController controller = TextEditingController();
 
@@ -603,12 +604,13 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
               ),
             )
           : Container(),
-
       (stockMoveLine.isLot ?? false)
           ? _tableItem((_calculateQtyDoneFromLot(stockMoveLine: stockMoveLine))
               .toStringAsFixed(MMTApplication.selectedCompany?.qtyDigit ?? 0))
           : BlocBuilder<StockLoadingCubit, StockLoadingState>(
               builder: (context, state) {
+                TextEditingController qtyInputController =
+                    TextEditingController();
                 return TextField(
                   style: const TextStyle(
                       fontSize: 14, fontWeight: FontWeight.bold),
@@ -618,11 +620,19 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
                             element.id == stockMoveLine.id &&
                             element.productUomId == stockMoveLine.productUomId);
                     if (index > -1) {
-                      state.stockMoveWithTotalList[index].qtyDone =
-                          _changeToRefQty(
-                              qty: double.tryParse(value) ?? 0,
-                              uomId: stockMoveLine.productUomId ?? 0,
-                              productId: stockMoveLine.productId ?? 0);
+                      double qtyDone = _changeToRefQty(
+                          qty: double.tryParse(value) ?? 0,
+                          uomId: stockMoveLine.productUomId ?? 0,
+                          productId: stockMoveLine.productId ?? 0);
+                      if (qtyDone >
+                          (state.stockMoveWithTotalList[index].productUomQty ?? 0)) {
+                        stockMoveLine.controller?.text =
+                            (stockMoveLine.qtyDone ?? 0).toQty();
+                        context.showErrorDialog(ConstString.qtyMustNotGreaterThanRequire);
+                        return;
+                      }
+                      //
+                      state.stockMoveWithTotalList[index].qtyDone = qtyDone;
                       _stockLoadingCubit.editStockMoveLineList(
                           stockMoveLineList: state.stockMoveWithTotalList);
                     }
@@ -650,10 +660,10 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
 
   Widget _tableItem(String text, {Alignment align = Alignment.centerRight}) {
     return Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       child: Align(
         alignment: align,
-        child: Text(text, style: TextStyle(fontWeight: FontWeight.bold)),
+        child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold)),
       ),
     );
   }
@@ -662,13 +672,12 @@ class _StockLoadingAddPageState extends State<StockLoadingAddPage> {
     double doneQty = 0;
 
     ProductProduct? product = _productList
-        .where(
-          (element) => element.id == stockMoveLine.productId,
-        )
+        .where((element) => element.id == stockMoveLine.productId)
         .firstOrNull;
     UomLine? initialUom = product?.uomLines?.firstWhereOrNull(
       (element) => element.uomId == stockMoveLine.productUomId,
     );
+    //
     stockMoveLine.lotList?.forEach(
       (lot) {
         UomLine? uomline = product?.uomLines?.firstWhereOrNull(

@@ -144,4 +144,5 @@ class ConstString {
   static const String stockOrderSummary = "Stock order summary";
   static const String requiredStar = "*";
   static const String areYouSureToExit = "Are you sure to exit!";
+  static const String qtyMustNotGreaterThanRequire = "ခွင့်ပြုထားသောအရေအတွက်ထက် ပိုရိုက်၍ မရပါ";
 }
