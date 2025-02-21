@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:mmt_mobile/model/price_list/price_list_item.dart';
 import 'package:mmt_mobile/model/product/uom_lines.dart';
 
@@ -240,4 +241,23 @@ class ProductProduct {
   }
 
   UomLine? getRefUom() => MMTApplication.getReferenceUomLine(uomLines!);
+
+  double uomPrice(UomLine? uomLine) {
+    double price = 0.0;
+    double subtotal = 1 * (listPrice ?? 0.0);
+    if(uomLine != null) {
+      double lQty = MMTApplication.uomQtyToRefTotal(uomLine, 1);
+      price = (subtotal / lQty).roundToDouble();
+    }
+    debugPrint('uom line is null in product');
+    return price;
+  }
+
+  double rewardPrice(UomLine uomLine) {
+    double price = 0.0;
+    double subtotal = 1 * (standardPrice ?? 0.0);
+    double lQty = MMTApplication.uomQtyToRefTotal(uomLine, 1);
+    price = (subtotal / lQty).roundToDouble();
+    return price;
+  }
 }

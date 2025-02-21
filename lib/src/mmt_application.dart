@@ -243,4 +243,16 @@ class MMTApplication {
     return (autoKey ?? 0.0) +
         (DateTime.now().microsecondsSinceEpoch / pow(10, 17).toDouble());
   }
+
+  static List<RewardLine> checkPromotionLines(
+      List<Promotions> promotions, ProductProduct product) {
+    //
+    List<RewardLine> rewards = [];
+    promotions.forEach((element) {
+      rewards.addAll(element.rewardLine ?? []);
+    });
+    final rtn =
+        rewards.where((element) => element.productId == product.id).toList();
+    return rtn;
+  }
 }

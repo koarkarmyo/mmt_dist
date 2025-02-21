@@ -399,6 +399,7 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                                   _cartCubit.addCartSaleItem(
                                       saleItem: SaleOrderLine(
                                           productId: product.id,
+                                          product: product,
                                           autoKey: deliveryItem.autoKey,
                                           productName: product.name,
                                           pkQty: (pkController.text != '')
@@ -437,6 +438,7 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                                   _cartCubit.addCartSaleItem(
                                       saleItem: SaleOrderLine(
                                           autoKey: deliveryItem.autoKey,
+                                          product: product,
                                           productId: product.id,
                                           productName: product.name,
                                           pkQty: (pkController.text != '')

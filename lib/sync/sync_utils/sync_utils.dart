@@ -1788,6 +1788,7 @@ class SyncUtils {
     //
     bool success = await _helper.insertDataListBath(
         DBConstant.promotionTable, promotionJsonList);
+    debugPrint('rewardLines:::::${rewardJsonList.length}');
     await _helper.insertDataListBath(
         DBConstant.rewardLineTable, rewardJsonList);
     if (success) {

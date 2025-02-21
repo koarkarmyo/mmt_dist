@@ -591,7 +591,7 @@ class DBConstant {
   static const String expenseProductName = 'expense_product_name';
 
   static const String minAmount = 'min_amount';
-  static const String discType = 'disc_type';
-  static const String disPer = 'disc_per';
+  static const String discType = 'dis_type';
+  static const String disPer = 'dis_per';
   static const String refQty = 'ref_qty';
 }

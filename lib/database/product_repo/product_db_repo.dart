@@ -55,15 +55,15 @@ class ProductDBRepo extends BaseDBRepo {
   Future<List<ProductProduct>> getProductList() async {
     List<ProductProduct> products = [];
 
-    List<Map<String, dynamic>> productJsonList =
-        await helper.readDataByWhereArgs(
-      tableName: DBConstant.productProductTable,
-      orderBy: DBConstant.name,
-      where: '${DBConstant.type} =? ',
-      whereArgs: [ProductTypes.consu.name],
-    );
-    // List<Map<String, dynamic>> productUomList =
-    //     await helper.readAllData(tableName: DBConstant.productUomTable);
+    // List<Map<String, dynamic>> productJsonList =
+    //     await helper.readDataByWhereArgs(
+    //   tableName: DBConstant.productProductTable,
+    //   orderBy: DBConstant.name,
+    //   where: '${DBConstant.type} =? ',
+    //   whereArgs: [ProductTypes.consu.name],
+    // );
+    List<Map<String, dynamic>> productJsonList = await helper.readAllData(
+        tableName: DBConstant.productProductTable, orderBy: DBConstant.name);
     List<Map<String, dynamic>> uomMapList =
         await helper.readAllData(tableName: DBConstant.productUomTable);
 

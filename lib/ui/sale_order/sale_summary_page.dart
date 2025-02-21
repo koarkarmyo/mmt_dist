@@ -82,6 +82,11 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
                   context.showErrorDialog('Product ထည့်ပါ');
                   return;
                 }
+
+                state.itemList.forEach((element) {
+                  debugPrint('summary:::::stype:${element.saleType?.name}');
+                  debugPrint('summary:::::${element.toJson()}');
+                });
                 //
                 SaleOrder saleOrder = SaleOrder(
                   partnerId: MMTApplication.currentCustomer?.id,

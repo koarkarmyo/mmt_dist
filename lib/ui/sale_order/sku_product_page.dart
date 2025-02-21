@@ -20,18 +20,17 @@ import '../../model/sale_order/sale_order_line.dart';
 import '../../src/const_string.dart';
 import '../../src/style/app_color.dart';
 
-class SaleOrderAddProductPage extends StatefulWidget {
+class SKUProductPage extends StatefulWidget {
   final SaleOrder? saleOrder;
   final ResPartner? customer;
 
-  const SaleOrderAddProductPage({super.key, this.customer, this.saleOrder});
+  const SKUProductPage({super.key, this.customer, this.saleOrder});
 
   @override
-  State<SaleOrderAddProductPage> createState() =>
-      _SaleOrderAddProductPageState();
+  State<SKUProductPage> createState() => _SKUProductPageState();
 }
 
-class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
+class _SKUProductPageState extends State<SKUProductPage> {
   late ProductCubit _productCubit;
   final TextEditingController _searchProduct = TextEditingController();
   String? _filterProductCategory = 'All';
@@ -108,7 +107,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                 BlocBuilder<ProductCubit, ProductState>(
                   builder: (context, state) {
                     return Text(
-                      "$_filterProductCategory product list",
+                      "${state.productList.where((element) => element.type == ProductTypes.consu.name).length} product list",
                       style: const TextStyle(
                           fontSize: 14, fontWeight: FontWeight.w600),
                     );
@@ -164,8 +163,9 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
   Widget _productTableRows() {
     return BlocBuilder<ProductCubit, ProductState>(
       builder: (context, state) {
+        List<ProductProduct> products = state.productList.where((element) => element.type == ProductTypes.consu.name).toList();
         return ListView.builder(
-          itemCount: state.productList.length,
+          itemCount: products.length,
           itemBuilder: (context, index) {
             //
             if (!(MMTApplication.selectedCompany?.useLooseUom ?? true)) {
@@ -183,7 +183,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
             //       )
             //     :
             return _productRow(
-                product: state.productList[index], position: index);
+                product: products[index], position: index);
           },
         ).expanded();
       },
@@ -364,6 +364,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                     _cartCubit.addCartSaleItem(
                       saleItem: SaleOrderLine(
                         productId: product.id,
+                        product: product,
                         productName: product.name,
                         pkQty: deliveryItem?.pkQty,
                         priceUnit: price,
@@ -409,6 +410,7 @@ class _SaleOrderAddProductPageState extends State<SaleOrderAddProductPage> {
                 _cartCubit.addCartSaleItem(
                   saleItem: SaleOrderLine(
                     productId: product.id,
+                    product: product,
                     autoKey: product.id?.toDouble(),
                     productName: product.name,
                     pkQty: double.tryParse(value),

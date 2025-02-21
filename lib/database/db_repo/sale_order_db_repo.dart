@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:mmt_mobile/model/product/uom_lines.dart';
 import 'package:mmt_mobile/src/enum.dart';
 import 'package:mmt_mobile/src/extension/nullable_extension.dart';
@@ -39,6 +40,10 @@ class SaleOrderDBRepo extends BaseDBRepo {
           saleOrderLineMapList.add(jsonData);
         },
       );
+
+      saleOrderLineMapList.forEach((element) {
+        debugPrint('xxxxxxx::::${element}');
+      },);
 
       await helper.insertDataListBath(
           DBConstant.saleOrderLineTable, saleOrderLineMapList);

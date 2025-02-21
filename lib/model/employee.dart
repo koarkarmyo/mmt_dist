@@ -19,6 +19,7 @@ class Employee {
   int? companyId;
   List<SyncAction>? syncActionList;
   bool? useLooseBox;
+  bool? allowedEditFoc;
   List<CompanyId>? companyList;
   List<NumberSeries>? numberSeriesList;
 
@@ -38,6 +39,7 @@ class Employee {
     this.defaultPricelistName,
     this.defaultWarehouseName,
     this.defaultWarehouseId,
+    this.allowedEditFoc,
   });
 
   Employee.fromJson(Map<String, dynamic> json) {
@@ -52,6 +54,7 @@ class Employee {
     defaultPricelistId = json['default_pricelist_id'];
     defaultPricelistName = json['default_pricelist_name'];
     companyId = json['company_id'];
+    allowedEditFoc = json['allowed_edit_foc'];
     useLooseBox = json['use_loose_box'];
     if (json['sync_action'] != null) {
       syncActionList = [];
@@ -82,6 +85,7 @@ class Employee {
     map['name'] = name;
     map['id'] = id;
     map['phone'] = phone;
+    map['allowed_edit_foc'] = allowedEditFoc;
     map['email'] = email;
     map['default_location_id'] = defaultLocationId;
     map['default_location_name'] = defaultLocationName;

@@ -12,17 +12,17 @@ class SaleOrderCubit extends Cubit<SaleOrderState> {
       : super(SaleOrderState(
             saleOrderLineList: [], state: BlocCRUDProcessState.initial));
 
-  Future<void> saveSaleOrder(
-      {required SaleOrder saleOrder,
-      required List<SaleOrderLine> saleOrderLineList}) async {
-    emit(state.copyWith(state: BlocCRUDProcessState.creating));
-    bool success = await SaleOrderDBRepo.instance.saveSaleOrder(
-        saleOrder: saleOrder, saleOrderLineList: saleOrderLineList);
-
-    if (success) {
-      emit(state.copyWith(state: BlocCRUDProcessState.createSuccess));
-    } else {
-      emit(state.copyWith(state: BlocCRUDProcessState.createFail));
-    }
-  }
+  // Future<void> saveSaleOrder(
+  //     {required SaleOrder saleOrder,
+  //     required List<SaleOrderLine> saleOrderLineList}) async {
+  //   emit(state.copyWith(state: BlocCRUDProcessState.creating));
+  //   bool success = await SaleOrderDBRepo.instance.saveSaleOrder(
+  //       saleOrder: saleOrder, saleOrderLineList: saleOrderLineList);
+  //
+  //   if (success) {
+  //     emit(state.copyWith(state: BlocCRUDProcessState.createSuccess));
+  //   } else {
+  //     emit(state.copyWith(state: BlocCRUDProcessState.createFail));
+  //   }
+  // }
 }

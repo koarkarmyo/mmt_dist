@@ -1,24 +1,38 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/rendering.dart';
+import 'package:mmt_mobile/database/data_object.dart';
 import 'package:mmt_mobile/database/db_repo/price_list_db_repo.dart';
+import 'package:mmt_mobile/database/product_repo/product_db_repo.dart';
 import 'package:mmt_mobile/src/enum.dart';
+import 'package:collection/collection.dart';
 
 import '../../../database/db_repo/sale_order_db_repo.dart';
 import '../../../model/price_list/price_list_item.dart';
+import '../../../model/product/product_product.dart';
+import '../../../model/product/uom_lines.dart';
+import '../../../model/promotion.dart';
 import '../../../model/sale_order/sale_order_6/sale_order.dart';
 import '../../../model/sale_order/sale_order_line.dart';
 import '../../../model/stock_picking/stock_picking_model.dart';
+import '../../../src/mmt_application.dart';
 import '../bloc_crud_process_state.dart';
 
 part 'cart_state.dart';
 
 class CartCubit extends Cubit<CartState> {
+  List<ProductProduct> _productList = [];
+
   CartCubit()
       : super(CartState(
             state: BlocCRUDProcessState.initial,
             itemList: [],
             focItemList: [],
-            couponList: []));
+            couponList: [])) {
+    ProductDBRepo.instance.getProductList().then((value) {
+      _productList = value;
+    });
+  }
+
   List<PriceListItem> _priceListItems = [];
 
   void addCartSaleItem(
@@ -47,9 +61,11 @@ class CartCubit extends Cubit<CartState> {
     }
 
     debugPrint('Cart Size ${state.itemList.length}');
+    List<SaleOrderLine> orderLines = state.itemList;
 
     emit(state.copyWith(
-      itemList: state.itemList,
+      itemList: orderLines,
+      focItemList: _promotionAdd(orderLines),
       state: BlocCRUDProcessState.updateSuccess,
     ));
   }
@@ -78,6 +94,7 @@ class CartCubit extends Cubit<CartState> {
 
     emit(state.copyWith(
       itemList: state.itemList,
+      focItemList: _promotionAdd(state.itemList),
       state: BlocCRUDProcessState.updateSuccess,
     ));
   }
@@ -92,7 +109,10 @@ class CartCubit extends Cubit<CartState> {
       state.itemList.removeAt(index);
     }
 
-    emit(state.copyWith(itemList: state.itemList));
+    emit(state.copyWith(
+      itemList: state.itemList,
+      focItemList: _promotionAdd(state.itemList),
+    ));
   }
 
   void addCartFocItem(
@@ -250,20 +270,20 @@ class CartCubit extends Cubit<CartState> {
     );
     state.focItemList.forEach(
       (element) {
-        if ((element.pcQty ?? 0) > 0) {
-          SaleOrderLine saleOrderLine = element.copyWith(
-              priceUnit: element.priceUnit,
-              productUomQty: element.pcQty,
-              uomLine: element.pcUomLine);
-          saleOrderLineList.add(saleOrderLine);
-        }
-        if ((element.pkQty ?? 0) > 0) {
+        // if ((element.pcQty ?? 0) > 0) {
+        //   SaleOrderLine saleOrderLine = element.copyWith(
+        //       priceUnit: element.priceUnit,
+        //       productUomQty: element.pcQty,
+        //       uomLine: element.pcUomLine);
+        //   saleOrderLineList.add(saleOrderLine);
+        // }
+        // if ((element.pkQty ?? 0) > 0) {
           SaleOrderLine saleOrderLine = element.copyWith(
               priceUnit: element.priceUnit,
               productUomQty: element.pkQty,
               uomLine: element.pkUomLine);
           saleOrderLineList.add(saleOrderLine);
-        }
+        // }
       },
     );
 
@@ -294,5 +314,160 @@ class CartCubit extends Cubit<CartState> {
     } else {
       emit(state.copyWith(state: BlocCRUDProcessState.createFail));
     }
+  }
+
+  List<SaleOrderLine> _promotionAdd(List<SaleOrderLine> lines) {
+    lines.removeWhere((element) => element.saleType == SaleType.foc);
+
+    List<SaleOrderLine> cartOrderDetailLines = [];
+    // cartOrderDetailLines.addAll(lines);
+    List<RewardLine> rewardLines = [];
+    lines.forEach((cart) {
+      List<RewardLine> rewardds = MMTApplication.checkPromotionLines(
+          MMTApplication.currentPromotions, cart.product!);
+
+      List<RewardLine> tmpRewards = rewardds
+          .where((element) => cart.totalRefQty >= (element.refQty ?? 0))
+          .toList();
+      if (tmpRewards.isNotEmpty) {
+        tmpRewards.sort((a, b) => (b.refQty ?? 0).compareTo(a.refQty ?? 0));
+        List<RewardLine> targetPromo = [];
+        targetPromo.add(tmpRewards.first);
+
+        // change to
+        targetPromo.forEach((rew) {
+          debugPrint('promotions:::: ${rew.productName}');
+          debugPrint('promotions:::: ${rew.refQty}');
+          debugPrint('promotions:::: ref cart ${cart.totalRefQty}');
+          debugPrint('--------------------------');
+          // List<UomLine> uomLines = cart.product.uomLines ?? [];
+          // double refQty = MMTApplication.uomQtyToRefTotal(
+          //     uomLines.firstWhere((uom) => uom.uomId == rew.uomId),
+          //     rew.qty ?? 0.0);
+          // debugPrint('rwward --- min qty ::: $refQty');
+          debugPrint('rwward --- total ref cart ::: ${cart.totalRefQty}');
+          // rew.refQty = refQty;
+          rew.product = cart.product;
+
+          if (cart.totalRefQty >= (rew.refQty ?? 0.0)) {
+            double rewardQty = 0;
+            if (rew.multiply ?? false) {
+              final double disc = cart.totalRefQty / (rew.refQty ?? 0.0);
+              // debugPrint('rwward --- rewws ::: ${cart.totalRefQty}');
+              // debugPrint('rwward --- rewws ::: ${rew.refQty}');
+              // debugPrint('rwward --- rewws ::: disc $disc');
+              // debugPrint(
+              //     'rwward --- rewws ::: ${disc.toInt() * (rew.rewardQty ?? 0)}');
+              // rew.rewardQty = disc.toInt() * (rew.rewardQty ?? 0);
+              rewardQty = disc.toInt() * (rew.rewardQty ?? 0);
+            }
+            rewardLines.add(rew.copyWith(rewardQty: rewardQty));
+          }
+          print('------------------------');
+        });
+      }
+    });
+
+    rewardLines.forEach((element) {
+      // reward product add
+      ProductProduct? rewProduct =
+          _productList.firstWhereOrNull((p) => p.id == element.rewardProductId);
+      if (rewProduct != null) {
+        // CartOrderDetail detail = CartOrderDetail(
+        //   defaultId: DateTime.now().microsecondsSinceEpoch.toDouble(),
+        //   product: rewProduct,
+        //   saleType: SaleType.foc,
+        //   suggestTotalQty: 0,
+        //   bQty: 0,
+        //   lQty: element.rewardQty ?? 0,
+        //   lUomId: element.rewardUomId,
+        //   lUomName: element.rewardUomName,
+        //   bUomId: element.rewardUomId,
+        //   bUomName: element.rewardUomName,
+        //   defaultPrice: rewProduct.standardPrice ?? 0.0,
+        //   priceListItems: [],
+        //   balanceQty: rewProduct.refQty ?? 0.0,
+        // );
+        //
+        UomLine? uomLine = rewProduct.uomLines
+            ?.firstWhereOrNull((uom) => uom.uomId == element.rewardUomId);
+        SaleOrderLine detail = SaleOrderLine(
+          productId: rewProduct.id,
+          product: rewProduct,
+          pkQty: element.rewardQty ?? 0,
+          uomLine: rewProduct.uomLines
+              ?.firstWhereOrNull((element) => element.uomId == element.uomId),
+          pkUomLine: rewProduct.uomLines
+              ?.firstWhereOrNull((element) => element.uomId == element.uomId),
+          saleType: SaleType.foc,
+          priceUnit: rewProduct.listPrice ?? 0.0,
+          listPrice: rewProduct.listPrice ?? 0.0,
+          productName: rewProduct.name,
+          singlePKPrice: rewProduct.uomPrice(uomLine),
+          autoKey: DateTime.now().microsecondsSinceEpoch.toDouble(),
+        );
+
+        //
+        // if (uomLine != null) {
+        //   detail.lPrice = rewProduct.rewardPrice(uomLine);
+        //   detail.calculateSubtotal();
+        // }
+        //
+        cartOrderDetailLines.add(detail);
+
+        if (element.productId != null) {
+          ProductProduct? product = _productList
+              .firstWhereOrNull((p) => p.id == element.expenseProductId);
+          debugPrint('rwward ::: expense Product ${product?.name}');
+          if (product != null) {
+            // CartOrderDetail expanseProduct = CartOrderDetail(
+            //   product: product,
+            //   defaultId: DateTime.now().microsecondsSinceEpoch.toDouble(),
+            //   saleType: SaleType.foc,
+            //   suggestTotalQty: 0,
+            //   bQty: 0,
+            //   lQty: -1 * (element.rewardQty ?? 1),
+            //   lUomId: product.uomId,
+            //   lUomName: product.uomName,
+            //   bUomId: product.uomId,
+            //   bUomName: product.uomName,
+            //   defaultPrice: product.standardPrice ?? 0.0,
+            //   priceListItems: [],
+            //   balanceQty: element.product?.refQty ?? 0.0,
+            // );
+            SaleOrderLine expanseProduct = SaleOrderLine(
+              productId: product.id,
+              product: product,
+              pkQty: -1 * (element.rewardQty ?? 1),
+              uomLine: rewProduct.uomLines?.firstWhereOrNull(
+                  (element) => element.uomId == element.uomId),
+              pkUomLine: product.uomLines?.firstWhereOrNull(
+                  (element) => element.uomId == element.uomId),
+              saleType: SaleType.foc,
+              priceUnit: product.rewardPrice(uomLine!),
+              listPrice: product.standardPrice ?? 0.0,
+              productName: product.name,
+              singlePKPrice: detail.singlePKPrice,
+              autoKey: DateTime.now().microsecondsSinceEpoch.toDouble(),
+            );
+            // saleItem: SaleOrderLine(
+            //   productId: product.id,
+            //   productName: product.name,
+            //   pkQty: deliveryItem?.pkQty,
+            //   priceUnit: price,
+            //   autoKey: product.id?.toDouble(),
+            //   productUomQty: deliveryItem?.productUomQty ?? 0.0,
+            //   uomLine: newValue,
+            // ),
+            // expanseProduct.lPrice = detail.lPrice;
+            //
+            cartOrderDetailLines.add(expanseProduct);
+          }
+        }
+      }
+    });
+
+    //
+    return cartOrderDetailLines;
   }
 }

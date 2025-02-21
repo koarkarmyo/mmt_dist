@@ -28,7 +28,6 @@ import 'package:mmt_mobile/ui/loading/stock_loading_detail.dart';
 import 'package:mmt_mobile/ui/login/admin_login.dart';
 import 'package:mmt_mobile/ui/login/login_page.dart';
 import 'package:mmt_mobile/ui/sale_order/sale_order_add_extra.dart';
-import 'package:mmt_mobile/ui/sale_order/sale_order_add_product.dart';
 import 'package:mmt_mobile/ui/sale_order/sale_order_page.dart';
 import 'package:mmt_mobile/ui/stock_request/stock_request_add_product.dart';
 import 'package:mmt_mobile/ui/stock_request/stock_request_home_page.dart';
@@ -36,11 +35,13 @@ import 'package:mmt_mobile/ui/stock_request/stock_request_list_page.dart';
 import 'package:mmt_mobile/ui/today_delivery_page.dart';
 
 import '../business logic/bloc/login/login_bloc.dart';
+import '../business logic/bloc/promotion/promotion_cubit.dart';
 import '../ui/contact_page.dart';
 import '../ui/loading/stock_loading_history_page.dart';
 import '../ui/product_report_page.dart';
 import '../ui/profile_page.dart';
 import '../ui/route_page.dart';
+import '../ui/sale_order/sku_product_page.dart';
 import '../ui/sale_order_history_page.dart';
 import '../ui/splash_page.dart';
 
@@ -88,8 +89,8 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
             providers: [BlocProvider(create: (context) => SyncActionCubit())],
             child: const ProfilePage(),
           ));
-  // case RouteList.dashboardPage:
-  //   return _buildPageRoute(routeSettings, const DashboardPage() );
+    // case RouteList.dashboardPage:
+    //   return _buildPageRoute(routeSettings, const DashboardPage() );
     case RouteList.routePage:
       return _buildPageRoute(
           routeSettings,
@@ -104,16 +105,20 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
     case RouteList.customerVisitPage:
       return _buildPageRoute(routeSettings, const CustomerVisitReportPage());
     case RouteList.todayOrderPage:
-      return _buildPageRoute(routeSettings, BlocProvider(
-        create: (context) => SaleOrderHistoryCubit(),
-        child: const SaleOrderHistoryPage(),
-      ));
+      return _buildPageRoute(
+          routeSettings,
+          BlocProvider(
+            create: (context) => SaleOrderHistoryCubit(),
+            child: const SaleOrderHistoryPage(),
+          ));
     case RouteList.saleOrderAddProductPage:
       return _buildPageRoute(
           routeSettings,
           MultiBlocProvider(
-            providers: [BlocProvider(create: (context) => ProductCubit())],
-            child: const SaleOrderAddProductPage(),
+            providers: [
+              BlocProvider(create: (context) => ProductCubit()),
+            ],
+            child: const SKUProductPage(),
           ));
     case RouteList.saleOrderPage:
       return _buildPageRoute(
@@ -121,15 +126,11 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
           MultiBlocProvider(
             providers: [
               BlocProvider(create: (context) => ProductCubit()),
+              BlocProvider(create: (context) => CartCubit()),
+              BlocProvider(create: (context) => ProductCategoryCubit()),
               BlocProvider(
-                create: (context) => CartCubit(),
-              ),
-              BlocProvider(
-                create: (context) => ProductCategoryCubit(),
-              ),
-              BlocProvider(
-                create: (context) => SaleOrderCubit(),
-              )
+                  create: (context) => PromotionCubit()..fetchPromotions()),
+              BlocProvider(create: (context) => SaleOrderCubit())
             ],
             child: const SaleOrderPage(),
           ));
@@ -152,8 +153,8 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
             ],
             child: const DeliveryPage(),
           ));
-  // case RouteList.scannerPage:
-  //   return _buildPageRoute(routeSettings, const ScannerPage());
+    // case RouteList.scannerPage:
+    //   return _buildPageRoute(routeSettings, const ScannerPage());
     case RouteList.todayDeliveryPage:
       return _buildPageRoute(routeSettings, const TodayDeliveryPage());
     case RouteList.deliveryReturnPage:

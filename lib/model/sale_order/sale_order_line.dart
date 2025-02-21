@@ -1,6 +1,8 @@
 import 'package:collection/collection.dart';
+import 'package:mmt_mobile/model/product/product_product.dart';
 
 import '../../database/db_constant.dart';
+import '../../src/mmt_application.dart';
 import '../product/uom_lines.dart';
 import '../stock_picking/stock_picking_model.dart';
 
@@ -18,6 +20,7 @@ class SaleOrderLine {
   UomLine? pcUomLine;
   double? pkQty;
   double? pcQty;
+  double? listPrice;
   double? priceUnit;
   double? subTotal;
   double? singlePKPrice;
@@ -25,6 +28,7 @@ class SaleOrderLine {
   double? discountPercent;
   int? productUom;
   String? productUomName;
+  ProductProduct? product;
 
   SaleOrderLine({
     this.productId,
@@ -40,6 +44,7 @@ class SaleOrderLine {
     this.pkQty,
     this.pcQty,
     this.priceUnit,
+    this.listPrice,
     this.subTotal,
     this.singlePCPrice,
     this.singlePKPrice,
@@ -47,6 +52,7 @@ class SaleOrderLine {
     this.productUomName,
     this.discountPercent,
     this.autoKey,
+    this.product,
   });
 
   SaleOrderLine.fromJson(Map<String, dynamic> json) {
@@ -163,33 +169,46 @@ class SaleOrderLine {
     double? pkQty,
     double? pcQty,
     double? priceUnit,
+    double? listPrice,
     double? subTotal,
     double? singlePKPrice,
     double? singlePCPrice,
     double? discountPercent,
     double? autoKey,
+    ProductProduct? product,
+    double? totalRef,
   }) {
     return SaleOrderLine(
-        id: id ?? this.id,
-        orderNo: orderNo ?? this.orderNo,
-        productId: productId ?? this.productId,
-        productName: productName ?? this.productName,
-        uomLine: uomLine ?? this.uomLine,
-        pkUomLine: pkUomLine ?? this.pkUomLine,
-        pcUomLine: pcUomLine ?? this.pcUomLine,
-        pcQty: pcQty ?? this.pcQty,
-        pkQty: pkQty ?? this.pkQty,
-        productUomQty: productUomQty ?? this.productUomQty,
-        priceUnit: priceUnit ?? this.priceUnit,
-        singlePCPrice: singlePCPrice ?? this.singlePCPrice,
-        singlePKPrice: singlePKPrice ?? this.singlePKPrice,
-        subTotal: subTotal ?? this.subTotal,
-        autoKey: autoKey ?? this.autoKey,
-        discountPercent: discountPercent ?? this.discountPercent);
+      id: id ?? this.id,
+      orderNo: orderNo ?? this.orderNo,
+      productId: productId ?? this.productId,
+      productName: productName ?? this.productName,
+      uomLine: uomLine ?? this.uomLine,
+      pkUomLine: pkUomLine ?? this.pkUomLine,
+      pcUomLine: pcUomLine ?? this.pcUomLine,
+      pcQty: pcQty ?? this.pcQty,
+      pkQty: pkQty ?? this.pkQty,
+      saleType: saleType ?? this.saleType,
+      productUomQty: productUomQty ?? this.productUomQty,
+      priceUnit: priceUnit ?? this.priceUnit,
+      singlePCPrice: singlePCPrice ?? this.singlePCPrice,
+      singlePKPrice: singlePKPrice ?? this.singlePKPrice,
+      subTotal: subTotal ?? this.subTotal,
+      autoKey: autoKey ?? this.autoKey,
+      product: product ?? this.product,
+      discountPercent: discountPercent ?? this.discountPercent,
+    );
   }
 
   @override
   String toString() {
     return 'SaleOrderLine{id: $id, orderNo: $orderNo, orderId: $orderId, autoKey: $autoKey, productId: $productId, productName: $productName, saleType: $saleType, productUomQty: $productUomQty, uomLine: $uomLine, pkUomLine: $pkUomLine, pcUomLine: $pcUomLine, pkQty: $pkQty, pcQty: $pcQty, priceUnit: $priceUnit, subTotal: $subTotal, singlePKPrice: $singlePKPrice, singlePCPrice: $singlePCPrice, discountPercent: $discountPercent, autoKey: $autoKey, productUom: $productUom, productUomName: $productUomName}';
+  }
+
+  double get totalRefQty {
+    if (uomLine != null) {
+      return MMTApplication.uomQtyToRefTotal(uomLine!, pkQty ?? 0);
+    }
+    return 0.0;
   }
 }

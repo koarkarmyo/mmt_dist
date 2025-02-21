@@ -22,7 +22,7 @@ class PromotionCubit extends Cubit<PromotionState> {
   fetchPromotions() async {
     emit(state.copyWith(state: BlocCRUDProcessState.fetching));
     DateTime today = DateTime.now();
-    String tDay = DateTimeUtils.yMmDd.format(today);
+    String tDay = DateTimeUtils.ddMmYYYFormatSlug.format(today);
     // SELECT * from promotion Where (start_date >= "2025-02-02" OR start_date IS NULL)
     // AND (end_date <= "2025-02-29" OR end_date IS NULL);
     List<Map<String, dynamic>> jList = await _helper.rawQueryC(
@@ -57,6 +57,8 @@ class PromotionCubit extends Cubit<PromotionState> {
     });
 
     MMTApplication.currentPromotions = tmp;
+
+    debugPrint('promotion ::: length ${tmp.length}');
     emit(state.copyWith(
         promotions: tmp, state: BlocCRUDProcessState.fetchSuccess));
   }

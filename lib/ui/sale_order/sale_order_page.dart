@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
+import 'package:mmt_mobile/business%20logic/bloc/promotion/promotion_cubit.dart';
 import 'package:mmt_mobile/model/res_partner.dart';
 import 'package:mmt_mobile/src/const_string.dart';
 import 'package:mmt_mobile/src/extension/navigator_extension.dart';
 import 'package:mmt_mobile/ui/sale_order/foc_item_page.dart';
-import 'package:mmt_mobile/ui/sale_order/sale_order_add_product.dart';
 import 'package:mmt_mobile/ui/sale_order/sale_order_sale_item_page.dart';
 import 'package:mmt_mobile/ui/sale_order/sale_summary_page.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
@@ -15,6 +15,7 @@ import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import '../../model/sale_order/sale_order_6/sale_order.dart';
 import '../../route/route_generate.dart';
 import '../../src/style/app_color.dart';
+import 'sku_product_page.dart';
 
 class SaleOrderPage extends StatefulWidget {
   const SaleOrderPage({super.key});
@@ -33,6 +34,7 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
 
   @override
   void initState() {
+    context.read<PromotionCubit>().fetchPromotions();
     _cartCubit = context.read<CartCubit>();
     super.initState();
   }
@@ -54,7 +56,7 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
 
   List<Widget> _buildScreens() {
     return [
-      SaleOrderAddProductPage(
+      SKUProductPage(
         customer: _customer,
         saleOrder: _so,
       ),
