@@ -144,7 +144,7 @@ class CustDialog extends SimpleDialog {
                   side: const BorderSide(color: Colors.transparent),
                   label: const TextWidget('Total Due : 0',
                       dataList: [ConstString.totalDue, ': 0'],
-                      style:  TextStyle(fontSize: 12)),
+                      style: TextStyle(fontSize: 12)),
                   backgroundColor: AppColors.dangerColor),
             ],
           ),

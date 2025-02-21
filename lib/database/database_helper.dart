@@ -79,6 +79,16 @@ class DatabaseHelper {
     return maps;
   }
 
+  Future<List<Map<String, dynamic>>> readRowsWhereIn(
+      {required String tableName,
+      required String where,
+      required List queryValues}) async {
+    Database db = await database;
+    return db.query(tableName,
+        where: '$where IN (${List.filled(queryValues.length, '?').join(',')})',
+        whereArgs: queryValues);
+  }
+
   Future<List<Map<String, dynamic>>> readDataRaw(String query) async {
     Database db = await database;
     List<Map<String, dynamic>> list = await db.rawQuery(query);
@@ -148,6 +158,7 @@ class DatabaseHelper {
     await _createPriceListItemTable(db);
     await _createUomCategoryTable(db);
     await _createCustVisitTable(db);
+    await _createPromotion(db);
   }
 
   _createCustVisitTable(Database db) async {
@@ -428,6 +439,7 @@ class DatabaseHelper {
         '${DBConstant.companyId} INTEGER,' // Added company_id
         '${DBConstant.companyName} TEXT,' // Added company_name
         '${DBConstant.listPrice} DOUBLE,'
+        '${DBConstant.standardPrice} DOUBLE,'
         '${DBConstant.defaultCode} TEXT,'
         '${DBConstant.type} TEXT,' // Fixed typo 'detialType' to 'detailedType'
         '${DBConstant.saleOK} INTEGER,' // Added sale_ok
@@ -604,5 +616,59 @@ class DatabaseHelper {
         '(${DBConstant.parentId} INTEGER,'
         '${DBConstant.childId} INTEGER'
         ')');
+  }
+
+  Future<List<Map<String, Object?>>> rawQueryC(String query) async {
+    Database db = await database;
+    List<Map<String, Object?>> affectedRow = await db.rawQuery(query);
+    return affectedRow;
+  }
+
+  _createPromotion(Database db) async {
+    //     minAmount = json['min_amount'];
+    //     disType = json['dis_type'];
+    //     amount = json['amount'];
+    //     disPer = json['dis_per'];
+    //     expenseProductId = json['expense_product_id'];
+    //     expenseProductName = json['expense_product_name'];
+    await db.execute('''CREATE TABLE ${DBConstant.promotionTable} (
+            ${DBConstant.id} INTEGER, 
+            ${DBConstant.name} TEXT, 
+            ${DBConstant.description} TEXT, 
+            ${DBConstant.startDate} TEXT, 
+            ${DBConstant.endDate} TEXT, 
+            ${DBConstant.minAmount} DOUBLE, 
+            ${DBConstant.discType} TEXT, 
+            ${DBConstant.amount} DOUBLE, 
+            ${DBConstant.disPer} DOUBLE, 
+            ${DBConstant.expenseProductId} INTEGER, 
+            ${DBConstant.expenseProductName} TEXT, 
+            ${DBConstant.writeDate} TEXT
+          );
+      ''');
+    await db.execute('''CREATE TABLE ${DBConstant.rewardLineTable} (
+         ${DBConstant.promotionId} INTEGER, 
+         ${DBConstant.productId} INTEGER, 
+         ${DBConstant.productName} TEXT, 
+         ${DBConstant.description} TEXT, 
+         ${DBConstant.qty} DOUBLE, 
+         ${DBConstant.refQty} DOUBLE, 
+         ${DBConstant.multiply} INTEGER, 
+         ${DBConstant.uomCategoryId} INTEGER, 
+         ${DBConstant.uomCategoryName} TEXT, 
+         ${DBConstant.uomId} INTEGER, 
+         ${DBConstant.uomName} TEXT, 
+         ${DBConstant.rewardProductId} INTEGER, 
+         ${DBConstant.rewardProductName} TEXT, 
+         ${DBConstant.rewardQty} DOUBLE, 
+         ${DBConstant.rewardUomId} INTEGER, 
+         ${DBConstant.rewardUomName} TEXT, 
+         ${DBConstant.rewardUomCategoryId} INTEGER, 
+         ${DBConstant.rewardUomCategoryName} TEXT, 
+         ${DBConstant.expenseProductId} INTEGER, 
+         ${DBConstant.expenseProductName} TEXT, 
+         ${DBConstant.buyXGetYId} INTEGER
+        );
+      ''');
   }
 }

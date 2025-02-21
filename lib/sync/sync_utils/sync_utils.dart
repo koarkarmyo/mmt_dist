@@ -16,6 +16,7 @@ import '../../model/currency.dart';
 import '../../model/dashboard.dart';
 import '../../model/price_list/price_list_item.dart';
 import '../../model/product/product_product.dart';
+import '../../model/promotion.dart';
 import '../../model/route/route_plan.dart';
 import '../../model/stock_quant.dart';
 import '../../src/mmt_application.dart';
@@ -66,6 +67,8 @@ class SyncUtils {
         return await _getUomCategoryProcess(actionName, response);
       case 'get_journal_list':
         return await _getJournalList(actionName, response);
+      case 'get_sale_foc_promotion':
+        return await _getPromotionList(actionName, response);
       // case 'get_customer_product':
       //   return await _getCustomerRegularSaleProductProcess(
       //       actionName, response);
@@ -75,7 +78,6 @@ class SyncUtils {
       //   return await _getInventoryStock(actionName, response);
       // case 'get_wh_stock':
       //   return await _getInventoryStock(actionName, response);
-
       // case 'get_mscm_township':
       //   return await _getMscmTownship(actionName, response);
       // case 'get_mscm_outlettype':
@@ -1741,6 +1743,60 @@ class SyncUtils {
           : SyncProcess.Fail;
     }
 
+    return SyncProcess.Finished;
+  }
+
+  static _getPromotionList(String actionName, Response response) async {
+    BaseApiResponse<Promotions> baseResponse = BaseApiResponse.fromJson(
+        response.data, fromJson: (Map<String, dynamic> e) {
+      return Promotions.fromJson(e);
+    });
+    if (baseResponse.data!.isEmpty) {
+      return SyncProcess.Finished;
+    }
+
+    List<Promotions> promotions = [];
+    List<RewardLine> rewardLines = [];
+
+    for (Promotions promotion in baseResponse.data ?? <Promotions>[]) {
+      promotions.add(promotion);
+      rewardLines.addAll(promotion.rewardLine ?? []);
+    }
+
+    await _helper.deleteRows(
+        tableName: DBConstant.promotionTable,
+        where: DBConstant.id,
+        wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+    //
+    await _helper.deleteRows(
+        tableName: DBConstant.rewardLineTable,
+        where: DBConstant.buyXGetYId,
+        wantDeleteRow: baseResponse.data!.map((e) => e.id).toList());
+
+    List<Promotions> tmp = [];
+    List<RewardLine> tmpRew = [];
+    tmp = promotions.where((element) => element.active == true).toList();
+    //
+    tmp.forEach((p) {
+      tmpRew.addAll(rewardLines.where((element) => element.buyXGetYId == p.id));
+    });
+
+    List<Map<String, dynamic>> promotionJsonList =
+        tmp.map((e) => e.toJsonDB()).toList();
+    List<Map<String, dynamic>> rewardJsonList =
+        tmpRew.map((e) => e.toJson()).toList();
+    //
+    bool success = await _helper.insertDataListBath(
+        DBConstant.promotionTable, promotionJsonList);
+    await _helper.insertDataListBath(
+        DBConstant.rewardLineTable, rewardJsonList);
+    if (success) {
+      return await _insertOrUpdateLastWriteDate(
+              actionName: actionName,
+              lastWriteDate: baseResponse.data!.last.writeDate!)
+          ? SyncProcess.Paginated
+          : SyncProcess.Fail;
+    }
     return SyncProcess.Finished;
   }
 }

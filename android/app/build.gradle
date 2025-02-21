@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.mmt_mobile.mmt_mobile"
     compileSdk = 35
-    ndkVersion = flutter.ndkVersion
+//    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

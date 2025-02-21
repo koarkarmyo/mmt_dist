@@ -7,6 +7,9 @@ class DBConstant {
         Tables
   */
   static const String uomCategoryTable = 'uom_category';
+  static const String promotionTable = 'promotion';
+  static const String rewardLineTable = 'reward_line';
+  static const String conditionRuleLineTable = 'condition_rule_line';
   static const String stockLocationTable = 'stock_location';
   static const String currencyTable = 'currency_table';
   static const String mscmUserTable = 'mscm_users';
@@ -272,6 +275,7 @@ class DBConstant {
 
   static const String categId = 'categ_id';
   static const String listPrice = 'list_price';
+  static const String standardPrice = 'standard_price';
   static const String defaultCode = 'default_code';
   static const String barcode = 'barcode';
   static const String image128 = 'image_128';
@@ -563,4 +567,31 @@ class DBConstant {
   static const String invoiceCount = 'invoice_count';
   static const String lastSaleCurrencyName = 'last_sale_currency_name';
   static const String totalOrdered = 'total_ordered';
+//
+//
+  static const String promotionId = 'promotion_id';
+  static const String startDate = 'start_date';
+  static const String endDate = 'end_date';
+
+  // Condition Rule Line Table
+  static const String conditionRuleLineId = 'condition_rule_line_id';
+  static const String buyXGetYId = 'buy_x_get_y_id';
+  static const String multiply = 'multiply';
+
+  // Reward Line Table
+  static const String rewardLineId = 'reward_line_id';
+  static const String rewardProductId = 'reward_product_id';
+  static const String rewardProductName = 'reward_product_name';
+  static const String rewardQty = 'reward_qty';
+  static const String rewardUomId = 'reward_uom_id';
+  static const String rewardUomName = 'reward_uom_name';
+  static const String rewardUomCategoryId = 'reward_uom_category_id';
+  static const String rewardUomCategoryName = 'reward_uom_category_name';
+  static const String expenseProductId = 'expense_product_id';
+  static const String expenseProductName = 'expense_product_name';
+
+  static const String minAmount = 'min_amount';
+  static const String discType = 'disc_type';
+  static const String disPer = 'disc_per';
+  static const String refQty = 'ref_qty';
 }

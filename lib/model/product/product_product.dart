@@ -12,6 +12,7 @@ class ProductProduct {
   int? companyId;
   String? companyName;
   double? listPrice;
+  double? standardPrice;
   String? defaultCode;
   String? type;
   bool? saleOk;
@@ -60,6 +61,7 @@ class ProductProduct {
     this.uomPoId,
     this.uomPoName,
     this.looseUomId,
+    this.standardPrice,
     this.looseUomName,
     this.boxUomId,
     this.boxUomName,
@@ -79,6 +81,7 @@ class ProductProduct {
     categId = json['categ_id'];
     categName = json['categ_name'];
     companyId = json['company_id'];
+    standardPrice = json['standard_price'];
     companyName = json['company_name'];
     listPrice = json['list_price'];
     defaultCode = json['default_code'];
@@ -128,6 +131,7 @@ class ProductProduct {
     data['company_name'] = companyName;
     data['list_price'] = listPrice;
     data['default_code'] = defaultCode;
+    data['standard_price'] = standardPrice;
     data['type'] = type;
     data['sale_ok'] = saleOk;
     data['purchase_ok'] = purchaseOk;
@@ -163,6 +167,7 @@ class ProductProduct {
     companyId = json['company_id'];
     companyName = json['company_name'];
     listPrice = json['list_price'];
+    standardPrice = json['standard_price'];
     defaultCode = json['default_code'];
     type = json['type'];
     saleOk = json['sale_ok'] == 1;
@@ -208,6 +213,7 @@ class ProductProduct {
     data['company_id'] = companyId;
     data['company_name'] = companyName;
     data['list_price'] = listPrice;
+    data['standard_price'] = standardPrice;
     data['default_code'] = defaultCode;
     data['type'] = type;
     data['sale_ok'] = saleOk ?? false ? 1 : 0;
