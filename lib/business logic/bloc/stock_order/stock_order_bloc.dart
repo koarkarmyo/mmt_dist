@@ -44,15 +44,15 @@ class StockOrderBloc extends Bloc<StockOrderEvent, StockOrderState> {
     try {
       int index = -1;
       index = stockOrderLines.indexWhere((element) {
-        print('xxxxxxxxx or ${event.stockOrderLine.index}');
-        print('xxxxxxxxx el ${element.index}');
+
         return element.productId == event.stockOrderLine.productId;
       });
       if (index > -1) {
         stockOrderLines.removeAt(index);
       } else {
-        if (event.stockOrderLine.product == null)
+        if (event.stockOrderLine.product == null) {
           throw RequireObjMissingException(message: 'Missing product object');
+        }
         if (event.stockOrderLine.product!.getRefUom() == null) {
           throw RequireObjMissingException(message: 'Missing RefUomLine');
         }

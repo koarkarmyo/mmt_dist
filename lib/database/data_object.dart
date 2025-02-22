@@ -46,7 +46,6 @@ class DataObject {
       priceJson = await DatabaseHelper.instance
           .readAllData(tableName: DBConstant.priceListItemTable);
     }
-    print('xxxxxxxx::::');
     return priceJson.map((e) => ProductPriceListItem.fromJson(e)).toList();
   }
 

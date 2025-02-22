@@ -201,7 +201,7 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
           // pcController.text = (pcNumber % 1 == 0)
           //     ? pcNumber.toInt().toString()
           //     : pcNumber.toString();
-          debugPrint('xxxxxxxx:::${deliveryItem.pkQty}');
+          // debugPrint('xxxxxxxx:::${deliveryItem.pkQty}');
           //
           pkController.text = (deliveryItem.pkQty ?? 0).toQty();
           pcController.text = (deliveryItem.pcQty ?? 0).toQty();
@@ -224,19 +224,19 @@ class _SaleOrderSaleItemPageState extends State<SaleOrderSaleItemPage> {
                   },
                   label: ConstString.add,
                   icon: Icons.add),
-              SlidableAction(
-                  backgroundColor: AppColors.successColor,
-                  onPressed: (context) {
-                    _cartCubit.addCartSaleItem(
-                      saleItem: deliveryItem.copyWith(
-                        autoKey:
-                            MMTApplication.genAutoKey(deliveryItem.autoKey),
-                        pkQty: 0,
-                      ),
-                    );
-                  },
-                  label: ConstString.delete,
-                  icon: Icons.delete),
+              // SlidableAction(
+              //     backgroundColor: AppColors.successColor,
+              //     onPressed: (context) {
+              //       _cartCubit.addCartSaleItem(
+              //         saleItem: deliveryItem.copyWith(
+              //           autoKey:
+              //               MMTApplication.genAutoKey(deliveryItem.autoKey),
+              //           pkQty: 0,
+              //         ),
+              //       );
+              //     },
+              //     label: ConstString.delete,
+              //     icon: Icons.delete),
             ]),
             endActionPane: ActionPane(motion: const ScrollMotion(), children: [
               SlidableAction(

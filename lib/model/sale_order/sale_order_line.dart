@@ -62,8 +62,7 @@ class SaleOrderLine {
     orderId = json['order_id'];
     productName = json['product_name'];
     saleType = SaleType.values.firstWhereOrNull(
-            (element) => element.name.toLowerCase() == json['sale_type']) ??
-        SaleType.sale;
+            (element) => element.name.toLowerCase() == json['sale_type']);
     // saleType =
     //     json['sale_type'] == SaleType.sale.name ? SaleType.sale : SaleType.foc;
     productUomQty = json['product_uom_qty'];
@@ -79,8 +78,7 @@ class SaleOrderLine {
     orderId = json['order_id'];
     productName = json['product_name'];
     saleType = SaleType.values.firstWhereOrNull(
-            (element) => element.name.toLowerCase() == json['sale_type']) ??
-        SaleType.sale;
+            (element) => element.name.toLowerCase() == json['sale_type']);
     pkQty = json['product_uom_qty'];
     // saleType =
     //     json['sale_type'] == SaleType.sale.name ? SaleType.sale : SaleType.foc;
@@ -145,7 +143,7 @@ class SaleOrderLine {
     // map['order_no'] = orderNo;
     // map['order_id'] = orderId;
     map['product_id'] = productId;
-    map['sale_type'] = saleType!.name.toLowerCase();
+    map['sale_type'] = saleType?.name.toLowerCase();
     map['name'] = productName;
     // map['state'] = state;
     map['product_uom_qty'] = productUomQty;

@@ -285,7 +285,7 @@ class MainSyncProcess {
       _sendToView(_syncResponse(name: actionDescription, progress: progress));
     }
 
-    // try {
+    try {
       SyncProcess syncProcess = await _sendApiRequest(actionList.first,
           limit: actionList.first.syncLimit);
 
@@ -313,27 +313,27 @@ class MainSyncProcess {
         progress: actionList.isEmpty ? 1.0 : progress,
         isFinished: actionList.isEmpty,
       ));
-    // } on DioError catch (e) {
-    //   _syncProcessIsRunning = false;
-    //   _stopAutoSync = false;
-    //   _sendToView(
-    //     _syncResponse(
-    //         name: actionDescription,
-    //         error: ApiErrorHandler.createError(e).values.first,
-    //         message: failMessage,
-    //         isFinished: true),
-    //   );
-    //   return;
-    // } catch (e) {
-    //   _syncProcessIsRunning = false;
-    //   _stopAutoSync = false;
-    //   _sendToView(_syncResponse(
-    //       name: actionDescription,
-    //       error: e.toString(),
-    //       message: failMessage,
-    //       isFinished: true));
-    //   return;
-    // }
+    } on DioError catch (e) {
+      _syncProcessIsRunning = false;
+      _stopAutoSync = false;
+      _sendToView(
+        _syncResponse(
+            name: actionDescription,
+            error: ApiErrorHandler.createError(e).values.first,
+            message: failMessage,
+            isFinished: true),
+      );
+      return;
+    } catch (e) {
+      _syncProcessIsRunning = false;
+      _stopAutoSync = false;
+      _sendToView(_syncResponse(
+          name: actionDescription,
+          error: e.toString(),
+          message: failMessage,
+          isFinished: true));
+      return;
+    }
     // assign auto sync is running or not
     _syncProcessIsRunning = actionList.isNotEmpty;
 

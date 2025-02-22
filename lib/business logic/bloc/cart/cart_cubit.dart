@@ -27,6 +27,7 @@ class CartCubit extends Cubit<CartState> {
             state: BlocCRUDProcessState.initial,
             itemList: [],
             focItemList: [],
+            discItemList: [],
             couponList: [])) {
     ProductDBRepo.instance.getProductList().then((value) {
       _productList = value;
@@ -306,6 +307,14 @@ class CartCubit extends Cubit<CartState> {
       },
     );
 
+    state.discItemList.forEach((element) {
+      SaleOrderLine saleOrderLine = element.copyWith(
+          priceUnit: element.priceUnit,
+          productUomQty: element.pkQty,
+          uomLine: element.pkUomLine);
+      saleOrderLineList.add(saleOrderLine);
+    });
+
     bool success = await SaleOrderDBRepo.instance.saveSaleOrder(
         saleOrder: saleOrder, saleOrderLineList: saleOrderLineList);
 
@@ -405,15 +414,15 @@ class CartCubit extends Cubit<CartState> {
               SaleOrderLine expanseProduct = SaleOrderLine(
                 productId: product.id,
                 product: product,
-                pkQty: -1 * (element.rewardQty ?? 1),
+                pkQty: (detail.priceUnit ?? 0) * (element.rewardQty ?? 0),
                 uomLine: rewProduct.uomLines?.firstWhereOrNull(
                     (element) => element.uomId == element.uomId),
                 pkUomLine: expUom,
-                saleType: SaleType.foc,
-                priceUnit: detail.singlePKPrice,
-                listPrice: product.standardPrice ?? 0.0,
+                // saleType: SaleType.foc,
+                priceUnit: -1,
+                listPrice: -1,
                 productName: product.name,
-                singlePKPrice: detail.singlePKPrice,
+                singlePKPrice: -1,
                 autoKey: DateTime.now().microsecondsSinceEpoch.toDouble(),
               );
               cartOrderDetailLines.add(expanseProduct);
@@ -431,5 +440,72 @@ class CartCubit extends Cubit<CartState> {
 
     //
     return cartOrderDetailLines;
+  }
+
+  void addAmountDiscount() {
+    double total = state.itemList.fold<double>(0.0,
+        (previousValue, element) => previousValue + (element.subTotal ?? 0.0));
+    debugPrint('rwward ::: expense Product $total');
+
+    List<Promotions> promotions = MMTApplication.currentPromotions
+        .where((element) => (element.minAmount ?? 0) <= total)
+        .toList();
+
+    debugPrint('rwward ::: expense Product ${promotions.length}');
+
+    List<SaleOrderLine> orderLines = [];
+
+    promotions.sort((a, b) => (b.minAmount ?? 0).compareTo(a.minAmount ?? 0));
+
+    if (promotions.isEmpty) return;
+    Promotions element = promotions.first;
+
+    if (element.expenseProductId != null) {
+      ProductProduct? product = _productList
+          .firstWhereOrNull((p) => p.id == element.expenseProductId);
+
+      debugPrint('rwward ::: expense Product ${product?.name}');
+      if (product != null) {
+        double disc = element.amount ?? 0.0;
+        //
+        UomLine? expUom = product.uomLines
+            ?.firstWhereOrNull((element) => element.uomId == element.uomId);
+        SaleOrderLine cartOrderDetail = SaleOrderLine(
+          productId: product.id,
+          product: product,
+          pkQty: -1,
+          uomLine: product.uomLines
+              ?.firstWhereOrNull((element) => element.uomId == element.uomId),
+          pkUomLine: expUom,
+          saleType: SaleType.disc,
+          priceUnit: disc,
+          listPrice: disc,
+          productName: product.name,
+          singlePKPrice: disc,
+          autoKey: DateTime.now().microsecondsSinceEpoch.toDouble(),
+        );
+        //
+        //
+        if (element.disType == DiscTypes.amount) {
+          cartOrderDetail.singlePKPrice = element.amount ?? 0.0;
+          cartOrderDetail.listPrice = element.amount ?? 0.0;
+          cartOrderDetail.priceUnit = element.amount ?? 0.0;
+        } else {
+          // final double total = saleItems.fold(
+          //     0, (previousValue, element) => element.subtotal + previousValue);
+          double disc = total * 0.01;
+          cartOrderDetail.singlePKPrice = disc;
+          cartOrderDetail.listPrice = disc;
+          cartOrderDetail.priceUnit = disc;
+          cartOrderDetail.discountPercent = element.disPer ?? 0;
+          // cartOrderDetail.discount = event.price;
+        }
+
+        orderLines.add(cartOrderDetail);
+      }
+    }
+
+    debugPrint('amount disc called:::: ${orderLines.length}');
+    emit(state.copyWith(discItemList: orderLines));
   }
 }

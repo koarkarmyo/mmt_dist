@@ -191,6 +191,21 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
             subtotal += element.subTotal ?? 0;
           },
         );
+        _discController.text = '';
+        _discountAmount = 0.0;
+        if (state.discItemList.isNotEmpty) {
+          if ((state.discItemList.first.discountPercent ?? 0) > 0) {
+            _discountType.value = DiscountTypes.Percentage;
+            _discController.text =
+                (state.discItemList.first.discountPercent ?? 0.0).toQty();
+            _discountAmount = state.discItemList.first.priceUnit ?? 0;
+          } else {
+            _discountType.value = DiscountTypes.K;
+            _discController.text =
+                (state.discItemList.first.singlePKPrice ?? 0.0).toQty();
+            _discountAmount = state.discItemList.first.priceUnit ?? 0;
+          }
+        }
         return Column(
           children: [
             _dataRow(title: "Subtotal", value: subtotal),
@@ -242,30 +257,46 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
   }
 
   Widget _discountWidget() {
-    return Container(
-        margin: 16.allPadding,
-        decoration:
-            BoxDecoration(borderRadius: 8.borderRadius, border: Border.all()),
-        child: Row(
-          children: [
-            _discountTypeChoice(),
-            TextField(
-              controller: _discController,
-              keyboardType: TextInputType.number,
-              onTapOutside: (event) {
-                FocusScope.of(context).unfocus();
-              },
-              onChanged: (value) {
-                //some logic on discount
-                _discountAmount = double.tryParse(value) ?? 0;
-              },
-              decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  hintText: "Discount",
-                  hintStyle: TextStyle(fontSize: 14)),
-            ).expanded()
-          ],
-        ));
+    return BlocBuilder<CartCubit, CartState>(builder: (context, state) {
+      if (state.discItemList.isNotEmpty) {
+        if ((state.discItemList.first.discountPercent ?? 0) > 0) {
+          _discountType.value = DiscountTypes.Percentage;
+          _discController.text =
+              (state.discItemList.first.discountPercent ?? 0.0).toQty();
+          _discountAmount = state.discItemList.first.discountPercent ?? 0;
+        } else {
+          _discountType.value = DiscountTypes.K;
+          _discController.text =
+              (state.discItemList.first.singlePKPrice ?? 0.0).toQty();
+          _discountAmount = state.discItemList.first.discountPercent ?? 0;
+        }
+      }
+      return Container(
+          margin: 16.allPadding,
+          decoration:
+              BoxDecoration(borderRadius: 8.borderRadius, border: Border.all()),
+          child: Row(
+            children: [
+              _discountTypeChoice(),
+              TextField(
+                readOnly: !(MMTApplication.currentUser?.allowedEditFoc ?? true),
+                controller: _discController,
+                keyboardType: TextInputType.number,
+                onTapOutside: (event) {
+                  FocusScope.of(context).unfocus();
+                },
+                onChanged: (value) {
+                  //some logic on discount
+                  _discountAmount = double.tryParse(value) ?? 0;
+                },
+                decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: "Discount",
+                    hintStyle: TextStyle(fontSize: 14)),
+              ).expanded()
+            ],
+          ));
+    });
   }
 
   Widget _discountTypeChoice() {
@@ -277,7 +308,10 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
       },
       itemBuilder: (BuildContext context) => DiscountTypes.values
           .map(
-            (e) => PopupMenuItem<DiscountTypes>(value: e, child: Text(e.name)),
+            (e) => PopupMenuItem<DiscountTypes>(
+                value: e,
+                enabled: (MMTApplication.currentUser?.allowedEditFoc ?? true),
+                child: Text(e.name)),
           )
           .toList(),
 

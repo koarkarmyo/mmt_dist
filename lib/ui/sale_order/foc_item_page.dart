@@ -76,7 +76,7 @@ class _FocItemPageState extends State<FocItemPage> {
             return Align(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  "Item count : ${state.focItemList.length}",
+                  "Item count : ${state.focItemList.where((element) => element.saleType != null).length}",
                   // "Subtotal : ${calculateSubtotal(state.itemList)}",
                   style: const TextStyle(fontSize: 20),
                 ));
@@ -206,8 +206,10 @@ class _FocItemPageState extends State<FocItemPage> {
         int index = state.focItemList.indexWhere((element) =>
             element.productId == product.id
             // && element.saleType == SaleType.foc,
+            // &&
+            // (element.pkQty ?? 0) > 0);
             &&
-            (element.pkQty ?? 0) > 0);
+            element.saleType != null);
         if (index == -1) {
           return Container();
         } else {
@@ -252,22 +254,22 @@ class _FocItemPageState extends State<FocItemPage> {
                           : "300 Units"),
                       GestureDetector(
                         onTap: () async {
-                          double? discountAmount = await showDialog(
-                              context: context,
-                              builder: (context) {
-                                return _discountDialog(context,
-                                    discountAmount:
-                                        deliveryItem.discountPercent);
-                              });
-                          if (discountAmount != null) {
-                            deliveryItem.discountPercent = discountAmount;
-                            double subtotal = calculateSubtotal([deliveryItem]);
-                            // print("Subtotal : $subtotal");
-                            _cartCubit.addCartSaleItem(
-                                saleItem: deliveryItem.copyWith(
-                                    discountPercent: discountAmount,
-                                    subTotal: subtotal));
-                          }
+                          // double? discountAmount = await showDialog(
+                          //     context: context,
+                          //     builder: (context) {
+                          //       return _discountDialog(context,
+                          //           discountAmount:
+                          //               deliveryItem.discountPercent);
+                          //     });
+                          // if (discountAmount != null) {
+                          //   deliveryItem.discountPercent = discountAmount;
+                          //   double subtotal = calculateSubtotal([deliveryItem]);
+                          //   // print("Subtotal : $subtotal");
+                          //   _cartCubit.addCartSaleItem(
+                          //       saleItem: deliveryItem.copyWith(
+                          //           discountPercent: discountAmount,
+                          //           subTotal: subtotal));
+                          // }
                         },
                         child: Text(
                           "Discount ${deliveryItem.discountPercent ?? 0} %",
@@ -286,6 +288,7 @@ class _FocItemPageState extends State<FocItemPage> {
                             SizedBox(
                               width: 80, // Set a fixed width for the TextField
                               child: TextField(
+                                readOnly: true,
                                 textAlign: TextAlign.right,
                                 keyboardType: TextInputType.number,
                                 onTap: () {
@@ -321,6 +324,7 @@ class _FocItemPageState extends State<FocItemPage> {
                             SizedBox(
                               width: 80, // Set a fixed width for the TextField
                               child: TextField(
+                                readOnly: true,
                                 textAlign: TextAlign.right,
                                 keyboardType: TextInputType.number,
                                 onTap: () {
@@ -367,6 +371,7 @@ class _FocItemPageState extends State<FocItemPage> {
                                     ?.map((UomLine value) =>
                                         DropdownMenuItem<UomLine>(
                                           value: value,
+                                          enabled: false,
                                           child: Text(value.uomName ?? ''),
                                         ))
                                     .toList(),
@@ -395,6 +400,7 @@ class _FocItemPageState extends State<FocItemPage> {
                             SizedBox(
                               width: 80, // Set a fixed width for the TextField
                               child: TextField(
+                                readOnly: true,
                                 textAlign: TextAlign.right,
                                 keyboardType: TextInputType.number,
                                 onTap: () {

@@ -106,18 +106,18 @@ class _RoutePageState extends State<RoutePage> {
             initDate: DateTime.now()),
       ),
       floatingActionButton:
-      // BlocListener<CustVisitBloc, CustVisitState>(
-      //   listener: (context, state) {
-      //     // cust visit send success or fail close dialog
-      //     if (state.state == BlocCRUDProcessState.fetchFail ||
-      //         state.state == BlocCRUDProcessState.fetchSuccess)
-      //       Navigator.pop(context);
-      //     // fetch background service
-      //     BackgroundServiceUtils.startLocationFetchProcess();
-      //   },
-      //   child: viewType == ViewTypes.list
-      //       ?
-      FloatingActionButton(
+          // BlocListener<CustVisitBloc, CustVisitState>(
+          //   listener: (context, state) {
+          //     // cust visit send success or fail close dialog
+          //     if (state.state == BlocCRUDProcessState.fetchFail ||
+          //         state.state == BlocCRUDProcessState.fetchSuccess)
+          //       Navigator.pop(context);
+          //     // fetch background service
+          //     BackgroundServiceUtils.startLocationFetchProcess();
+          //   },
+          //   child: viewType == ViewTypes.list
+          //       ?
+          FloatingActionButton(
         backgroundColor: Colors.white,
         onPressed: () {
           // Navigator.pushNamed(context, RouteList.customerCreateRoute)
@@ -143,8 +143,8 @@ class _RoutePageState extends State<RoutePage> {
                 if (state.state == BlocCRUDProcessState.fetching) {
                   return const Expanded(
                       child: Center(
-                        child: CircularProgressIndicator(),
-                      ));
+                    child: CircularProgressIndicator(),
+                  ));
                 }
                 if (state.customerList.isEmpty) {
                   return SizedBox(
@@ -167,7 +167,7 @@ class _RoutePageState extends State<RoutePage> {
                     itemCount: state.customerList.length,
                     // Replace with your desired item count
                     gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 1,
                       childAspectRatio: 4 / 2,
                     ),
@@ -184,17 +184,16 @@ class _RoutePageState extends State<RoutePage> {
         ),
       ),
       bottomNavigationBar: BlocBuilder<CustomerCubit, CustomerState>(
-        builder: (context, state) =>
-            TextWidget(
-              "Total Count : 1444",
-              dataList: [
-                ConstString.total,
-                ' : ',
-                state.customerList.length.toString()
-              ],
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 20),
-            ),
+        builder: (context, state) => TextWidget(
+          "Total Count : 1444",
+          dataList: [
+            ConstString.total,
+            ' : ',
+            state.customerList.length.toString()
+          ],
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 20),
+        ),
       ),
     );
   }
@@ -208,7 +207,11 @@ class _RoutePageState extends State<RoutePage> {
 
         if (isOk ?? false) {
           Navigator.pushNamed(context, RouteList.customerDashboardPage,
-              arguments: {'customer': selectedCustomer});
+              arguments: {'customer': selectedCustomer}).then(
+            (value) {
+              _filteredCalled(context);
+            },
+          );
         }
       },
       child: Card(
@@ -236,7 +239,7 @@ class _RoutePageState extends State<RoutePage> {
               ),
               Padding(
                 padding:
-                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14),
+                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -517,7 +520,7 @@ class _RoutePageState extends State<RoutePage> {
 
   _customerInfo(BuildContext context,
       {required ResPartner selectedCustomer,
-        OnClickCallBack<bool>? callback}) async {
+      OnClickCallBack<bool>? callback}) async {
     bool? success = await showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -543,10 +546,11 @@ class DatePickerPreferredSizeWidget extends StatefulWidget
   final ValueChanged<DateTime> onChange;
   final BuildContext context;
 
-  const DatePickerPreferredSizeWidget({super.key,
-    required this.initDate,
-    required this.onChange,
-    required this.context});
+  const DatePickerPreferredSizeWidget(
+      {super.key,
+      required this.initDate,
+      required this.onChange,
+      required this.context});
 
   @override
   State<DatePickerPreferredSizeWidget> createState() =>
@@ -560,7 +564,7 @@ class DatePickerPreferredSizeWidget extends StatefulWidget
 class _DatePickerPreferredSizeWidgetState
     extends State<DatePickerPreferredSizeWidget> {
   final GlobalKey<DatePickerBtnState> _datePickerKey =
-  GlobalKey<DatePickerBtnState>();
+      GlobalKey<DatePickerBtnState>();
   DateTime _currentDate = DateTime.now();
 
   @override
@@ -575,7 +579,7 @@ class _DatePickerPreferredSizeWidgetState
       height: ConstantDimens.listDefaultHeight,
       alignment: Alignment.center,
       padding:
-      const EdgeInsets.symmetric(vertical: ConstantDimens.normalPadding),
+          const EdgeInsets.symmetric(vertical: ConstantDimens.normalPadding),
       child: Row(
         children: [
           IconButton(

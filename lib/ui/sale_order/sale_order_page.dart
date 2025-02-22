@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mmt_mobile/business%20logic/bloc/cart/cart_cubit.dart';
 import 'package:mmt_mobile/business%20logic/bloc/promotion/promotion_cubit.dart';
 import 'package:mmt_mobile/model/res_partner.dart';
@@ -94,6 +93,12 @@ class _SaleOrderPageState extends State<SaleOrderPage> {
           context,
           controller: _controller,
           screens: _buildScreens(),
+          onItemSelected: (value) {
+            debugPrint('intttt $value');
+            if (value == 3) {
+              _cartCubit.addAmountDiscount();
+            }
+          },
           items: _navBarsItems(),
           // Default is true.
           resizeToAvoidBottomInset: true,

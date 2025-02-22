@@ -16,6 +16,7 @@ import 'package:mmt_mobile/src/mmt_application.dart';
 
 import '../../common_widget/text_widget.dart';
 import '../../model/product/product_product.dart';
+import '../../model/promotion.dart';
 import '../../model/sale_order/sale_order_line.dart';
 import '../../src/const_string.dart';
 import '../../src/style/app_color.dart';
@@ -163,7 +164,9 @@ class _SKUProductPageState extends State<SKUProductPage> {
   Widget _productTableRows() {
     return BlocBuilder<ProductCubit, ProductState>(
       builder: (context, state) {
-        List<ProductProduct> products = state.productList.where((element) => element.type == ProductTypes.consu.name).toList();
+        List<ProductProduct> products = state.productList
+            .where((element) => element.type == ProductTypes.consu.name)
+            .toList();
         return ListView.builder(
           itemCount: products.length,
           itemBuilder: (context, index) {
@@ -182,8 +185,7 @@ class _SKUProductPageState extends State<SKUProductPage> {
             //         position: index,
             //       )
             //     :
-            return _productRow(
-                product: products[index], position: index);
+            return _productRow(product: products[index], position: index);
           },
         ).expanded();
       },
@@ -351,7 +353,7 @@ class _SKUProductPageState extends State<SKUProductPage> {
                           child: Text(value.uomName ?? ''),
                         ))
                     .toList(),
-                onChanged: (UomLine? newValue) {
+                onChanged: (UomLine? newValue) async {
                   if (newValue != null) {
                     //
                     double price = (product.priceListItems
@@ -360,6 +362,19 @@ class _SKUProductPageState extends State<SKUProductPage> {
                             )
                             ?.fixedPrice ??
                         0);
+                    //
+                    bool showPromo = state.itemList
+                        .where((element) => element.productId == product.id)
+                        .isEmpty;
+                    if (showPromo) {
+                      List<RewardLine> lines =
+                          MMTApplication.checkPromotionLines(
+                              MMTApplication.currentPromotions, product);
+                      //
+                      if (lines.isNotEmpty) {
+                        await showPromotions(lines);
+                      }
+                    }
                     // Handle selection change
                     _cartCubit.addCartSaleItem(
                       saleItem: SaleOrderLine(
@@ -395,7 +410,7 @@ class _SKUProductPageState extends State<SKUProductPage> {
               onTapOutside: (event) {
                 FocusScope.of(context).unfocus();
               },
-              onChanged: (value) {
+              onChanged: (value) async {
                 //
                 double price = (product.priceListItems
                         ?.firstWhereOrNull(
@@ -406,6 +421,18 @@ class _SKUProductPageState extends State<SKUProductPage> {
                         )
                         ?.fixedPrice ??
                     0);
+                //
+                bool showPromo = state.itemList
+                    .where((element) => element.productId == product.id)
+                    .isEmpty;
+                if (showPromo) {
+                  List<RewardLine> lines = MMTApplication.checkPromotionLines(
+                      MMTApplication.currentPromotions, product);
+                  //
+                  if (lines.isNotEmpty) {
+                    await showPromotions(lines);
+                  }
+                }
                 //
                 _cartCubit.addCartSaleItem(
                   saleItem: SaleOrderLine(
@@ -539,6 +566,108 @@ class _SKUProductPageState extends State<SKUProductPage> {
     );
   }
 
+  Future<void> showPromotions(List<RewardLine> promotions) async {
+    Map<String, List<RewardLine>> promo =
+        promotions.groupBy((p0) => p0.buyXGetYName ?? '');
+    return showModalBottomSheet(
+        // backgroundColor: Colors.transparent,
+        context: context,
+        enableDrag: true,
+        builder: (_) {
+          return Stack(
+            children: [
+              ListView.builder(
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    top: 30,
+                    bottom: 16,
+                    right: 16,
+                  ),
+                  itemBuilder: (context, index) {
+                    List<RewardLine> rewards = promo.values.toList()[index];
+                    rewards.forEach((element) {
+                      debugPrint('xxxxxxxxxxx::::${element.buyXGetYName}');
+                      debugPrint('xxxxxxxxxxx::::${element.rewardQty}');
+                    });
+                    debugPrint('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+                    return Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            promo.keys.toList()[index],
+                            style: const TextStyle(fontSize: 20),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(rewards.first.description ?? ''),
+                          // for (RewardLine line in rewards) ...[
+                          //   Row(
+                          //       mainAxisAlignment:
+                          //           MainAxisAlignment.spaceBetween,
+                          //       children: [
+                          //         Expanded(
+                          //           child: Row(
+                          //             mainAxisAlignment:
+                          //                 MainAxisAlignment.spaceBetween,
+                          //             children: [
+                          //               Expanded(
+                          //                   child: Text('${line.productName}')),
+                          //               SizedBox(width: 10),
+                          //               Expanded(
+                          //                 child: Text(
+                          //                   '${line.qty} ${line.uomName}',
+                          //                   style: TextStyle(
+                          //                       color: AppColors.successColor),
+                          //                 ),
+                          //               ),
+                          //             ],
+                          //           ),
+                          //         ),
+                          //         Icon(Icons.arrow_forward,
+                          //             color: AppColors.dangerColor),
+                          //         SizedBox(width: 10),
+                          //         Expanded(
+                          //           child: Row(
+                          //             mainAxisAlignment: MainAxisAlignment.end,
+                          //             children: [
+                          //               Expanded(
+                          //                   child: Text(
+                          //                       '${line.rewardProductName}')),
+                          //               SizedBox(width: 10),
+                          //               Expanded(
+                          //                 child: Text(
+                          //                   '${line.rewardQty} ${line.rewardUomName}',
+                          //                   style: TextStyle(
+                          //                       color: AppColors.successColor),
+                          //                 ),
+                          //               ),
+                          //             ],
+                          //           ),
+                          //         ),
+                          //       ]),
+                          //   Divider()
+                          // ]
+                        ]);
+                  },
+                  // separatorBuilder: (_, __) => Divider(),
+                  itemCount: promo.keys.length),
+              Align(
+                // right: 0,
+                // top: -30,
+                alignment: Alignment.topRight,
+                child: IconButton(
+                  iconSize: 40,
+                  color: Colors.red,
+                  icon: const Icon(Icons.cancel_outlined),
+                  onPressed: () async {
+                    context.pop();
+                  },
+                ),
+              ),
+            ],
+          );
+        });
+  }
 // Widget _showProductList() {
 //   return BlocBuilder<ProductCubit, ProductState>(builder: (context, state) {
 //     return ListView.builder(
