@@ -278,11 +278,11 @@ class CartCubit extends Cubit<CartState> {
         //   saleOrderLineList.add(saleOrderLine);
         // }
         // if ((element.pkQty ?? 0) > 0) {
-          SaleOrderLine saleOrderLine = element.copyWith(
-              priceUnit: element.priceUnit,
-              productUomQty: element.pkQty,
-              uomLine: element.pkUomLine);
-          saleOrderLineList.add(saleOrderLine);
+        SaleOrderLine saleOrderLine = element.copyWith(
+            priceUnit: element.priceUnit,
+            productUomQty: element.pkQty,
+            uomLine: element.pkUomLine);
+        saleOrderLineList.add(saleOrderLine);
         // }
       },
     );
@@ -373,97 +373,59 @@ class CartCubit extends Cubit<CartState> {
       ProductProduct? rewProduct =
           _productList.firstWhereOrNull((p) => p.id == element.rewardProductId);
       if (rewProduct != null) {
-        // CartOrderDetail detail = CartOrderDetail(
-        //   defaultId: DateTime.now().microsecondsSinceEpoch.toDouble(),
-        //   product: rewProduct,
-        //   saleType: SaleType.foc,
-        //   suggestTotalQty: 0,
-        //   bQty: 0,
-        //   lQty: element.rewardQty ?? 0,
-        //   lUomId: element.rewardUomId,
-        //   lUomName: element.rewardUomName,
-        //   bUomId: element.rewardUomId,
-        //   bUomName: element.rewardUomName,
-        //   defaultPrice: rewProduct.standardPrice ?? 0.0,
-        //   priceListItems: [],
-        //   balanceQty: rewProduct.refQty ?? 0.0,
-        // );
-        //
         UomLine? uomLine = rewProduct.uomLines
             ?.firstWhereOrNull((uom) => uom.uomId == element.rewardUomId);
-        SaleOrderLine detail = SaleOrderLine(
-          productId: rewProduct.id,
-          product: rewProduct,
-          pkQty: element.rewardQty ?? 0,
-          uomLine: rewProduct.uomLines
-              ?.firstWhereOrNull((element) => element.uomId == element.uomId),
-          pkUomLine: rewProduct.uomLines
-              ?.firstWhereOrNull((element) => element.uomId == element.uomId),
-          saleType: SaleType.foc,
-          priceUnit: rewProduct.listPrice ?? 0.0,
-          listPrice: rewProduct.listPrice ?? 0.0,
-          productName: rewProduct.name,
-          singlePKPrice: rewProduct.uomPrice(uomLine),
-          autoKey: DateTime.now().microsecondsSinceEpoch.toDouble(),
-        );
+        if (uomLine != null) {
+          SaleOrderLine detail = SaleOrderLine(
+            productId: rewProduct.id,
+            product: rewProduct,
+            pkQty: element.rewardQty ?? 0,
+            uomLine: rewProduct.uomLines
+                ?.firstWhereOrNull((element) => element.uomId == element.uomId),
+            pkUomLine: rewProduct.uomLines
+                ?.firstWhereOrNull((element) => element.uomId == element.uomId),
+            saleType: SaleType.foc,
+            priceUnit: rewProduct.rewardPrice(uomLine),
+            listPrice: rewProduct.rewardPrice(uomLine),
+            productName: rewProduct.name,
+            singlePKPrice: rewProduct.rewardPrice(uomLine),
+            autoKey: DateTime.now().microsecondsSinceEpoch.toDouble(),
+          );
 
+          cartOrderDetailLines.add(detail);
+
+          if (element.productId != null) {
+            ProductProduct? product = _productList
+                .firstWhereOrNull((p) => p.id == element.expenseProductId);
+
+            debugPrint('rwward ::: expense Product ${product?.name}');
+            if (product != null) {
+              UomLine? expUom = product.uomLines?.firstWhereOrNull(
+                  (element) => element.uomId == element.uomId);
+              SaleOrderLine expanseProduct = SaleOrderLine(
+                productId: product.id,
+                product: product,
+                pkQty: -1 * (element.rewardQty ?? 1),
+                uomLine: rewProduct.uomLines?.firstWhereOrNull(
+                    (element) => element.uomId == element.uomId),
+                pkUomLine: expUom,
+                saleType: SaleType.foc,
+                priceUnit: detail.singlePKPrice,
+                listPrice: product.standardPrice ?? 0.0,
+                productName: product.name,
+                singlePKPrice: detail.singlePKPrice,
+                autoKey: DateTime.now().microsecondsSinceEpoch.toDouble(),
+              );
+              cartOrderDetailLines.add(expanseProduct);
+            }
+          }
+        }
         //
         // if (uomLine != null) {
         //   detail.lPrice = rewProduct.rewardPrice(uomLine);
         //   detail.calculateSubtotal();
         // }
         //
-        cartOrderDetailLines.add(detail);
-
-        if (element.productId != null) {
-          ProductProduct? product = _productList
-              .firstWhereOrNull((p) => p.id == element.expenseProductId);
-          debugPrint('rwward ::: expense Product ${product?.name}');
-          if (product != null) {
-            // CartOrderDetail expanseProduct = CartOrderDetail(
-            //   product: product,
-            //   defaultId: DateTime.now().microsecondsSinceEpoch.toDouble(),
-            //   saleType: SaleType.foc,
-            //   suggestTotalQty: 0,
-            //   bQty: 0,
-            //   lQty: -1 * (element.rewardQty ?? 1),
-            //   lUomId: product.uomId,
-            //   lUomName: product.uomName,
-            //   bUomId: product.uomId,
-            //   bUomName: product.uomName,
-            //   defaultPrice: product.standardPrice ?? 0.0,
-            //   priceListItems: [],
-            //   balanceQty: element.product?.refQty ?? 0.0,
-            // );
-            SaleOrderLine expanseProduct = SaleOrderLine(
-              productId: product.id,
-              product: product,
-              pkQty: -1 * (element.rewardQty ?? 1),
-              uomLine: rewProduct.uomLines?.firstWhereOrNull(
-                  (element) => element.uomId == element.uomId),
-              pkUomLine: product.uomLines?.firstWhereOrNull(
-                  (element) => element.uomId == element.uomId),
-              saleType: SaleType.foc,
-              priceUnit: product.rewardPrice(uomLine!),
-              listPrice: product.standardPrice ?? 0.0,
-              productName: product.name,
-              singlePKPrice: detail.singlePKPrice,
-              autoKey: DateTime.now().microsecondsSinceEpoch.toDouble(),
-            );
-            // saleItem: SaleOrderLine(
-            //   productId: product.id,
-            //   productName: product.name,
-            //   pkQty: deliveryItem?.pkQty,
-            //   priceUnit: price,
-            //   autoKey: product.id?.toDouble(),
-            //   productUomQty: deliveryItem?.productUomQty ?? 0.0,
-            //   uomLine: newValue,
-            // ),
-            // expanseProduct.lPrice = detail.lPrice;
-            //
-            cartOrderDetailLines.add(expanseProduct);
-          }
-        }
       }
     });
 
