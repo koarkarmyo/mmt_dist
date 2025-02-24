@@ -473,7 +473,7 @@ class CartCubit extends Cubit<CartState> {
         SaleOrderLine cartOrderDetail = SaleOrderLine(
           productId: product.id,
           product: product,
-          pkQty: -1,
+          pkQty: 1,
           uomLine: product.uomLines
               ?.firstWhereOrNull((element) => element.uomId == element.uomId),
           pkUomLine: expUom,
@@ -488,15 +488,15 @@ class CartCubit extends Cubit<CartState> {
         //
         if (element.disType == DiscTypes.amount) {
           cartOrderDetail.singlePKPrice = element.amount ?? 0.0;
-          cartOrderDetail.listPrice = element.amount ?? 0.0;
-          cartOrderDetail.priceUnit = element.amount ?? 0.0;
+          cartOrderDetail.listPrice = (element.amount ?? 0.0) * -1;
+          cartOrderDetail.priceUnit = (element.amount ?? 0.0) * -1;
         } else {
           // final double total = saleItems.fold(
           //     0, (previousValue, element) => element.subtotal + previousValue);
           double disc = total * 0.01;
           cartOrderDetail.singlePKPrice = disc;
-          cartOrderDetail.listPrice = disc;
-          cartOrderDetail.priceUnit = disc;
+          cartOrderDetail.listPrice = disc * -1;
+          cartOrderDetail.priceUnit = disc * -1;
           cartOrderDetail.discountPercent = element.disPer ?? 0;
           // cartOrderDetail.discount = event.price;
         }

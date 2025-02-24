@@ -210,7 +210,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
           children: [
             _dataRow(title: "Subtotal", value: subtotal),
             _dataRow(title: "Discount total", value: _discountAmount),
-            _dataRow(title: "Total", value: subtotal - _discountAmount),
+            _dataRow(title: "Total", value: _discountAmount.isNegative ?  subtotal + _discountAmount : subtotal - _discountAmount),
           ],
         );
       },
