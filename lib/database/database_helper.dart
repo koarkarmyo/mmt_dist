@@ -159,6 +159,8 @@ class DatabaseHelper {
     await _createUomCategoryTable(db);
     await _createCustVisitTable(db);
     await _createPromotion(db);
+    // secondary sale
+    await _createSecondarySaleOrderHeaderTable(db);
   }
 
   _createCustVisitTable(Database db) async {
@@ -239,6 +241,68 @@ class DatabaseHelper {
         '${DBConstant.latitude} DOUBLE,'
         '${DBConstant.longitude} DOUBLE,'
         '${DBConstant.pickingState} TEXT'
+        ')');
+  }
+
+  _createSecondarySaleOrderHeaderTable(Database db) async {
+    await db.execute('CREATE TABLE ${DBConstant.secondarySaleOrderTable} '
+        '(${DBConstant.id} INTEGER,'
+        '${DBConstant.name} TEXT,'
+        '${DBConstant.partnerId} INTEGER,'
+        '${DBConstant.partnerName} TEXT,'
+        '${DBConstant.employeeId} INTEGER,'
+        '${DBConstant.vehicleId} INTEGER,'
+        '${DBConstant.warehouseId} INTEGER,'
+        '${DBConstant.warehouseName} TEXT,'
+        '${DBConstant.isUpload} INTEGER,'
+        '${DBConstant.amountTotal} DOUBLE,'
+        '${DBConstant.origin} TEXT,'
+        '${DBConstant.clientOrderRef} TEXT,'
+        '${DBConstant.reference} TEXT,'
+        '${DBConstant.isQuotation} TINYINT,'
+        '${DBConstant.state} TEXT,'
+        '${DBConstant.validityDate} TEXT,'
+        '${DBConstant.isExpired} INTEGER,'
+        '${DBConstant.requireSignature} INTEGER,'
+        '${DBConstant.requirePayment} TEXT,'
+        '${DBConstant.invoiceStatus} TEXT,'
+        '${DBConstant.note} TEXT,'
+        '${DBConstant.remark} TEXT,'
+        '${DBConstant.amountTax} TEXT,'
+        '${DBConstant.batchNo} INTEGER,'
+        '${DBConstant.batchName} TEXT,'
+        '${DBConstant.signature} TEXT,'
+        '${DBConstant.signedBy} TEXT,'
+        '${DBConstant.signedOn} TEXT,'
+        '${DBConstant.writeDate} TEXT,'
+        '${DBConstant.dateOrder} TEXT,'
+        '${DBConstant.pickingNo} TEXT,'
+        '${DBConstant.commitmentDate} TEXT,'
+        '${DBConstant.deliveryStatus} TEXT,'
+        '${DBConstant.fromDirectSale} INTEGER,'
+        '${DBConstant.saleOrderTypeId} INTEGER,'
+        '${DBConstant.saleOrderTypeName} TEXT,'
+        '${DBConstant.latitude} DOUBLE,'
+        '${DBConstant.longitude} DOUBLE,'
+        '${DBConstant.pickingState} TEXT'
+        ')');
+
+    await db.execute('CREATE TABLE ${DBConstant.saleOrderLineTable} '
+        '(${DBConstant.productId} INTEGER,'
+        '${DBConstant.id} INTEGER,'
+        '${DBConstant.productName} TEXT,'
+        '${DBConstant.orderNo} TEXT,'
+        '${DBConstant.orderId} INTEGER,'
+        '${DBConstant.saleType} TEXT,'
+        '${DBConstant.productUomQty} DOUBLE,'
+        '${DBConstant.productTemplateId} INTEGER,'
+        '${DBConstant.qtyDelivered} DOUBLE,'
+        '${DBConstant.qtyInvoiced} DOUBLE,'
+        '${DBConstant.productUom} INTEGER,'
+        '${DBConstant.productUomName} TEXT,'
+        '${DBConstant.priceUnit} DOUBLE,'
+        '${DBConstant.discount} DOUBLE,'
+        '${DBConstant.priceSubtotal} DOUBLE'
         ')');
   }
 

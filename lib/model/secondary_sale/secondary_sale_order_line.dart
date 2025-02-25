@@ -7,7 +7,7 @@ import '../../src/mmt_application.dart';
 import '../product/uom_lines.dart';
 import '../stock_picking/stock_picking_model.dart';
 
-class SaleOrderLine {
+class SecondarySaleOrderLine {
   int? id;
   String? orderNo;
   int? orderId;
@@ -31,7 +31,7 @@ class SaleOrderLine {
   String? productUomName;
   ProductProduct? product;
 
-  SaleOrderLine({
+  SecondarySaleOrderLine({
     this.productId,
     this.id,
     this.productName,
@@ -56,7 +56,7 @@ class SaleOrderLine {
     this.product,
   });
 
-  SaleOrderLine.fromJson(Map<String, dynamic> json) {
+  SecondarySaleOrderLine.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     productId = json['product_id'];
     orderNo = json['order_no'];
@@ -72,7 +72,7 @@ class SaleOrderLine {
     priceUnit = json['price_unit'];
   }
 
-  SaleOrderLine.fromJsonDB(Map<String, dynamic> json) {
+  SecondarySaleOrderLine.fromJsonDB(Map<String, dynamic> json) {
     id = json['id'];
     productId = json['product_id'];
     orderNo = json['order_no'];
@@ -163,7 +163,7 @@ class SaleOrderLine {
     return map;
   }
 
-  SaleOrderLine copyWith({
+  SecondarySaleOrderLine copyWith({
     int? id,
     String? orderNo,
     int? orderId,
@@ -188,7 +188,7 @@ class SaleOrderLine {
     ProductProduct? product,
     double? totalRef,
   }) {
-    return SaleOrderLine(
+    return SecondarySaleOrderLine(
       id: id ?? this.id,
       orderNo: orderNo ?? this.orderNo,
       productId: productId ?? this.productId,

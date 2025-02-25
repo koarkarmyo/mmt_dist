@@ -181,7 +181,7 @@ class _SaleOrderHistoryPageState extends State<SaleOrderHistoryPage> {
                                     debugPrint(element.toJson().toString());
                                   });
                                   context.pushTo(
-                                      route: RouteList.saleOrderPage,
+                                      route: RouteList.saleOrderDetailPage,
                                       args: {
                                         'customer':
                                             MMTApplication.currentCustomer,

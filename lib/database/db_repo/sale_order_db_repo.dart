@@ -119,7 +119,7 @@ class SaleOrderDBRepo extends BaseDBRepo {
     List<SaleOrderLine> lines = [];
 
     lineList.forEach((e) {
-      SaleOrderLine line = SaleOrderLine.fromJson(e);
+      SaleOrderLine line = SaleOrderLine.fromJsonDB(e);
       line.uomLine =
           uomLines.firstWhereOrNull((e) => e.uomId == line.productUom);
       lines.add(line);

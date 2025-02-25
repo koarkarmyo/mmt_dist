@@ -11,6 +11,7 @@ class RouteList {
   static const String customerVisitPage = '/cust_visit_report';
   static const String todayOrderPage = '/today_order';
   static const String saleOrderPage = '/sale_order_page';
+  static const String saleOrderDetailPage = '/sale_order_detail_page';
   static const String saleOrderAddProductPage = '/sale_order_add_product';
   static const String todayDeliveryPage = '/today_delivery';
   static const String customerDashboardPage = '/customer_dashboard';

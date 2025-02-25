@@ -41,6 +41,7 @@ import '../ui/loading/stock_loading_history_page.dart';
 import '../ui/product_report_page.dart';
 import '../ui/profile_page.dart';
 import '../ui/route_page.dart';
+import '../ui/sale_order/sale_order_detail_page.dart';
 import '../ui/sale_order/sku_product_page.dart';
 import '../ui/sale_order_history_page.dart';
 import '../ui/splash_page.dart';
@@ -110,6 +111,13 @@ Route<Map<String, dynamic>> generateRoute(RouteSettings routeSettings) {
           BlocProvider(
             create: (context) => SaleOrderHistoryCubit(),
             child: const SaleOrderHistoryPage(),
+          ));
+    case RouteList.saleOrderDetailPage:
+      return _buildPageRoute(
+          routeSettings,
+          BlocProvider(
+            create: (context) => CartCubit(),
+            child: const SaleOrderDetailPage(),
           ));
     case RouteList.saleOrderAddProductPage:
       return _buildPageRoute(

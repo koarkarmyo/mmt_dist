@@ -195,14 +195,8 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
         _discountAmount = 0.0;
         if (state.discItemList.isNotEmpty) {
           if ((state.discItemList.first.discountPercent ?? 0) > 0) {
-            _discountType.value = DiscountTypes.Percentage;
-            _discController.text =
-                (state.discItemList.first.discountPercent ?? 0.0).toQty();
             _discountAmount = state.discItemList.first.priceUnit ?? 0;
           } else {
-            _discountType.value = DiscountTypes.K;
-            _discController.text =
-                (state.discItemList.first.singlePKPrice ?? 0.0).toQty();
             _discountAmount = state.discItemList.first.priceUnit ?? 0;
           }
         }
@@ -210,7 +204,11 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
           children: [
             _dataRow(title: "Subtotal", value: subtotal),
             _dataRow(title: "Discount total", value: _discountAmount),
-            _dataRow(title: "Total", value: _discountAmount.isNegative ?  subtotal + _discountAmount : subtotal - _discountAmount),
+            _dataRow(
+                title: "Total",
+                value: _discountAmount.isNegative
+                    ? subtotal + _discountAmount
+                    : subtotal - _discountAmount),
           ],
         );
       },
@@ -258,19 +256,26 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
 
   Widget _discountWidget() {
     return BlocBuilder<CartCubit, CartState>(builder: (context, state) {
-      if (state.discItemList.isNotEmpty) {
-        if ((state.discItemList.first.discountPercent ?? 0) > 0) {
-          _discountType.value = DiscountTypes.Percentage;
-          _discController.text =
-              (state.discItemList.first.discountPercent ?? 0.0).toQty();
-          _discountAmount = state.discItemList.first.discountPercent ?? 0;
-        } else {
-          _discountType.value = DiscountTypes.K;
-          _discController.text =
-              (state.discItemList.first.singlePKPrice ?? 0.0).toQty();
-          _discountAmount = state.discItemList.first.discountPercent ?? 0;
-        }
-      }
+      WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback(
+        (timeStamp) {
+          _discController.text = '';
+          _discountAmount = 0.0;
+          if (state.discItemList.isNotEmpty) {
+            if ((state.discItemList.first.discountPercent ?? 0) > 0) {
+              _discountType.value = DiscountTypes.Percentage;
+              _discController.text =
+                  (state.discItemList.first.discountPercent ?? 0.0).toQty();
+              _discountAmount = state.discItemList.first.priceUnit ?? 0;
+            } else {
+              _discountType.value = DiscountTypes.K;
+              _discController.text =
+                  (state.discItemList.first.singlePKPrice ?? 0.0).toQty();
+              _discountAmount = state.discItemList.first.priceUnit ?? 0;
+            }
+          }
+        },
+      );
+
       return Container(
           margin: 16.allPadding,
           decoration:

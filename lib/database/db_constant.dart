@@ -41,6 +41,8 @@ class DBConstant {
   static const String customerProductTable = 'customer_products';
   static const String saleOrderTable = 'sale_order';
   static const String saleOrderLineTable = 'sale_order_line';
+  static const String secondarySaleOrderTable = 'secondary_sale_order';
+  static const String secondarySaleOrderLineTable = 'secondary_sale_order_line';
   static const String numberSeriesTable = 'number_series';
   static const String stockMoveTable = "stock_move";
   static const String pickingTypeTable = 'picking_types';
