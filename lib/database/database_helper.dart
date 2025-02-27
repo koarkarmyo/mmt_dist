@@ -54,9 +54,7 @@ class DatabaseHelper {
         where:
             '$where IN (${List.filled(wantDeleteRow.length, '?').join(',')})',
         whereArgs: wantDeleteRow);
-
-    print("Deleted rows : $affectedRow : $tableName");
-
+    //
     return affectedRow == wantDeleteRow.length;
   }
 
@@ -287,7 +285,7 @@ class DatabaseHelper {
         '${DBConstant.pickingState} TEXT'
         ')');
 
-    await db.execute('CREATE TABLE ${DBConstant.saleOrderLineTable} '
+    await db.execute('CREATE TABLE ${DBConstant.secondarySaleOrderLineTable} '
         '(${DBConstant.productId} INTEGER,'
         '${DBConstant.id} INTEGER,'
         '${DBConstant.productName} TEXT,'

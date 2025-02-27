@@ -11,22 +11,22 @@ import 'package:mmt_mobile/src/extension/widget_extension.dart';
 import 'package:mmt_mobile/src/mmt_application.dart';
 import 'package:mmt_mobile/utils/date_time_utils.dart';
 
-import '../../model/secondary_sale/secondary_sale_order.dart';
+import '../../model/sale_order/sale_order_6/sale_order.dart';
 import '../../src/const_string.dart';
 import '../../src/enum.dart';
 import '../../src/style/app_color.dart';
 import '../../sync/sync_utils/main_sync_process.dart';
 
-class SaleSummaryPage extends StatefulWidget {
-  final SecondarySaleOrder? saleOrder;
+class SecondarySaleSummaryPage extends StatefulWidget {
+  final SaleOrder? saleOrder;
 
-  const SaleSummaryPage({super.key, this.saleOrder});
+  const SecondarySaleSummaryPage({super.key, this.saleOrder});
 
   @override
-  State<SaleSummaryPage> createState() => _SaleSummaryPageState();
+  State<SecondarySaleSummaryPage> createState() => _SecondarySaleSummaryPageState();
 }
 
-class _SaleSummaryPageState extends State<SaleSummaryPage> {
+class _SecondarySaleSummaryPageState extends State<SecondarySaleSummaryPage> {
   final ValueNotifier<DateTime?> _deliveryDate = ValueNotifier(DateTime.now());
   late CartCubit _cartCubit;
   late SaleOrderCubit _saleOrderCubit;
@@ -88,7 +88,7 @@ class _SaleSummaryPageState extends State<SaleSummaryPage> {
                   debugPrint('summary:::::${element.toJson()}');
                 });
                 //
-                SecondarySaleOrder saleOrder = SecondarySaleOrder(
+                SaleOrder saleOrder = SaleOrder(
                   partnerId: MMTApplication.currentCustomer?.id,
                   partnerName: MMTApplication.currentCustomer?.name,
                   amountTotal: _total - _discountAmount,
